@@ -1,2 +1,3 @@
-# simpledcc-arduino
-DCC decoders for railway modelling (trains and accessories) based on Arduino
+# Loco.Engineering Simple DCC decoders | Version for Arduino
+
+
