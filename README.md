@@ -19,11 +19,35 @@ The main differences are:
 ## Getting Started
 
 1. Order a [Loco.Engineering](https://loco.engineering) decoder or build one yourself.
-2. Connect the decoder to wires or a track with DCC.
-3. Open the Wi-Fi networks on your phone, tablet, or laptop and connect to a network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you are using customized hardware.
-4. Open http://loco.local in your browser.
-5. If your DCC command station is sending messages to the track/wires the decoder is connected to, you should see them in your browser. Use filters to hide messages you don't need.
-6. Click "Add action" next to a DCC packet to add actions that the decoder should perform when that packet is received. For example, turn on red and green LEDs on a semaphore. The decoder has marked outputs where you connect wires from accessories/trains/vehicles, so you know that a red LED on a semaphore is connected to output number 5, etc.
+2. (Optional for Loco.Engineering decoders, but required for customized decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload firmware to the decoder (follow steps in How to build and upload)
+3. Connect the decoder to wires or a track with DCC.
+4. Open the Wi-Fi networks on your phone, tablet, or laptop and connect to a network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you are using customized hardware.
+5. Open http://loco.local in your browser.
+6. If your DCC command station is sending messages to the track/wires the decoder is connected to, you should see them in your browser. Use filters to hide messages you don't need.
+7. Click "Add action" next to a DCC packet to add actions that the decoder should perform when that packet is received. For example, turn on red and green LEDs on a semaphore. The decoder has marked outputs where you connect wires from accessories/trains/vehicles, so you know that a red LED on a semaphore is connected to output number 5, etc.
+
+
+## How to build and upload
+
+- Install Arduino IDE (we test with Arduino IDE 2.3.2)
+- Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0)
+- Change configuration in config.h if required
+- (Optional) If you change files in the simpledcc-arduino/data folder, you should recreate and upload SPIFFS to your board (for Arduino 2.2.1 - https://github.com/espx-cz/arduino-spiffs-upload?tab=readme-ov-file, Arduino 1.x.x - https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/)
+- Build and upload the firmware
+
+
+## I don't see any logs
+
+In case if you use Loco.Engineering decoder and don't see any logs in Arduino IDE, use the follow settings (Top Menu -> Tools -> ...)
+
+- Select the ESP32-S3 DevKit board
+- Select the USB port
+- Enable CDC on Boot (IDE Board Menu)
+- Select "Upload Mode" as "UART0 / Hardware CDC"
+- Select "USB Mode" as "Hardware CDC and JTAG"
+- Select "JTAG Adapter" as "Integrated USB JTAG"
+- Select and load the Sketch that will be debugged
+- Build and Upload it
 
 ## Contact Us
 

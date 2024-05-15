@@ -1,7 +1,13 @@
-#include "NmraDcc.h"
+#include "SPIFFS.h"
+#include "config.h"
 
-// ESP32 pin that receives DCC Signal 
-#define DCC_PIN     17
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
+
+#include "src/dcc_reader/NmraDcc.h"
+#include "src/network/webserver.h"
 
 NmraDcc  Dcc ;
 
@@ -102,6 +108,15 @@ void notifyDccMsg( DCC_MSG * Msg)
   Serial.println();
 }
 
+// Initialize SPIFFS
+void initSPIFFS() {
+  if (!SPIFFS.begin(true)) {
+    Serial.println("An error has occurred while mounting SPIFFS");
+  }
+  Serial.println("SPIFFS mounted successfully");
+}
+
+
 void setup()
 {
   Serial.begin(115200);
@@ -112,10 +127,13 @@ void setup()
   Dcc.init( MAN_ID_DIY, 0, 0, 0 );
   Serial.print("DCC reader is ready...");
 
+  initSPIFFS();
+  setup_webserver();
+
 }
 
 void loop()
 {
-
+  loop_webserver();
   Dcc.process();
 }
