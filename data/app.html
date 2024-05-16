@@ -1,12 +1,280 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Loco.Engineering App</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loco.Engineering Decoder Settings</title>
+    <style>
+        * {
+    font-family: courier;
+  } 
+  h1{
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 40px;
+        padding-bottom: 20px;
+        max-width: 620px;
+
+        font-size:25px;
+        font-weight: 800;
+    }
+
+    .section_header{
+        margin-bottom: 5px;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .section_hint{
+        font-size: 13px;
+        font-weight: 300;
+        margin-bottom: 35px;
+    }
+    
+        a {text-decoration: none; }
+
+        input[type=text], select {
+          width: 100%;
+          padding: 12px 20px;
+          margin: 8px 0;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }   
+        
+        .wifi_set_cont {
+          border-radius: 20px;
+          background-color: #f2f2f2;
+          padding: 40px;
+          max-width: 820px;
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: 30px;
+          text-align: left;
+        }
+
+        .s_wifi{
+            width: 160px;
+            border-radius: 20px;
+            height: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            color: white;
+            border-style: none;
+            background-color: black;
+            font-weight: 700;
+            display: block;
+            margin-top: 30px;
+            font-size: 12px;
+        }
+        .s_wifi:hover{
+            cursor: pointer;
+        }
+
+        .table_btn{
+            width: 160px;
+            border-radius: 20px;
+            height: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            color: white;
+            border-style: none;
+            background-color: black;
+            font-weight: 700;
+            display: block;
+            font-size: 12px;
+        }
+        .table_btn:hover{
+            cursor: pointer;
+        }
+
+        .hint{
+            margin-bottom: 10px;
+        }
+
+
+        .common_table {
+  border-collapse: collapse;
+  width: 100%;
+  max-height: 400px;
+}
+
+.common_table td, #common_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.common_table td {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.common_table tr:nth-child(even){background-color: #f2f2f2;}
+
+.common_table tr:hover {background-color: #eeeeee; cursor: pointer;}
+
+.common_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #eeeeee;
+}
+
+.tableFixHead {
+        overflow-y: auto; /* make the table scrollable if height is more than 200 px  */
+        max-height: 300px; /* gives an initial height of 200px to the table */
+      }
+      .tableFixHead thead th {
+        position: sticky; /* make the table heads sticky */
+        top: 0px; /* table head will be placed from the top of the table and sticks to it */
+      }
+
+        </style>
     </head>
-    <body>
-        <div>
-            <h1>Hey</h1>
-        </div>
-    </body>
+<body>
+    <h1>SimpleDCC/WCC Decoder Settings</h1>
+
+    <div class="wifi_set_cont">
+        <h3 class="section_header">Settings</h3>
+        <p class="section_hint">Type in a decoder address that you want to use with this decoder.
+            It should be the same address as you use to send DCC commands from your command station to this decoder. For example, 2 or 5 or 110, etc.
+            <br>
+            <br>
+            Leave blank if you want to see all DCC packets in the list below or you don't use DCC.</p>
+          <input type="text" id="ssid" placeholder="Decoder address, for example, 2 or 5 or 122 etc">
+          <button id="s_wifi" class="s_wifi">Save</button>
+      </div>
+
+      <div class="wifi_set_cont">
+        <h3 class="section_header">DCC packets</h3>
+        <p class="section_hint">DCC packets filtered by the decoder address or all DCC packets received by the decoder if the decoder address isn't specified</p>
+
+        <div class="tableFixHead">
+
+        <table id="dcc_packets" class="common_table">
+            <thead>
+            <tr><th width="40">ADDRESS</th><th width="100">TYPE</th><th>DESCRIPTION</th><th width="100">RAW PACKET</th><th width="80"></th></tr>
+        </thead>
+        <tbody>
+            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td><button id="table_btn" class="table_btn">Add action</button>   </td></tr>
+            <tr class="service_cell"><td>1020</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+<div class="wifi_set_cont">
+    <h3 class="section_header">WCC messages</h3>
+    <p class="section_hint">Messages received from other decoders over WCC protocol</p>
+
+    <div class="tableFixHead">
+
+    <table id="dcc_packets" class="common_table">
+        <thead>
+        <tr><th width="40">ADDRESS</th><th width="100">TYPE</th><th>DESCRIPTION</th><th width="100">RAW PACKET</th><th width="80"></th></tr>
+    </thead>
+    <tbody>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td><button id="table_btn" class="table_btn">Add action</button>   </td></tr>
+        <tr class="service_cell"><td>1020</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+    </tbody>
+
+    </table>
+</div>
+</div>
+
+
+<div class="wifi_set_cont">
+    <h3 class="section_header">Actions</h3>
+    <p class="section_hint">What the decoder should do when a particular DCC packet or WCC message is received</p>
+    <div class="tableFixHead">
+
+    <table id="dcc_packets" class="common_table">
+        <thead>
+        <tr><th width="40">ADDRESS</th><th width="100">TYPE</th><th>DESCRIPTION</th><th width="100">RAW PACKET</th><th width="80"></th></tr>
+    </thead>
+    <tbody>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td><button id="table_btn" class="table_btn">Add action</button>   </td></tr>
+        <tr class="service_cell"><td>1020</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+    </tbody>
+
+    </table>
+</div>
+</div>
+
+
+    <script>
+        //var gateway = `ws://${window.location.hostname}/ws`;
+        var gateway = `ws://192.168.4.1/ws`;
+        var websocket;
+        window.addEventListener('load', onLoad);
+        function initWebSocket() {
+            console.log('Trying to open a WebSocket connection...');
+            websocket = new WebSocket(gateway);
+            websocket.onopen = onOpen;
+            websocket.onclose = onClose;
+            websocket.onmessage = onMessage;
+        }
+        function onOpen(event) {
+            console.log('Connection opened');
+        }
+        function onClose(event) {
+            console.log('Connection closed');
+            setTimeout(initWebSocket, 2000);
+        }
+        async function onMessage(event) {
+
+            const buffer = new Uint8Array(await event.data.arrayBuffer());
+            console.log("New message " + buffer.length);
+            for (var i=0; i < buffer.length; i++) {
+                console.log(buffer[i]);
+            }
+            console.log("=================  ")
+        }
+        function onLoad(event) {
+            initWebSocket();
+            initButton();
+        }
+        function initButton() {
+            document.getElementById('s_wifi').addEventListener('click', connectToWiFi);
+        }
+        function connectToWiFi() {
+            let ssid = document.getElementById('ssid').value;
+            let passwd =  document.getElementById('passwd').value;
+            let msg_ind = 0;
+            var wf_set = [];
+            wf_set[msg_ind++] = 2; //message type
+            wf_set[msg_ind++] = ssid.length; // ssid length
+            for (let i =0; i < ssid.length; ++i){
+                wf_set[msg_ind++] = ssid.charCodeAt(i);
+            }
+            wf_set[msg_ind++] = passwd.length; // passwd length
+            for (let i =0; i < passwd.length; ++i){
+                wf_set[msg_ind++] = passwd.charCodeAt(i);
+            }
+            let msg = new Uint8Array(wf_set);
+            console.log(msg);
+            websocket.send(msg);
+        }
+    </script>
+</body>
 </html>
