@@ -15,6 +15,7 @@ For instance, if you want to evaluate a new level crossing signal before install
 The main differences are:
 - You don't need to understand how DCC works because the decoder's logic can be set in the web app without using any additional tools for programming.
 - You don't need to study lengthy manuals, as SimpleDCC performs actions (e.g., changing semaphore aspects, turning lights on/off) without strictly adhering to DCC protocols, which often have many unclear parts. You can see all messages received by a SimpleDCC decoder in your browser (with options to group and filter them by various values), and define what a decoder should do based on a received packet. From our experience, this greatly simplifies working with DCC.
+- SimpleDCC decoders work with virtually all command stations and DCC protocols (mfx support on our roadmap), if you don't know the format of a DCC packet you still can assign actions to DCC packets. For example, Märklin Mobile Station sends accessory DCC packets in non-standard format and most accessory decoders don't understand them but with SimpleDCC you can assign actions to a DCC packet as is without understanding it format.
 
 ## Getting Started
 

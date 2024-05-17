@@ -31,6 +31,13 @@
         font-weight: 300;
         margin-bottom: 35px;
     }
+
+    .no_data_hint{
+        font-size: 13px;
+        font-weight: 300;
+        text-align: center;
+        margin-top: 30px;
+    }
     
         a {text-decoration: none; }
 
@@ -93,6 +100,7 @@
         .hint{
             margin-bottom: 10px;
         }
+
 
 
         .common_table {
@@ -158,21 +166,18 @@
         <h3 class="section_header">DCC packets</h3>
         <p class="section_hint">DCC packets filtered by the decoder address or all DCC packets received by the decoder if the decoder address isn't specified</p>
 
-        <div class="tableFixHead">
+        <div class="tableFixHead" id="dcc_packets_table_container" >
 
-        <table id="dcc_packets" class="common_table">
+        <table id="dcc_packets_table" class="common_table">
             <thead>
             <tr><th width="40">ADDRESS</th><th width="100">TYPE</th><th>DESCRIPTION</th><th width="100">RAW PACKET</th><th width="80"></th></tr>
         </thead>
-        <tbody>
-            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td><button id="table_btn" class="table_btn">Add action</button>   </td></tr>
-            <tr class="service_cell"><td>1020</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
-            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
-            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
-            <tr class="service_cell"><td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>4 23 10</td><td></td></tr>
+        <tbody id="dcc_packets_tbody">
         </tbody>
 
         </table>
+        <p class="no_data_hint" id="no_dcc_packets_hint">No DCC packets received yet</p>
+
     </div>
 </div>
 
@@ -245,10 +250,24 @@
 
             const buffer = new Uint8Array(await event.data.arrayBuffer());
             console.log("New message " + buffer.length);
+            var raw_packet = "";
             for (var i=0; i < buffer.length; i++) {
                 console.log(buffer[i]);
+                raw_packet += buffer[i] + " ";
             }
-            console.log("=================  ")
+            console.log("=================  ");
+
+        document.querySelector('#no_dcc_packets_hint').style.display = "none";
+
+         var tr_node = document.createElement('tr');
+         tr_node.classList.add("service_cell");
+         tr_node.innerHTML =  `<td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>${raw_packet}</td><td><button id="table_btn" class="table_btn">Add action</button></td>`;
+         
+         document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
+
+         let dcc_packets_table_el = document.querySelector('#dcc_packets_table_container');
+         dcc_packets_table_el.scrollTop = dcc_packets_table_el.scrollHeight;
+
         }
         function onLoad(event) {
             initWebSocket();

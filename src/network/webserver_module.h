@@ -1,7 +1,3 @@
-// Replace with your network credentials
-const char *ssid = "loco-12345";
-const char *password = "12345678";
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
@@ -24,9 +20,11 @@ void initWiFi()
   }
 }
 
-void notifyClients(uint8_t *msg, size_t len)
+void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_count)
 {
-  ws.binaryAll(msg, len);
+  const size_t dcc_packet_size = 5;//sizeof(dcc_packet);
+  uint8_t msg_to_send[dcc_packet_size * MAX_CACHED_DCC_PACKETS];
+ // ws.binaryAll(msg, len);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
@@ -94,5 +92,5 @@ void setup_webserver()
 
 void loop_webserver()
 {
-  ws.cleanupClients();
+  //ws.cleanupClients();
 }
