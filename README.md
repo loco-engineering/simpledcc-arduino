@@ -1,3 +1,5 @@
+#### Note: The project is in active development
+
 # SimpleDCC Arduino
 
 License: Attribution-NonCommercial 4.0 International

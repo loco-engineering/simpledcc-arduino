@@ -2,8 +2,8 @@
 
 // GPIO that receives DCC Signal 
 #define DCC_PIN     17
-#define MAX_CACHED_DCC_PACKETS 40
+#define MAX_CACHED_DCC_PACKETS 100
 
 // Replace with your network credentials
 #define WIFI_SSID "loco12345"
-#define WIFI_PASSWORD "12345678"
+#define WIFI_PASSWORD "asdf1234"

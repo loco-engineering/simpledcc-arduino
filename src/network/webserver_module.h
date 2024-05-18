@@ -33,7 +33,10 @@ void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_
   for (int i = 0; i < cached_packets_count; ++i){
     struct dcc_packet cached_packet = cached_packets[i];
     msg_to_send[msg_index++] = cached_packet.packet_type;
+    msg_to_send[msg_index++] = cached_packet.address[0];
+    msg_to_send[msg_index++] = cached_packet.address[1];
     msg_to_send[msg_index++] = cached_packet.raw_packet_length;
+
     for (int k = 0; k < cached_packet.raw_packet_length; ++k){
       msg_to_send[msg_index++] = cached_packet.raw_packet[k];
     }

@@ -250,20 +250,70 @@
 
             const buffer = new Uint8Array(await event.data.arrayBuffer());
             console.log("New message " + buffer.length);
-            var raw_packet = "";
-            for (var i=0; i < buffer.length; i++) {
-                console.log(buffer[i]);
-                raw_packet += buffer[i] + " ";
+
+            //Parse the message from a decoder
+            //Get a type
+            var msg_index = 0;
+            let msg_type = buffer[msg_index++];
+
+            if (msg_type == 4){
+                //This a message with DCC packets
+                //Get the amount of DCC packets
+                let dcc_packets_amount = buffer[msg_index++];
+                for (var i = 0; i < dcc_packets_amount; i++){
+                    let packet_type = buffer[msg_index++];
+                    var packet_type_str = "Unknown";
+                    var description_str = "";
+
+                    let adr_1 = buffer[msg_index++];
+                    let adr_2 = buffer[msg_index++];
+
+                    let address = ( ( ( adr_2 & 0xFF) << 8) | ( adr_1 & 0xFF) );
+                    let raw_packet_length = buffer[msg_index++];
+
+                    var raw_packet = [];
+                    var raw_packet_str = "";
+
+                    for (var k = 0; k < raw_packet_length; k++){
+                        raw_packet[k] = buffer[msg_index++];
+                        raw_packet_str += toBinString(Uint8Array.from([raw_packet[k]])) + " ";
+                    }
+
+                    let user_data_length = buffer[msg_index++];
+
+                    var user_data = [];
+                    for (var k = 0; k < user_data_length; k++){
+                        user_data[k] = buffer[msg_index++];
+
+                    }
+
+                    switch (packet_type) {
+                        case 0:
+                            description_str = "No description available";
+                            address = "-";
+                            break;
+                        case 1:
+                            packet_type_str = "Speed";
+                            description_str = `Speed: ${user_data[0]} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    //Add a cell to the DCC packets list
+                    var tr_node = document.createElement('tr');
+                    tr_node.classList.add("service_cell");
+                    tr_node.innerHTML =  `<td>${address}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><button id="table_btn" class="table_btn">Add action</button></td>`;
+                    
+                    document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
+
+
+                }
+
             }
-            console.log("=================  ");
 
-        document.querySelector('#no_dcc_packets_hint').style.display = "none";
-
-         var tr_node = document.createElement('tr');
-         tr_node.classList.add("service_cell");
-         tr_node.innerHTML =  `<td>4</td><td>Speed</td><td>Speed: 20 Direction: back</td><td>${raw_packet}</td><td><button id="table_btn" class="table_btn">Add action</button></td>`;
-         
-         document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
+            document.querySelector('#no_dcc_packets_hint').style.display = "none";
 
          //Autoscoll
          //let dcc_packets_table_el = document.querySelector('#dcc_packets_table_container');
@@ -295,6 +345,9 @@
             console.log(msg);
             websocket.send(msg);
         }
+
+        const toBinString = (bytes) =>
+            bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '');
     </script>
 </body>
 </html>
