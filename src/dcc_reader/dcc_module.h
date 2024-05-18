@@ -38,6 +38,17 @@ void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint
   Serial.print("  Function Group: ");
   Serial.print(FuncGrp, DEC);
 
+  // Set packet type
+  cached_packets[cached_packets_count - 1].packet_type = 2;
+  // Save address
+  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
+  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+  // Save user data
+  cached_packets[cached_packets_count - 1].user_data[0] = FuncGrp;
+  cached_packets[cached_packets_count - 1].user_data[1] = FuncState;
+  cached_packets[cached_packets_count - 1].user_data_length = 2;
+
+
   switch (FuncGrp)
   {
 #ifdef NMRA_DCC_ENABLE_14_SPEED_STEP_MODE
