@@ -5,5 +5,5 @@
 #define MAX_CACHED_DCC_PACKETS 40
 
 // Replace with your network credentials
-const char *ssid = "loco-12345";
-const char *password = "12345678";
+#define WIFI_SSID "loco12345"
+#define WIFI_PASSWORD "12345678"

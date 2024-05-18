@@ -7,7 +7,7 @@ AsyncWebSocket ws("/ws");
 // Initialize WiFi
 void initWiFi()
 {
-  WiFi.softAP(ssid, password);
+  WiFi.softAP(WIFI_SSID, WIFI_PASSWORD);
 
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -22,9 +22,27 @@ void initWiFi()
 
 void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_count)
 {
-  const size_t dcc_packet_size = 5;//sizeof(dcc_packet);
+  const size_t dcc_packet_size = sizeof(dcc_packet);
   uint8_t msg_to_send[dcc_packet_size * MAX_CACHED_DCC_PACKETS];
- // ws.binaryAll(msg, len);
+  //Set message type
+  msg_to_send[0] = 4; //4 - a message with DCC packets
+  msg_to_send[1] = cached_packets_count; //amount of DCC packates in the message
+  uint16_t msg_index = 2;
+
+  //Iterate DCC packets in cached_packets and add to a websockets message
+  for (int i = 0; i < cached_packets_count; ++i){
+    struct dcc_packet cached_packet = cached_packets[i];
+    msg_to_send[msg_index++] = cached_packet.packet_type;
+    msg_to_send[msg_index++] = cached_packet.raw_packet_length;
+    for (int k = 0; k < cached_packet.raw_packet_length; ++k){
+      msg_to_send[msg_index++] = cached_packet.raw_packet[k];
+    }
+    msg_to_send[msg_index++] = cached_packet.user_data_length;
+    for (int k = 0; k < cached_packet.user_data_length; ++k){
+      msg_to_send[msg_index++] = cached_packet.user_data[k];
+    }
+  }
+  ws.binaryAll(msg_to_send, msg_index);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
