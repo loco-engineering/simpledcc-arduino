@@ -48,7 +48,6 @@ void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint
   cached_packets[cached_packets_count - 1].user_data[1] = FuncState;
   cached_packets[cached_packets_count - 1].user_data_length = 2;
 
-
   switch (FuncGrp)
   {
 #ifdef NMRA_DCC_ENABLE_14_SPEED_STEP_MODE
@@ -154,8 +153,7 @@ void notifyDccMsg(DCC_MSG *Msg)
   // Reset the DCC packet type to undefined
   cached_packets[cached_packets_count].packet_type = 0;
 
-    ++cached_packets_count;
-
+  ++cached_packets_count;
 }
 
 void setup_dcc_module()

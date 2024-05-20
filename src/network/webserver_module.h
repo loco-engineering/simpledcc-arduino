@@ -24,24 +24,27 @@ void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_
 {
   const size_t dcc_packet_size = sizeof(dcc_packet);
   uint8_t msg_to_send[dcc_packet_size * MAX_CACHED_DCC_PACKETS];
-  //Set message type
-  msg_to_send[0] = 4; //4 - a message with DCC packets
-  msg_to_send[1] = cached_packets_count; //amount of DCC packates in the message
+  // Set message type
+  msg_to_send[0] = 4;                    // 4 - a message with DCC packets
+  msg_to_send[1] = cached_packets_count; // amount of DCC packates in the message
   uint16_t msg_index = 2;
 
-  //Iterate DCC packets in cached_packets and add to a websockets message
-  for (int i = 0; i < cached_packets_count; ++i){
+  // Iterate DCC packets in cached_packets and add to a websockets message
+  for (int i = 0; i < cached_packets_count; ++i)
+  {
     struct dcc_packet cached_packet = cached_packets[i];
     msg_to_send[msg_index++] = cached_packet.packet_type;
     msg_to_send[msg_index++] = cached_packet.address[0];
     msg_to_send[msg_index++] = cached_packet.address[1];
     msg_to_send[msg_index++] = cached_packet.raw_packet_length;
 
-    for (int k = 0; k < cached_packet.raw_packet_length; ++k){
+    for (int k = 0; k < cached_packet.raw_packet_length; ++k)
+    {
       msg_to_send[msg_index++] = cached_packet.raw_packet[k];
     }
     msg_to_send[msg_index++] = cached_packet.user_data_length;
-    for (int k = 0; k < cached_packet.user_data_length; ++k){
+    for (int k = 0; k < cached_packet.user_data_length; ++k)
+    {
       msg_to_send[msg_index++] = cached_packet.user_data[k];
     }
   }
@@ -53,9 +56,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
   if (info->final && info->index == 0 && info->len == len)
   {
-     data[len] = 0;
-     String message = (char*)data;
-     Serial.print (message);
+    data[len] = 0;
+    String message = (char *)data;
+    Serial.print(message);
     //  Check if the message is "getReadings"
     // if (strcmp((char*)data, "getReadings") == 0) {
     // if it is, send current sensor readings
@@ -68,17 +71,17 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
-  char log_buffer[100]; //Used for printing messages with formatting
+  char log_buffer[100]; // Used for printing messages with formatting
 
   switch (type)
   {
   case WS_EVT_CONNECT:
-    sprintf (log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-    Serial.print (log_buffer);
+    sprintf(log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+    Serial.print(log_buffer);
     break;
   case WS_EVT_DISCONNECT:
-    sprintf (log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-    Serial.print (log_buffer);
+    sprintf(log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+    Serial.print(log_buffer);
     break;
   case WS_EVT_DATA:
     handleWebSocketMessage(arg, data, len);
@@ -113,5 +116,5 @@ void setup_webserver()
 
 void loop_webserver()
 {
-  //ws.cleanupClients();
+  // ws.cleanupClients();
 }

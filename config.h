@@ -4,6 +4,9 @@
 #define DCC_PIN     17
 #define MAX_CACHED_DCC_PACKETS 100
 
+//LEDs
+#define MAX_LED_CONNECTIONS 20
+
 // Replace with your network credentials
 #define WIFI_SSID "loco12345"
 #define WIFI_PASSWORD "asdf1234"
