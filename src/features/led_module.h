@@ -39,7 +39,7 @@ void add_led_connection(uint8_t type, uint8_t led_pin, float pwm, unsigned long 
     {
         led_connections[led_connections_count].is_on = false;
     }
-    led_connections[led_initconnections_count].next_on = millis() + start_delay;
+    led_connections[led_connections_count].next_on = millis() + start_delay;
     led_connections[led_connections_count].next_off = millis() + on_duration;
 
     ++led_connections_count;

@@ -8,8 +8,16 @@
 #include <ESPmDNS.h>
 #include <PCA9955B.h>
 
+#include <SPI.h>
+#include <MFRC522v2.h>
+#include <MFRC522DriverSPI.h>
+//#include <MFRC522DriverI2C.h>
+#include <MFRC522DriverPinSimple.h>
+#include <MFRC522Debug.h>
+
 #include "src/dcc_reader/dcc_module.h"
 #include "src/features/led_module.h"
+#include "src/features/nfc_module.h"
 
 // Initialize SPIFFS
 void initSPIFFS()
@@ -35,10 +43,10 @@ void setup()
   initSPIFFS();
   setup_webserver();
   setup_led();
-
+  setup_nfc();
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
-  add_led_connection(1, 1, 0.5, 1000, 1000, 0);
-  add_led_connection(1, 2, 0.5, 1000, 1000, 1000);
+  //add_led_connection(1, 1, 0.5, 1000, 1000, 0);
+  //add_led_connection(1, 2, 0.5, 1000, 1000, 1000);
 }
 
 void loop()
@@ -46,4 +54,5 @@ void loop()
   loop_dcc_module();
   loop_webserver();
   loop_led();
+  loop_nfc();
 }
