@@ -23,7 +23,7 @@ The main differences are:
 
 ## Getting Started
 
-1. Order a [Loco.Engineering](https://loco.engineering) decoder or build one yourself.
+1. Order a [Loco.Engineering](https://loco.engineering) decoder or build one yourself (you can start with ESP32S3 development board if you want to control from the web browser only).
 2. (Optional for Loco.Engineering decoders, but required for customized decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload firmware to the decoder (follow steps in How to build and upload)
 3. Connect the decoder to wires or a track with DCC.
 4. Open the Wi-Fi networks on your phone, tablet, or laptop and connect to a network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you are using customized hardware.
@@ -35,7 +35,7 @@ The main differences are:
 ## How to build and upload
 
 - Install Arduino IDE (we test with Arduino IDE 2.3.2)
-- Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522v2 (tested with 2.0.4). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
+- Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
 - Change configuration in config.h if required
 - (Optional) If you change files in the simpledcc-arduino/data folder, you should recreate and upload SPIFFS to your board (for Arduino 2.2.1 - https://github.com/espx-cz/arduino-spiffs-upload?tab=readme-ov-file, Arduino 1.x.x - https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/)
 - Build and upload the firmware
