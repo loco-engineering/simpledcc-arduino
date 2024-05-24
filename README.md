@@ -38,6 +38,7 @@ The main differences are:
 - Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
 - Change configuration in config.h if required
 - (Optional) If you change files in the simpledcc-arduino/data folder, you should recreate and upload SPIFFS to your board (for Arduino 2.2.1 - https://github.com/espx-cz/arduino-spiffs-upload?tab=readme-ov-file, Arduino 1.x.x - https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/)
+- (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose
 - Build and upload the firmware
 
 
