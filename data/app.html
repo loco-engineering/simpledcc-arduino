@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Loco.Engineering Decoder Settings</title>
+
+    <link rel="stylesheet" href="./base-min.css">
+    <link rel="stylesheet" href="./grids-min.css">
+    <link rel="stylesheet" href="./grids-responsive-min.css">
+    <script type="module" src="./action-modal.js"></script>
+
     <style>
         * {
             font-family: courier;
@@ -80,9 +86,31 @@
             display: block;
             margin-top: 30px;
             font-size: 12px;
+            margin-left: 10px;</div>
+            margin-right: 10px;
         }
 
         .s_wifi:hover {
+            cursor: pointer;
+        }
+
+        .new_btn {
+            width: 100px;
+            border-radius: 20px;
+            height: 25px;
+            line-height: 25px;
+            margin-left: auto;
+            margin-right: auto;
+            color: black;
+            border-style: none;
+            background-color: #e9c46a;
+            font-weight: 700;
+            margin-left: 20px;
+            font-size: 11px;
+
+        }
+
+        .new_btn:hover {
             cursor: pointer;
         }
 
@@ -163,11 +191,65 @@
             top: 0px;
             /* table head will be placed from the top of the table and sticks to it */
         }
+
+        /*Modal*/
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fdfdfd;
+  margin: 10% auto; /* 15% from the top and centered */
+  padding-top: 30px;
+  padding-bottom: 30px;
+  padding-left: 20px;
+  padding-right: 20px;
+  min-width: 350px; /* Could be more or less, depending on screen size */
+  max-width: 400px; /* Could be more or less, depending on screen size */
+  border-radius: 10px;
+}
+
+.modal-content-container {
+  max-width: 350px;
+  min-width: 300px;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* The Close Button */
+.modal-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
     </style>
 </head>
 
 <body>
-    <h1>SimpleDCC/WCC Decoder Settings</h1>
+    <h1>Wireless Command Control (WCC)/SimpleDCC Decoder Settings</h1>
 
     <div class="wifi_set_cont">
         <h3 class="section_header">Settings</h3>
@@ -176,10 +258,35 @@
             example, 2 or 5 or 110, etc.
             <br>
             <br>
-            Leave blank if you want to see all DCC packets in the list below or you don't use DCC.
+            Press on "Skip" if you want to see all DCC packets in the list below or you don't use DCC.
         </p>
         <input type="text" id="ssid" placeholder="Decoder address, for example, 2 or 5 or 122 etc">
-        <button id="s_wifi" class="s_wifi">Save</button>
+        <div style="display: flex; width:300px; margin: auto;"><button id="s_wifi" class="s_wifi">Save</button>
+        <button id="s_wifi" class="s_wifi">Hide</button></div>
+    </div>
+
+    <div class="wifi_set_cont">
+        <h3 class="section_header">Actions<button id="new_action_btn" class="new_btn">Add action</button>
+        </h3>
+
+        <p class="section_hint">What the decoder should do when a particular DCC packet or WCC message is received</p>
+        <div class="tableFixHead">
+
+            <table id="dcc_packets" class="common_table">
+                <thead>
+                    <tr>
+                        <th width="40">ADDRESS</th>
+                        <th width="100">TYPE</th>
+                        <th>DESCRIPTION</th>
+                        <th width="100">RAW PACKET</th>
+                        <th width="80"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+
+            </table>
+        </div>
     </div>
 
     <div class="wifi_set_cont">
@@ -230,33 +337,14 @@
 
             </table>
         </div>
+
+        <action-modal></action-modal>
+
     </div>
 
+    <script type="module">
+        import { show_new_action } from "./action-modal.js";
 
-    <div class="wifi_set_cont">
-        <h3 class="section_header">Actions</h3>
-        <p class="section_hint">What the decoder should do when a particular DCC packet or WCC message is received</p>
-        <div class="tableFixHead">
-
-            <table id="dcc_packets" class="common_table">
-                <thead>
-                    <tr>
-                        <th width="40">ADDRESS</th>
-                        <th width="100">TYPE</th>
-                        <th>DESCRIPTION</th>
-                        <th width="100">RAW PACKET</th>
-                        <th width="80"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-
-            </table>
-        </div>
-    </div>
-
-
-    <script>
         //var gateway = `ws://${window.location.hostname}/ws`;
         var gateway = `ws://192.168.4.1/ws`;
         var websocket;
@@ -395,6 +483,10 @@
             console.log(msg);
             websocket.send(msg);
         }
+
+        document.getElementById("new_action_btn").onclick = () => {
+                show_new_action();
+            };
 
         const toBinString = (bytes) =>
             bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '');
