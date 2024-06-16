@@ -99,8 +99,6 @@
             border-radius: 20px;
             height: 25px;
             line-height: 25px;
-            margin-left: auto;
-            margin-right: auto;
             color: black;
             border-style: none;
             background-color: #e9c46a;
@@ -113,6 +111,11 @@
         .new_btn:hover {
             cursor: pointer;
         }
+
+        .new_action_btn {
+            margin-left: 5px;
+        }
+
 
         .table_btn {
             width: 160px;
@@ -146,8 +149,8 @@
 
         .common_table td,
         #common_table th {
-            padding-top: 12px;
-            padding-bottom: 12px;
+            padding-top: 4px;
+            padding-bottom: 4px;
             padding-left: 5px;
             padding-right: 5px;
         }
@@ -159,6 +162,10 @@
 
         .common_table tr:nth-child(even) {
             background-color: #f2f2f2;
+        }
+
+        .add_output_value_cell {
+            background-color: #fff;
         }
 
         .common_table tr:hover {
@@ -245,6 +252,82 @@
 }
 
 
+/*Switcher*/
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 28px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2a9d8f;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2a9d8f;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(30px);
+  -ms-transform: translateX(30px);
+  transform: translateX(30px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 28px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/*New action modal*/
+.action_modal_title {
+    display: block;
+    padding-top: 25px;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .output_values_table{
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 
@@ -317,7 +400,7 @@
 
 
     <div class="wifi_set_cont">
-        <h3 class="section_header">WCC messages</h3>
+        <h3 class="section_header">WCC events</h3>
         <p class="section_hint">Messages received from other decoders over WCC protocol</p>
 
         <div class="tableFixHead">
@@ -347,6 +430,16 @@
 
         //var gateway = `ws://${window.location.hostname}/ws`;
         var gateway = `ws://192.168.4.1/ws`;
+
+        var outputs = [];
+
+        outputs.push({name: "IO1", type:"IO"});
+        outputs.push({name: "IO2", type:"IO"});
+        outputs.push({name: "LED1", type:"LED"});
+        outputs.push({name: "LED2", type:"LED"});
+        outputs.push({name: "LED3", type:"LED"});
+        outputs.push({name: "Speaker", type:"AUDIO"});
+
         var websocket;
         window.addEventListener('load', onLoad);
         function initWebSocket() {
@@ -485,7 +578,7 @@
         }
 
         document.getElementById("new_action_btn").onclick = () => {
-                show_new_action();
+                show_new_action(outputs);
             };
 
         const toBinString = (bytes) =>
