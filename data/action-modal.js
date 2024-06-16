@@ -2,7 +2,7 @@
 class ActionModal extends HTMLElement {
     constructor() {
         super();
-        
+
         this.innerHTML = /*html*/`
     <div id="action-modal-container" class="modal">
         <div class="modal-content">
@@ -27,7 +27,8 @@ class ActionModal extends HTMLElement {
             <table id="dcc_packets" class="common_table">
                 <thead>
                     <tr>
-                        <th width="100">OUTPUT</th>
+                        <th width="80">OUTPUT</th>
+                        <th width="50">TYPE</th>
                         <th width="100">VALUE</th>
                     </tr>
                 </thead>
@@ -36,6 +37,7 @@ class ActionModal extends HTMLElement {
 
             </table>
         </div>
+        <button id="new_output_value_btn" class="new_btn new_action_btn">Add value</button></td><td  class="add_output_value_cell">
 
                 <div style="display: flex; width:300px; margin: auto;">
                     <button id="save_action_settings" class="s_wifi">Save</button>
@@ -51,36 +53,41 @@ class ActionModal extends HTMLElement {
             document.getElementById("action-modal-container").style.display = "none";
         }
 
-        document.getElementById("save_action_settings").onclick = () => {          
+        document.getElementById("save_action_settings").onclick = () => {
         };
     }
 }
 
-export function reload_action_outputs(){
+export function reload_action_outputs() {
     //Add a cell to the action outputs list
     document.querySelector('#action_outputs_tbody').innerHTML = "";
 
-for (let value_index = 0; value_index < action_output_values.length; ++value_index){
+    for (let value_index = 0; value_index < action_output_values.length; ++value_index) {
 
-    var output_select = `<select id="action_output">`;
+        var output_select = `<select id="action_output" data-action-select-id="${value_index}">`;
 
-    for (let index = 0; index < available_outputs.length; ++index) {
-        const output = available_outputs[index];
-        output_select += `<option value="${index}">${output.name}</option>`;
+        for (let index = 0; index < available_outputs.length; ++index) {
+            const output = available_outputs[index];
+            output_select += `<option value="${index}">${output.name}</option>`;
+        }
+        output_select += `</select>`;
+
+        var tr_node = document.createElement('tr');
+        tr_node.classList.add("service_cell");
+        tr_node.innerHTML = `<td height="40">${output_select}</td><td height="40">IO</td><td height="40"><input type="text" placeholder="Output value"></td>`;
+        document.querySelector('#action_outputs_tbody').appendChild(tr_node);
+
     }
-    output_select += `</select>`;
 
-    var tr_node = document.createElement('tr');
+    /*var tr_node = document.createElement('tr');
     tr_node.classList.add("service_cell");
-    tr_node.innerHTML = `<td>${output_select}</td><td><input type="text" placeholder="Output value"></td>`;
-    document.querySelector('#action_outputs_tbody').appendChild(tr_node);
+    tr_node.innerHTML = `<td class="add_output_value_cell"><button id="new_output_value_btn" class="new_btn new_action_btn">Add value</button></td><td  class="add_output_value_cell"></td>`;
+    document.querySelector('#action_outputs_tbody').appendChild(tr_node);*/
 
-}
-
-var tr_node = document.createElement('tr');
-tr_node.classList.add("service_cell");
-tr_node.innerHTML = `<td class="add_output_value_cell"><button id="new_output_value_btn" class="new_btn new_action_btn">Add value</button></td><td  class="add_output_value_cell"></td>`;
-document.querySelector('#action_outputs_tbody').appendChild(tr_node);
+    document.getElementById("new_output_value_btn").onclick = () => {
+        action_output_values.push({});
+        reload_action_outputs();
+    };
 
 }
 

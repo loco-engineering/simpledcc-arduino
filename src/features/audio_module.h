@@ -162,7 +162,7 @@ void play_audio_from_header_file()
         i2s_driver_install(i2s_num, &i2s_config, 0, NULL);   // ESP32 will allocated resources to run I2S
         i2s_set_pin(i2s_num, &pin_config);                   // Tell it the pins you will be using
         i2s_set_sample_rates(i2s_num, WavHeader.SampleRate); // set sample rate
-        wav_data = audio_data_from_h_file;                         // set to start of data
+        wav_data = audio_data_from_h_file;                   // set to start of data
         wav_data += 44;
         wav_data_index = 0;
     }
