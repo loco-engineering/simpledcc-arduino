@@ -50,12 +50,13 @@ void setup()
   setup_dcc_module();
   setup_webserver();
   setup_led();
-  setup_nfc();
+  //setup_nfc();
   setup_status_led();
+  on_status_led();
 
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
-  // add_led_connection(0, 0, 0.5, 1000, 1000, 0);
-  // add_led_connection(1, 2, 0.5, 1000, 1000, 1000);
+  //add_led_connection(0, 0, 0.5, 1000, 1000, 0);
+  //add_led_connection(1, 2, 0.5, 1000, 1000, 1000);
 
   // Test SPIFFS
   listDir(SPIFFS, "/", 0);

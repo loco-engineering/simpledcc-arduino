@@ -1,0 +1,296 @@
+* {
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+h1 {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 40px;
+    padding-bottom: 20px;
+    max-width: 620px;
+
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.section_header {
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.section_hint {
+    font-size: 13px;
+    font-weight: 300;
+    margin-bottom: 35px;
+}
+
+.no_data_hint {
+    font-size: 13px;
+    font-weight: 300;
+    text-align: center;
+    margin-top: 30px;
+}
+
+a {
+    text-decoration: none;
+}
+
+input[type=text],
+select {
+    width: 100%;
+    padding: 5px 10px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.wifi_set_cont {
+    border-radius: 20px;
+    background-color: #f2f2f2;
+    padding: 40px;
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.s_wifi {
+    width: 160px;
+    border-radius: 20px;
+    height: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    border-style: none;
+    background-color: black;
+    font-weight: 700;
+    display: block;
+    margin-top: 30px;
+    font-size: 12px;
+    margin-left: 10px;
+    </div>margin-right: 10px;
+}
+
+.s_wifi:hover {
+    cursor: pointer;
+}
+
+.new_btn {
+    width: 100px;
+    border-radius: 20px;
+    height: 25px;
+    line-height: 25px;
+    color: black;
+    border-style: none;
+    background-color: #e9c46a;
+    font-weight: 700;
+    margin-left: 20px;
+    font-size: 11px;
+
+}
+
+.new_btn:hover {
+    cursor: pointer;
+}
+
+.new_action_btn {
+    margin-left: 5px;
+}
+
+
+.table_btn {
+    width: 160px;
+    border-radius: 20px;
+    height: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    border-style: none;
+    background-color: black;
+    font-weight: 700;
+    display: block;
+    font-size: 12px;
+}
+
+.table_btn:hover {
+    cursor: pointer;
+}
+
+.hint {
+    margin-bottom: 10px;
+}
+
+
+
+.common_table {
+    border-collapse: collapse;
+    width: 100%;
+    max-height: 400px;
+}
+
+.common_table td,
+#common_table th {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.common_table td {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.common_table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.add_output_value_cell {
+    background-color: #fff;
+}
+
+.common_table tr:hover {
+    background-color: #eeeeee;
+    cursor: pointer;
+}
+
+.common_table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: #eeeeee;
+}
+
+.state_table {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.tableFixHead {
+    overflow-y: auto;
+    /* make the table scrollable if height is more than 200 px  */
+    max-height: 300px;
+    /* gives an initial height of 200px to the table */
+}
+
+.tableFixHead thead th {
+    position: sticky;
+    /* make the table heads sticky */
+    top: 0px;
+    /* table head will be placed from the top of the table and sticks to it */
+}
+
+/*Modal*/
+/* The Modal (background) */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fdfdfd;
+    margin: 10% auto;
+    /* 15% from the top and centered */
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    min-width: 350px;
+    /* Could be more or less, depending on screen size */
+    max-width: 400px;
+    /* Could be more or less, depending on screen size */
+    border-radius: 10px;
+}
+
+.modal-content-container {
+    max-width: 350px;
+    min-width: 300px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* The Close Button */
+.modal-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*New action modal*/
+.action_modal_title {
+    display: block;
+    padding-top: 25px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.output_values_table {
+    margin-top: 10px;
+}
+
+/*New state modal*/
+.state_check_box {
+    margin-top: 10px;
+}
+
+.state_settings_container {
+    padding-top: 10px;
+}
+
+.state_text_input {
+    padding-bottom: 10px;
+}
+
+.state_input_text_label {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.state_outputs_list {
+    margin-bottom: 10px;
+}
+
+.state_outputs_list_gray {
+    margin-bottom: 10px;
+    background-color: #f3f3f3;
+    border-radius: 6px;
+}
+
+.output_cell {
+    padding: 4px;
+}
