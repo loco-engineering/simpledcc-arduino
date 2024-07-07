@@ -56,7 +56,7 @@ The main differences are:
 - On your phone, tablet, or laptop, connect to a Wi-Fi network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you're using custom hardware.
 - Open http://loco.local or http://192.168.4.1 in your browser.
 - If your DCC command station is sending messages to the connected track/wires, you should see them in your browser. Use filters to hide unwanted messages.
-- To add actions for the decoder to perform when receiving a specific DCC packet, click "Add action" next to that packet. For example, you can set it to turn on red and green LEDs on a semaphore. The decoder has marked outputs for connecting wires from accessories/trains/vehicles, so you'll know that a red LED on a semaphore is connected to output number 5, etc.
+- To add actions for the decoder to perform when receiving a specific DCC packet, click "Add state" next to that packet. Loco.Engineering decoders have marked outputs for connecting wires from accessories/trains/vehicles, so you'll know that a red LED on a semaphore is connected to output number 5, etc.
 
 
 ## How to build and upload
