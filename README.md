@@ -6,6 +6,8 @@ License: Attribution-NonCommercial 4.0 International
 
 For commercial use, please contact us at hey@loco.engineering with a description of your project and how you intend to use it.
 
+**If you like this project and its concept, please spread the word and don't forget to give us a star on GitHub. Your support helps us grow!**
+
 ## Why We Started Working on SimpleDCC
 
 DCC (Digital Command Control) for model railways operates on a basic principle—a command station sends messages to DCC decoders via two wires or rails. Unlike most wireless systems, it doesn't involve encryption, authorization, or acknowledgment packets. However, updating the logic on DCC decoders remains a challenge, as it can't be done directly from a laptop or mobile phone without a command station. DCC decoder logic is typically predefined by the manufacturer, only allowing users to toggle certain features or outputs.
@@ -59,10 +61,11 @@ The main differences are:
 ## How to build and upload
 
 - Install Arduino IDE (we test with Arduino IDE 2.3.2)
-- Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
+- Install ESP32 for Arduino IDE (we test with version 2.0.17, later versions could not work and you will have build errors)
+- Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11), LiteLED (version 1.2.0). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
 - Change configuration in config.h if required
 - (Optional) If you change files in the simpledcc-arduino/data folder, you should recreate and upload SPIFFS to your board (for Arduino 2.2.1 - https://github.com/espx-cz/arduino-spiffs-upload?tab=readme-ov-file, Arduino 1.x.x - https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/)
-- (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose
+- (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose. If you don't see any logs check "I don't see any logs" below
 - Build and upload the firmware
 
 
