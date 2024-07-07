@@ -19,7 +19,8 @@
     <h1>Wireless Command Control (WCC)/SimpleDCC Decoder Settings</h1>
 
     <div class="wifi_set_cont">
-        <h3 class="section_header">Settings</h3>
+        <h3 class="section_header">Decoder Settings</h3>
+        <h5>DCC Address (optional)</h5>
         <p class="section_hint">Type in a decoder DCC address that you want to use with this decoder.
             It should be the same address as you use to send DCC commands from your command station to this decoder. For
             example, 2 or 5 or 110, etc. This address will be used to filter DCC packets received by the decoder.
@@ -36,23 +37,26 @@
         <h3 class="section_header">States<button id="new_action_btn" class="new_btn">Add state</button>
         </h3>
 
-        <p class="section_hint">What the decoder should do when a particular DCC packet or WCC message is received</p>
+        <p class="section_hint">What the decoder should do when a DCC packet, WCC message or message from the web app is received. For example, turn on top red light on a signal or close barriers on a level crossing.</p>
         <div class="tableFixHead">
 
             <table id="dcc_packets" class="common_table">
                 <thead>
                     <tr>
-                        <th width="40">ADDRESS</th>
+                        <th width="40">ICON</th>
+                        <th width="100">NAME</th>
                         <th width="100">TYPE</th>
-                        <th>DESCRIPTION</th>
-                        <th width="100">RAW PACKET</th>
-                        <th width="80"></th>
+                        <th width="40">ACTIVE</th>
+                        <th width="40"></th>
                     </tr>
                 </thead>
                 <tbody>
                 </tbody>
 
             </table>
+
+            <p class="no_data_hint" id="no_dcc_packets_hint">No states yet. Click on "Add State" above</p>
+
         </div>
     </div>
 
@@ -85,7 +89,7 @@
 
     <div class="wifi_set_cont">
         <h3 class="section_header">WCC events</h3>
-        <p class="section_hint">Messages received from other decoders over WCC protocol</p>
+        <p class="section_hint">Messages received from other decoders and the web app over WCC protocol</p>
 
         <div class="tableFixHead">
 
@@ -103,6 +107,9 @@
                 </tbody>
 
             </table>
+
+            <p class="no_data_hint" id="no_dcc_packets_hint">No WCC events received yet</p>
+
         </div>
 
         <action-modal></action-modal>

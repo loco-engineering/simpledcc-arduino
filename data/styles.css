@@ -14,11 +14,18 @@ h1 {
     font-weight: 800;
 }
 
+.h3 {
+    margin-top: 2px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .section_header {
-    margin-bottom: 5px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 900;
 }
+
+
 
 .section_hint {
     font-size: 13px;
@@ -43,7 +50,6 @@ select {
     padding: 5px 10px;
     display: inline-block;
     border: 1px solid #ccc;
-    background-color: #fff;
     border-radius: 4px;
     box-sizing: border-box;
 }
@@ -73,7 +79,7 @@ select {
     margin-top: 30px;
     font-size: 12px;
     margin-left: 10px;
-    </div>margin-right: 10px;
+    margin-right: 10px;
 }
 
 .s_wifi:hover {
@@ -158,7 +164,7 @@ select {
 }
 
 .common_table th {
-    padding-top: 12px;
+    padding-top: 2px;
     padding-bottom: 12px;
     text-align: left;
     color: #000;

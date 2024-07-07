@@ -1,35 +1,59 @@
 #### Note: The project is in active development
 
-# SimpleDCC Arduino
+# DCC (Digital Command Control) / WCC (Wireless Command Control) decoders for Arduino and ESP32XX SOCs
 
 License: Attribution-NonCommercial 4.0 International
 
-For commercial use, please contact us at hey@loco.engineering with a description of your project and how you plan to use it.
+For commercial use, please contact us at hey@loco.engineering with a description of your project and how you intend to use it.
 
 ## Why We Started Working on SimpleDCC
 
-DCC (Digital Command Control) for model railways operates in a straightforward manner—a command station sends messages to DCC decoders over two wires/rails. Unlike most wireless systems, there are no encryption, authorization, or acknowledgment packets involved. However, updating the logic on DCC decoders remains challenging, as it cannot be done directly from a laptop or mobile phone without a command station. The entire logic of DCC decoders is predefined by the manufacturer, allowing you only to switch certain features or outputs on and off. 
+DCC (Digital Command Control) for model railways operates on a basic principle—a command station sends messages to DCC decoders via two wires or rails. Unlike most wireless systems, it doesn't involve encryption, authorization, or acknowledgment packets. However, updating the logic on DCC decoders remains a challenge, as it can't be done directly from a laptop or mobile phone without a command station. DCC decoder logic is typically predefined by the manufacturer, only allowing users to toggle certain features or outputs.
 
-For instance, if you want to evaluate a new level crossing signal before installing it on your layout, you need to program decoders and sometimes use additional proprietary modules just to get the signals working (e.g., the Viessmann 5057 manual). The main idea behind SimpleDCC is to simplify DCC by allowing you to program and control DCC decoders directly from a browser on a computer, mobile phone, or tablet. A SimpleDCC decoder connects to a laptop or mobile device using Wi-Fi, USB, or even Bluetooth, without a command station. You can add custom logic to any decoder or use our DCC templates. The project is open-source (a special commercial license is required for commercial usage, contact us for more information).
+For example, if you want to test a new level crossing signal before installing it on your layout, you need to program decoders and sometimes use additional proprietary modules just to get the signals working (as seen in the Viessmann 5057 manual). The core concept behind SimpleDCC is to streamline DCC by enabling direct programming and control of DCC decoders from a browser on a computer, mobile phone, or tablet. A SimpleDCC decoder connects to a laptop or mobile device via Wi-Fi, USB, or even Bluetooth, eliminating the need for a command station. You can add custom logic to any decoder or use our DCC templates. The project is open-source (though a special commercial license is required for commercial use—contact us for more information).
 
-## How SimpleDCC Differs from Other DCC Projects/Decoders
+## What is WCC (Wireless Command Control)?
+
+WCC (Wireless Command Control) is an open wireless system for operating model railways, LEGO® trains, RC cars, and other models or toys. WCC can run on DC, AC (including tracks with DCC), or battery power and requires only one essential hardware component:
+
+- A decoder (for trains, cars, or accessories) to control trains, cars, and layout elements (such as signals and switches)
+
+Additionally, unpowered NFC stickers can be used optionally to provide more interaction possibilities.
+
+WCC consists of:
+- An open protocol (defining how trains, cars, and layout elements communicate)
+- An open API for updating logic via BLE, Wi-Fi, and USB
+- Code examples demonstrating how to use various WCC features in your own projects
+
+The main difference between DCC and WCC lies in how messages or packets are transmitted. WCC messages are sent wirelessly, eliminating the need for wires, while DCC packets/messages are delivered through tracks or wires. Furthermore, WCC enables two-way communication between decoders, allowing trains, cars, and accessories to send messages directly to each other. Unlike DCC, WCC doesn't require a command station at all.
+
+For more detailed information about WCC, please visit [https://loco.engineering/docs](https://loco.engineering/docs/)
+
+
+## How SimpleDCC/WCC Decoders Differs from Other DCC Projects/Decoders
 
 The main differences are:
-- You don't need to understand how DCC works because the decoder's logic can be set in the web app without using any additional tools for programming.
-- You don't need to study lengthy manuals, as SimpleDCC performs actions (e.g., changing semaphore aspects, turning lights on/off) without strictly adhering to DCC protocols, which often have many unclear parts. You can see all messages received by a SimpleDCC decoder in your browser (with options to group and filter them by various values), and define what a decoder should do based on a received packet. From our experience, this greatly simplifies working with DCC.
-- SimpleDCC decoders work with virtually all command stations and DCC protocols (mfx support on our roadmap), if you don't know the format of a DCC packet you still can assign actions to DCC packets. For example, Märklin Mobile Station sends accessory DCC packets in non-standard format and most accessory decoders don't understand them but with SimpleDCC you can assign actions to a DCC packet as is without understanding it format.
-- SimpleDCC/WCC decoders can control trains, vehicles, and layout accessories like signals, turnouts, and more without needing to know the specific types connected to the decoder. For example, with a traditional decoder, to change a signal aspect, you need to find the correct command to send from the command station to the decoder. With a SimpleDCC/WCC decoder, the user (not the manufacturer) sets what action should be taken when a specific DCC packet is received. You're not limited to the signal aspects (or any other features) predefined by companies like Pico or Marklin in their proprietary decoders. Instead, you can create virtually any state and action you need. No programming is required, but for advanced users, the source code is available, providing full control over the decoder's behavior.
+
+- You don't need to understand DCC's inner workings because the decoder's logic can be set in the web app without additional programming tools.
+
+- There's no need to study lengthy manuals. SimpleDCC performs actions (e.g., changing semaphore aspects, turning lights on/off) without strictly adhering to often ambiguous DCC protocols. You can view all messages received by a SimpleDCC decoder in your browser (with options to group and filter them), and define the decoder's response to received packets. In our experience, this greatly simplifies working with DCC.
+
+- SimpleDCC decoders are compatible with virtually all command stations and DCC protocols (with mfx support on our roadmap). Even if you don't understand a DCC packet's format, you can still assign actions to it. For instance, Märklin Mobile Station sends accessory DCC packets in a non-standard format that most accessory decoders don't understand, but with SimpleDCC, you can assign actions to these packets as-is.
+
+- SimpleDCC/WCC decoders can control trains, vehicles, and layout accessories like signals and turnouts without needing to know the specific types connected. With a traditional decoder, changing a signal aspect requires finding the correct command to send from the command station. With SimpleDCC/WCC, the user defines what action should occur when a specific DCC packet is received. You're not limited to predefined signal aspects or features set by manufacturers like Pico or Marklin. Instead, you can create virtually any state and action you need. No programming is required, but for advanced users, the source code is available for full control over the decoder's behavior.
+
 - You can control almost everything with SimpleDCC/WCC from a command station or web browser, including RGB addressable LEDs, NFC readers, Hall sensors, and more.
+
 
 ## Getting Started
 
-1. Order a [Loco.Engineering](https://loco.engineering) decoder or build one yourself (you can start with ESP32S3 development board if you want to control from the web browser only).
-2. (Optional for Loco.Engineering decoders, but required for customized decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload firmware to the decoder (follow steps in How to build and upload)
-3. Connect the decoder to wires or a track with DCC.
-4. Open the Wi-Fi networks on your phone, tablet, or laptop and connect to a network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you are using customized hardware.
-5. Open http://loco.local or http://192.168.4.1 in your browser.
-6. If your DCC command station is sending messages to the track/wires the decoder is connected to, you should see them in your browser. Use filters to hide messages you don't need.
-7. Click "Add action" next to a DCC packet to add actions that the decoder should perform when that packet is received. For example, turn on red and green LEDs on a semaphore. The decoder has marked outputs where you connect wires from accessories/trains/vehicles, so you know that a red LED on a semaphore is connected to output number 5, etc.
+- Purchase a [Loco.Engineering](https://loco.engineering) decoder or build your own (any ESP32S3 dev board can serve as a WCC decoder when powered by USB, but for handling DCC signals, you'll need a DCC converter with a DC drop-down circuit).
+- (Optional for Loco.Engineering decoders, required for custom decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload the firmware to the decoder (follow the steps in "How to build and upload").
+- (Optional for WCC but required for DCC) Connect the decoder to DCC-enabled wires or track.
+- On your phone, tablet, or laptop, connect to a Wi-Fi network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you're using custom hardware.
+- Open http://loco.local or http://192.168.4.1 in your browser.
+- If your DCC command station is sending messages to the connected track/wires, you should see them in your browser. Use filters to hide unwanted messages.
+- To add actions for the decoder to perform when receiving a specific DCC packet, click "Add action" next to that packet. For example, you can set it to turn on red and green LEDs on a semaphore. The decoder has marked outputs for connecting wires from accessories/trains/vehicles, so you'll know that a red LED on a semaphore is connected to output number 5, etc.
 
 
 ## How to build and upload

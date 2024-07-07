@@ -9,23 +9,23 @@ class ActionModal extends HTMLElement {
         <div class="modal-content">
             <div class="modal-content-container">  
 
-            <span class="action_modal_title">Settings</span>
+            <span class="action_modal_title">State </span>
             <hr>
             <div class="state_settings_container">
 
     <div class="state_text_input">
      <label class="state_input_text_label"for="state_name"> Name (optional)</label>
-    <input type="text" placeholder="" name="state_name">
+    <input type="text" placeholder="" name="state_name" id="state_name">
     </div>
 
     <div class="state_text_input">
-    <label class="state_input_text_label" for="state_name"> DCC Packet (optional)</label>
-    <input type="text" placeholder="" name="state_name">
+    <label class="state_input_text_label" for="state_dcc_packet"> DCC Packet (optional)</label>
+    <input type="text" placeholder="" name="state_dcc_packet" id="state_dcc_packet">
     </div>
 
     <div class="state_text_input">
-    <label class="state_input_text_label" for="state_name"> WCC Event (optional)</label>
-    <input type="text" placeholder="" name="state_name">
+    <label class="state_input_text_label" for="state_wcc_event"> WCC Event (optional)</label>
+    <input type="text" placeholder="" name="state_wcc_event" id="state_wcc_event">
     </div>
 
 
@@ -65,6 +65,8 @@ class ActionModal extends HTMLElement {
             //Iterate over all outputs and values
             var new_state = {};
             new_state.values = action_output_values;
+            
+            new_state.name = document.getElementById("state_name").value;
             add_state(new_state);
             document.getElementById("action-modal-container").style.display = "none";
 
