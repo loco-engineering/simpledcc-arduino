@@ -52,6 +52,7 @@ The main differences are:
 - Purchase a [Loco.Engineering](https://loco.engineering) decoder or build your own (any ESP32S3 dev board can serve as a WCC decoder when powered by USB, but for handling DCC signals, you'll need a DCC converter with a DC drop-down circuit).
 - (Optional for Loco.Engineering decoders, required for custom decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload the firmware to the decoder (follow the steps in "How to build and upload").
 - (Optional for WCC but required for DCC) Connect the decoder to DCC-enabled wires or track.
+- Power the decoder
 - On your phone, tablet, or laptop, connect to a Wi-Fi network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you're using custom hardware.
 - Open http://loco.local or http://192.168.4.1 in your browser.
 - If your DCC command station is sending messages to the connected track/wires, you should see them in your browser. Use filters to hide unwanted messages.
