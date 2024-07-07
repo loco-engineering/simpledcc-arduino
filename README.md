@@ -1,6 +1,6 @@
 #### Note: The project is in active development
 
-# DCC (Digital Command Control) / WCC (Wireless Command Control) decoders for Arduino and ESP32XX SOCs
+# DCC (Digital Command Control) / WCC (Wireless Command Control) decoders based on Arduino and ESP32XX SOCs
 
 License: Attribution-NonCommercial 4.0 International
 
