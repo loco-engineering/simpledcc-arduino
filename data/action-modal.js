@@ -1,4 +1,6 @@
-import { set_decoder_id, load_local_project, add_state, get_project_settings } from "./storage.js";
+import { add_state, update_state } from "./storage.js";
+
+var close_callback = null;
 
 class ActionModal extends HTMLElement {
     constructor() {
@@ -9,7 +11,7 @@ class ActionModal extends HTMLElement {
         <div class="modal-content">
             <div class="modal-content-container">  
 
-            <span class="action_modal_title">State </span>
+            <span class="action_modal_title">State Settings</span>
             <hr>
             <div class="state_settings_container">
 
@@ -29,20 +31,28 @@ class ActionModal extends HTMLElement {
     </div>
 
 
-            <input class ="state_check_box" type="checkbox" id="state_active" name="state_active" value="Bike">
-            <label class="state_input_text_label" for="state_active"> Active</label><br>
+            <input class ="state_check_box" type="checkbox" id="state_active" name="state_active">
+            <label class="state_input_text_label" id="state_is_active" for="state_active"> Active</label><br>
             
             </div>
+            <div class="pure-g ">
 
+            <div class="pure-u-1-2 ">
             <span class="action_modal_title">Outputs & values</span>
+            </div>
+
+            <div class="pure-u-1-2">
+            <button style="margin-top:20px; margin-left:4px;" id="new_output_value_btn" class="new_btn new_action_btn">Add value</button>
+            </div>
+
+            </div>
             <hr>
 
-            <div class="tableFixHead output_values_table">
+            <div class="output_values_table">
 
             <div id="output_list">
             </div>
         </div>
-        <button id="new_output_value_btn" class="new_btn new_action_btn">Add value</button></td><td  class="add_output_value_cell">
 
                 <div style="display: flex; width:300px; margin: auto; padding-top:10px;">
                     <button id="save_action_settings" class="s_wifi">Save</button>
@@ -58,16 +68,36 @@ class ActionModal extends HTMLElement {
             document.getElementById("action-modal-container").style.display = "none";
         }
 
+        document.getElementById("state_is_active").onclick = function () {
+            console.log("clicked on is active");
+        }
+
         document.getElementById("save_action_settings").onclick = () => {
 
             save_outputs();
-
-            //Iterate over all outputs and values
-            var new_state = {};
-            new_state.values = action_output_values;
             
-            new_state.name = document.getElementById("state_name").value;
-            add_state(new_state);
+            current_state.name = document.getElementById("state_name").value;
+            current_state.is_active = document.getElementById("state_is_active").value;
+
+            if (current_state.name == ''){
+                if (current_state.values.length > 0){
+                    var name = '';
+                    current_state.values.forEach(value => {
+                        name += `${value.output} `;
+                    });
+                    current_state.name = name;
+                }else{
+                    current_state.name = `-`;
+                }
+            }
+            if (current_state.id != undefined){
+                update_state(current_state);
+            }else{
+                add_state(current_state);
+            }
+
+            close_callback();
+
             document.getElementById("action-modal-container").style.display = "none";
 
         };
@@ -78,7 +108,7 @@ export function reload_action_outputs() {
     //Add a cell to the action outputs list
     document.querySelector('#output_list').innerHTML = "";
 
-    for (let value_index = 0; value_index < action_output_values.length; ++value_index) {
+    for (let value_index = 0; value_index < current_state.values.length; ++value_index) {
 
         var output_select = `<select class="state_output" id="state_output_${value_index}">`;
 
@@ -109,26 +139,68 @@ export function reload_action_outputs() {
         }
 
         grid_node.innerHTML = `
-        <div class="pure-u-1-3 "><div class="output_cell">${output_select}</div></div>
-        <div class="pure-u-1-3 "><div class="output_cell">${type_select}</div></div>
-        <div class="pure-u-1-3 "><div class="output_cell"><input type="text" id="state_value_${value_index}" placeholder="0 - 255"></div></div>
-        
-        <div class="pure-u-1-3 "><div class="output_cell">Hey</div></div>
-        <div class="pure-u-1-3 "><div class="output_cell">Brrr</div></div>
-        <div class="pure-u-1-3 "><div class="output_cell">UUUU</div></div>
+    
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Name</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">${output_select}</div></div>
 
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Type</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">${type_select}</div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Value</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">
+            <input class="state_settings_input" type="text" id="state_value_${value_index}" value="0">
+        </div>
+        </div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Action</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">
+        <select class="type_output" id="state_output_action_${value_index}">
+        <option value="0">None</option>
+        <option value="1">Blink</option>
+        </select>
+        </div></div>
+
+        <div class="pure-g">
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Start delay</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" type="text" id="state_value_start_delay${value_index}" placeholder="in ms"></div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"On" duration</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" type="text" id="state_value_start_delay${value_index}" placeholder="in ms"></div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"Off" duration</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" type="text" id="state_value_start_delay${value_index}" placeholder="in ms"></div></div>
+        
+        <div class="pure-u-1-2 "></div>
+        <div class="pure-u-1-2 "><div class="output_cell state_value_cell_btns">
+        <button class="delete_btn delete_output" data-id="${value_index}"><img class="delete_btn_icn" src="/delete.png"></button>
+
+        </div></div>
+
+        </div>
         `;
 
         document.querySelector('#output_list').appendChild(grid_node);
 
 
-        if (action_output_values[value_index].output != undefined){
-            document.getElementById(`state_output_${value_index}`).value = action_output_values[value_index].output;
-            document.getElementById(`state_value_${value_index}`).value = action_output_values[value_index].value;
+        if (current_state.values[value_index].output != undefined){
+            document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].output;
+            document.getElementById(`state_value_${value_index}`).value = current_state.values[value_index].value;
 
         }
 
     }
+
+    const cells = document.querySelectorAll('.delete_output');
+    cells.forEach(cell => {
+        cell.addEventListener('click', function handleClick(event) {
+            event.preventDefault();
+
+            current_state.values.splice(this.dataset.id, 1);
+            reload_action_outputs();
+
+        });
+    });
 
     /*var tr_node = document.createElement('tr');
     tr_node.classList.add("service_cell");
@@ -139,30 +211,57 @@ export function reload_action_outputs() {
 
         save_outputs();
 
-        action_output_values.push({});
+        current_state.values.push({});
         reload_action_outputs();
     };
 
 }
 
 export function save_outputs(){
-    action_output_values = [];
+    current_state.values = [];
 
     var state_output_els = document.getElementsByClassName('state_output');
     for (var i = 0; i < state_output_els.length; ++i) {
         const state_output_val = document.getElementById(`state_output_${i}`).value;
         const state_value_val = document.getElementById(`state_value_${i}`).value;
 
-        action_output_values.push({output: state_output_val, type: 1, value: state_value_val});
+        current_state.values.push({output: state_output_val, type: 1, value: parseInt(state_value_val)});
 
     }
 }
 
 var available_outputs = [];
-var action_output_values = [{}];
+var current_state = null;
 
-export function show_new_action() {
+export function show_new_action(reload_states) {
 
+    current_state = {};
+    current_state.values = [{}];
+
+    set_available_outputs();
+
+    reload_action_outputs();
+    document.getElementById("action-modal-container").style.display = "block";
+
+    close_callback = reload_states;
+}
+
+export function show_edit_action(reload_states, state) {
+
+    current_state = state;
+
+    set_available_outputs();
+    reload_action_outputs();
+
+    document.getElementById("state_name").value = current_state.name;
+    document.getElementById("state_is_active").value = current_state.is_active;
+
+    document.getElementById("action-modal-container").style.display = "block";
+
+    close_callback = reload_states;
+}
+
+export function set_available_outputs(){
     available_outputs = [];
 
     available_outputs.push({name: "IO1", type:"IO"});
@@ -171,9 +270,6 @@ export function show_new_action() {
     available_outputs.push({name: "LED2", type:"LED"});
     available_outputs.push({name: "LED3", type:"LED"});
     available_outputs.push({name: "Speaker", type:"AUDIO"});
-
-    reload_action_outputs();
-    document.getElementById("action-modal-container").style.display = "block";
 }
 
 customElements.define("action-modal", ActionModal);

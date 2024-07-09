@@ -45,8 +45,16 @@ void add_led_connection(uint8_t type, uint8_t led_pin, float pwm, unsigned long 
     ++led_connections_count;
 }
 
+double time_from_last_check = 0;
+
 void loop_led()
 {
+    if (millis() - time_from_last_check < 100){
+        return;
+    }
+
+    time_from_last_check = millis();
+
     for (int i = 0; i < led_connections_count; ++i)
     {
         led_connection cur_led_connection = led_connections[i];

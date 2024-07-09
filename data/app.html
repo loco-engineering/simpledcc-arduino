@@ -16,11 +16,11 @@
 </head>
 
 <body>
-    <h1>Wireless Command Control (WCC)/SimpleDCC Decoder Settings</h1>
+    <h1>WCC / SimpleDCC Decoder</h1>
 
     <div class="wifi_set_cont">
-        <h3 class="section_header">Decoder Settings</h3>
-        <h5>DCC Address (optional)</h5>
+        <h3 class="section_header">Settings</h3>
+        <h5 class="section_subheader">DCC Address (optional)</h5>
         <p class="section_hint">Type in a decoder DCC address that you want to use with this decoder.
             It should be the same address as you use to send DCC commands from your command station to this decoder. For
             example, 2 or 5 or 110, etc. This address will be used to filter DCC packets received by the decoder.
@@ -29,33 +29,36 @@
             If you don't use DCC or want to see all DCC packets in the list below, leave this field empty.
         </p>
         <input type="text" id="ssid" placeholder="Decoder address, for example, 2 or 5 or 122 etc">
-        <div style="display: flex; width:300px; margin: auto;"><button id="s_wifi" class="s_wifi">Save</button>
-        <button id="s_wifi" class="s_wifi">Hide</button></div>
+        <div style="text-align: center; "><button style="margin-right: 0px; " id="save_decoder_settings"
+                class="s_wifi">Save</button>
+        </div>
+
     </div>
 
     <div class="wifi_set_cont">
         <h3 class="section_header">States<button id="new_action_btn" class="new_btn">Add state</button>
         </h3>
 
-        <p class="section_hint">What the decoder should do when a DCC packet, WCC message or message from the web app is received. For example, turn on top red light on a signal or close barriers on a level crossing.</p>
+        <p class="section_hint">What the decoder should do when a DCC packet, WCC message or message from the web app is
+            received. For example, turn on top red light on a signal or close barriers on a level crossing.</p>
         <div class="tableFixHead">
 
-            <table id="dcc_packets" class="common_table">
+            <table id="states_list" class="common_table">
                 <thead>
                     <tr>
-                        <th width="40">ICON</th>
-                        <th width="100">NAME</th>
+                        <th width="60">ICON</th>
+                        <th>NAME</th>
                         <th width="100">TYPE</th>
                         <th width="40">ACTIVE</th>
                         <th width="40"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="states_list_tbody">
                 </tbody>
 
             </table>
 
-            <p class="no_data_hint" id="no_dcc_packets_hint">No states yet. Click on "Add State" above</p>
+            <p class="no_data_hint" id="no_states_hint">No states yet. Click on "Add State" above</p>
 
         </div>
     </div>
@@ -117,131 +120,95 @@
     </div>
 
     <script type="module">
-        import { show_new_action } from "./action-modal.js";
-        import { set_decoder_id, load_local_project, add_state } from "./storage.js";
+        import { show_new_action, show_edit_action } from "./action-modal.js";
+        import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
+        import { initWebSocket } from "./api.js";
 
         set_decoder_id("some_id"); //Replace with decoder mac address
-        load_local_project();
-        //var gateway = `ws://${window.location.hostname}/ws`;
-        var gateway = `ws://192.168.4.1/ws`;
+        //clear_project();
+        reload_states();
 
-        var websocket;
         window.addEventListener('load', onLoad);
-        function initWebSocket() {
-            console.log('Trying to open a WebSocket connection...');
-            websocket = new WebSocket(gateway);
-            websocket.onopen = onOpen;
-            websocket.onclose = onClose;
-            websocket.onmessage = onMessage;
-        }
-        function onOpen(event) {
-            console.log('Connection opened');
-        }
-        function onClose(event) {
-            console.log('Connection closed');
-            setTimeout(initWebSocket, 2000);
-        }
-        async function onMessage(event) {
 
-            const buffer = new Uint8Array(await event.data.arrayBuffer());
-            console.log("New message " + buffer.length);
-
-            //Parse the message from a decoder
-            //Get a type
-            var msg_index = 0;
-            let msg_type = buffer[msg_index++];
-
-            if (msg_type == 4) {
-                //This a message with DCC packets
-                //Get the amount of DCC packets
-                let dcc_packets_amount = buffer[msg_index++];
-                for (var i = 0; i < dcc_packets_amount; i++) {
-                    let packet_type = buffer[msg_index++];
-                    var packet_type_str = "Unknown";
-                    var description_str = "";
-
-                    let adr_1 = buffer[msg_index++];
-                    let adr_2 = buffer[msg_index++];
-
-                    let address = (((adr_2 & 0xFF) << 8) | (adr_1 & 0xFF));
-                    let raw_packet_length = buffer[msg_index++];
-
-                    var raw_packet = [];
-                    var raw_packet_str = "";
-
-                    for (var k = 0; k < raw_packet_length; k++) {
-                        raw_packet[k] = buffer[msg_index++];
-                        raw_packet_str += toBinString(Uint8Array.from([raw_packet[k]])) + " ";
-                    }
-
-                    let user_data_length = buffer[msg_index++];
-
-                    var user_data = [];
-                    for (var k = 0; k < user_data_length; k++) {
-                        user_data[k] = buffer[msg_index++];
-
-                    }
-
-                    switch (packet_type) {
-                        case 0:
-                            description_str = "No description available";
-                            address = "-";
-                            break;
-                        case 1:
-                            packet_type_str = "Speed";
-                            description_str = `Speed: ${user_data[0]} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
-                            break;
-                        case 2:
-                            packet_type_str = "Function";
-                            //Get the function group
-                            var function_group_str = "0 - 4";
-                            switch (user_data[0]) {
-                                case 2:
-                                    function_group_str = "5 - 8";
-                                    break;
-                                case 3:
-                                    function_group_str = "9 - 12";
-                                    break;
-                                case 4:
-                                    function_group_str = "13 - 20";
-                                    break;
-                                case 5:
-                                    function_group_str = "21 - 28";
-                                    break;
-                                default:
-                                    break;
-                            }
-                            description_str = `Function Group: ${function_group_str} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
-                            break;
-                        default:
-                            break;
-                    }
-
-                    //Add a cell to the DCC packets list
-                    var tr_node = document.createElement('tr');
-                    tr_node.classList.add("service_cell");
-                    tr_node.innerHTML = `<td>${address}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><button id="table_btn" class="table_btn">Add action</button></td>`;
-
-                    document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
-
-
-                }
-
-            }
-
-            document.querySelector('#no_dcc_packets_hint').style.display = "none";
-
-            //Autoscoll
-            //let dcc_packets_table_el = document.querySelector('#dcc_packets_table_container');
-            //dcc_packets_table_el.scrollTop = dcc_packets_table_el.scrollHeight;
-
-        }
         function onLoad(event) {
             initWebSocket();
             initButton();
         }
+
+        function reload_states() {
+            let project = load_local_project();
+
+            document.querySelector('#states_list_tbody').innerHTML = '';
+
+            for (var i = 0; i < project.states.length; i++) {
+                var state = project.states[i];
+
+                //Add a cell to the DCC packets list
+                var tr_node = document.createElement('tr');
+                tr_node.classList.add("service_cell");
+                tr_node.classList.add("state_cell");
+
+                tr_node.dataset.id = state.id;
+
+                tr_node.innerHTML = `<td ><div class="state_icn"></div></td><td>${state.name}</td><td></td><td></td><td class="delete_state_btn" data-id="${state.id}" style="text-align:center;">
+                    <button class="delete_btn"><img class="delete_btn_icn" src="/delete.png"></button>
+                    </td>`;
+
+                document.querySelector('#states_list_tbody').appendChild(tr_node);
+            }
+
+            if (project.states.length > 0) {
+                document.querySelector('#no_states_hint').style.display = "none";
+            } else {
+                document.querySelector('#no_states_hint').style.display = "block";
+            }
+
+            document.querySelectorAll('.state_cell').forEach(cell => {
+                cell.addEventListener('click', function handleClick(event) {
+                    event.preventDefault();
+
+                    var selected_state = null;
+                    //Find a selected product
+                    project.states.forEach((state) => {
+                        if (state.id == this.dataset.id) {
+                            show_edit_action(reload_states, state);
+                        }
+                    });
+
+                });
+            });
+
+            document.querySelectorAll('.delete_state_btn').forEach(cell => {
+                cell.addEventListener('click', function handleClick(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    var selected_state = null;
+                    //Find a selected product
+                    let project = load_local_project();
+
+                    project.states.forEach((state, index) => {
+                        if (state.id == this.dataset.id) {
+
+                            let text = `State "${state.name}" will be deleted permanently. Are you sure?`;
+                            if (confirm(text) == true) {
+                                delete_state(this.dataset.id);
+                                reload_states();
+                            } else {
+
+                            }
+
+
+                        }
+                    });
+
+                });
+            });
+
+        }
+
         function initButton() {
-            document.getElementById('s_wifi').addEventListener('click', connectToWiFi);
+            document.getElementById('save_decoder_settings').addEventListener('click', connectToWiFi);
         }
         function connectToWiFi() {
             let ssid = document.getElementById('ssid').value;
@@ -263,8 +230,8 @@
         }
 
         document.getElementById("new_action_btn").onclick = () => {
-                show_new_action();
-            };
+            show_new_action(reload_states);
+        };
 
         const toBinString = (bytes) =>
             bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '');

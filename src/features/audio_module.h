@@ -173,9 +173,9 @@ void loop_audio()
 
     size_t BytesWritten; // Returned by the I2S write routine, we are not interested in it
 
-    if (wav_data_index < WavHeader.DataSize)
-    {
-        i2s_write(i2s_num, wav_data + wav_data_index, 4, &BytesWritten, portMAX_DELAY);
-        wav_data_index += 4;
-    }
+    i2s_write(i2s_num, wav_data + wav_data_index, 4, &BytesWritten, portMAX_DELAY);
+    wav_data_index += 4;
+
+    if(wav_data_index>=WavHeader.DataSize)               // If we gone past end of data reset back to beginning
+    wav_data_index=0;    
 }

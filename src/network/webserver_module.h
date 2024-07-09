@@ -1,3 +1,9 @@
+
+#ifndef WEBSERVER_MODULE_H
+#define WEBSERVER_MODULE_H
+
+#include "../features/wcc_module.h"
+
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
@@ -54,9 +60,29 @@ void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
+     
+     
+    Serial.println("=======================");
+    Serial.println("New message over WebSocket received");
+    Serial.println("Size");
+    Serial.println(info->len );
+    Serial.println("Content");
+    for(int i=0; i < len; i++) {
+      Serial.print(data[i]);
+      Serial.print("|");
+    }
+    Serial.println();
+    //Check the type - first byte
+    if (data[0] == 1){
+      //This message is WCC message, trying to parse
+      //Move a pointer with data to the second byte
+      data++;
+      handle_wcc_message(data, len);
+    }
+    Serial.println("=======================");
+
   if (info->final && info->index == 0 && info->len == len)
   {
-    data[len] = 0;
     String message = (char *)data;
     Serial.print(message);
     //  Check if the message is "getReadings"
@@ -118,3 +144,5 @@ void loop_webserver()
 {
   // ws.cleanupClients();
 }
+
+#endif
