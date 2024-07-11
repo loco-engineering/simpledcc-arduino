@@ -183,8 +183,8 @@ export function reload_action_outputs() {
         document.querySelector('#output_list').appendChild(grid_node);
 
 
-        if (current_state.values[value_index].output != undefined){
-            document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].output;
+        if (current_state.values[value_index].connection_name != undefined){
+            document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].connection_name;
             document.getElementById(`state_value_${value_index}`).value = current_state.values[value_index].value;
 
         }
@@ -217,21 +217,31 @@ export function reload_action_outputs() {
 
 }
 
+
+var available_outputs = [];
+var current_state = null;
+
 export function save_outputs(){
     current_state.values = [];
 
     var state_output_els = document.getElementsByClassName('state_output');
     for (var i = 0; i < state_output_els.length; ++i) {
-        const state_output_val = document.getElementById(`state_output_${i}`).value;
+        const state_connection_name = document.getElementById(`state_output_${i}`).value;
         const state_value_val = document.getElementById(`state_value_${i}`).value;
 
-        current_state.values.push({output: state_output_val, type: 1, value: parseInt(state_value_val)});
+        //Find id of a connection
+        var connection_id = 0;
+        for (var av_i = 0; av_i < available_outputs.length; av_i += 1){
+            const connection = available_outputs[av_i];
+                if (state_connection_name == connection.name){
+                    connection_id = i;
+                }
+        }
+
+        current_state.values.push({connection_name:  state_connection_name, connection_id: connection_id, signal_type: 0, value: parseInt(state_value_val)});
 
     }
 }
-
-var available_outputs = [];
-var current_state = null;
 
 export function show_new_action(reload_states) {
 
@@ -264,12 +274,12 @@ export function show_edit_action(reload_states, state) {
 export function set_available_outputs(){
     available_outputs = [];
 
-    available_outputs.push({name: "IO1", type:"IO"});
-    available_outputs.push({name: "IO2", type:"IO"});
-    available_outputs.push({name: "LED1", type:"LED"});
-    available_outputs.push({name: "LED2", type:"LED"});
-    available_outputs.push({name: "LED3", type:"LED"});
-    available_outputs.push({name: "Speaker", type:"AUDIO"});
+    available_outputs.push({name: "O0", signal_types:["PWM"]});
+    available_outputs.push({name: "O1", signal_types:["PWM"]});
+    available_outputs.push({name: "O2", signal_types:["PWM"]});
+
+    available_outputs.push({name: "IO08", signal_types:["Digital", "PWM"]});
+    available_outputs.push({name: "Speaker", signal_types:"AUDIO"});
 }
 
 customElements.define("action-modal", ActionModal);

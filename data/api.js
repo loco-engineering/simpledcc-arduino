@@ -70,9 +70,8 @@ export function generate_wcc_message(module_settings) {
 
         state.values.forEach(value => {
 
-            //Set state's ouput_id, 1 byte
-            //For tests it's 4
-            wcc_msg[wcc_msg_ind++] = 0;
+            //Set state's connection_id, 1 byte
+            wcc_msg[wcc_msg_ind++] = value.connection_id;
 
             //Set state's value length in bytes, 2 bytes
             const value_length = bytesArray(1, 2);
