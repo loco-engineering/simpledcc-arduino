@@ -1,3 +1,6 @@
+#ifndef LED_MODULE_H
+#define LED_MODULE_H
+
 PCA9955B ledd(0x3F);
 
 // setting PWM properties
@@ -122,3 +125,5 @@ void loop_led()
         }
     }
 }
+
+#endif

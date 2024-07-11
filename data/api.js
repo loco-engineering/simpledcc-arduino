@@ -72,7 +72,7 @@ export function generate_wcc_message(module_settings) {
 
             //Set state's ouput_id, 1 byte
             //For tests it's 4
-            wcc_msg[wcc_msg_ind++] = 4;
+            wcc_msg[wcc_msg_ind++] = 0;
 
             //Set state's value length in bytes, 2 bytes
             const value_length = bytesArray(1, 2);

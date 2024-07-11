@@ -48,6 +48,12 @@ void setup()
 
   initSPIFFS();
 
+  //Set board config
+  fill_board_connections(); //after we call this function we can get connections by using var board_connections
+  for (int i = 0; i < 16; i++) {
+      Serial.println( board_connections[i].name);
+  }
+
   setup_dcc_module();
   setup_webserver();
   setup_led();
@@ -56,14 +62,14 @@ void setup()
   on_status_led();
 
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
-  add_led_connection(0, 0, 0.5, 1000, 1000, 0);
+  //add_led_connection(0, 0, 0.5, 1000, 1000, 0);
   //add_led_connection(1, 2, 0.5, 1000, 1000, 1000);
 
   // Test SPIFFS
   listDir(SPIFFS, "/", 0);
 
   // Test audio
-   play_audio_from_header_file();
+  //play_audio_from_header_file();
 
   //Test WCC parse
   //uint8_t test_msg[] = { 0x00, 0x01, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0xdc, 0x54, 0x75, 0xd8, 0xf8, 0x30, 0x00, 0x00, 0x00, 0x07, 0x01, 0x01, 0x04, 0x06,/*states start*/ 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x08, 0x01 /*States End*/, 0x00, 0x00, 0x00, 0x00};

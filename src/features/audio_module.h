@@ -2,7 +2,7 @@
 #include "test_audio.h"    // The Wav file
 
 static const i2s_port_t i2s_num = I2S_NUM_0; // i2s port number
-unsigned const char *wav_data;
+unsigned const char *wav_data = 0;
 uint32_t wav_data_index = 0; // index offset into "wav_data" for current  data t send to I2S
 
 struct WavHeader_Struct
@@ -170,6 +170,10 @@ void play_audio_from_header_file()
 
 void loop_audio()
 {
+
+    if (wav_data == 0){
+        return;
+    }
 
     size_t BytesWritten; // Returned by the I2S write routine, we are not interested in it
 

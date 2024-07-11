@@ -2,12 +2,8 @@
 #define WCC_MODULE_H
 
 #include "esp32-hal-log.h"
-
-typedef struct
-{
-    uint8_t GPIO;
-    uint8_t type;
-} Connection;
+#include "../config/board_config.h"
+#include "./led_module.h"
 
 typedef struct
 {
@@ -163,6 +159,7 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                 // Get connection id
                 value.connection_id = output_buffer[element_data_start_ind];
                 ESP_LOGI(TAG, "Connection id: %d", value.connection_id);
+
                 ++element_data_start_ind;
 
                 // Get value length
@@ -186,7 +183,11 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                 }
                 ESP_LOGI(TAG, "=======================");
 
+                add_led_connection(0, value.connection_id, (float) (value.val[0])/255.0);
+
+
                 state.values[value_number] = value;
+
             }
 
             // Parse if this state is active
