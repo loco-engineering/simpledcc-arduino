@@ -83,7 +83,9 @@ class ActionModal extends HTMLElement {
                 if (current_state.values.length > 0){
                     var name = '';
                     current_state.values.forEach(value => {
-                        name += `${value.output} `;
+                        if (value.output != undefined){
+                            name += `${value.output} `;
+                        }
                     });
                     current_state.name = name;
                 }else{
@@ -111,6 +113,7 @@ export function reload_action_outputs() {
     for (let value_index = 0; value_index < current_state.values.length; ++value_index) {
 
         var output_select = `<select class="state_output" id="state_output_${value_index}">`;
+        output_select += `<option value="0">Not selected</option>`;
 
         for (let index = 0; index < available_outputs.length; ++index) {
             const output = available_outputs[index];
@@ -119,6 +122,7 @@ export function reload_action_outputs() {
         output_select += `</select>`;
 
         var type_select = `<select class="type_output" id="type_output_${value_index}">`;
+        type_select += `<option value="0">Not selected</option>`;
 
         for (let index = 0; index < 1; ++index) {
             type_select += `<option value="gpio">GPIO</option>`;
@@ -140,7 +144,7 @@ export function reload_action_outputs() {
 
         grid_node.innerHTML = `
     
-        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Name</div></div>
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Name on a decoder</div></div>
         <div class="pure-u-1-2 "><div class="output_cell">${output_select}</div></div>
 
         <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Type</div></div>
