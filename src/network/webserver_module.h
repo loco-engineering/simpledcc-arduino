@@ -57,6 +57,46 @@ void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_
   ws.binaryAll(msg_to_send, msg_index);
 }
 
+void send_board_config_message()
+{
+
+  const size_t dcc_packet_size = sizeof(Connection);
+  uint8_t msg_to_send[dcc_packet_size * connection_amount];
+
+  // Set message type
+  msg_to_send[0] = 5;                    // 5 - a message with a board config
+  msg_to_send[1] = connection_amount; // amount of DCC packates in the message
+
+  uint16_t msg_index = 2;
+
+  // Iterate DCC packets in cached_packets and add to a websockets message
+  for (uint8_t i = 0; i < connection_amount; ++i)
+  {
+    Connection connection = board_connections[i];
+
+    //Fill the connection name
+    for (uint8_t name_ind = 0; name_ind < CONNECTION_NAME_LENGTH; ++name_ind){
+      msg_to_send[msg_index++] = connection.name[name_ind];
+    }
+
+    //Output number on the chip
+    msg_to_send[msg_index++] = connection.output_num;
+
+    //Chip type
+    msg_to_send[msg_index++] = connection.owner_id;
+
+    //Fill the signal types this connection can handle
+    for (uint8_t sig_type_ind = 0; sig_type_ind < CONNECTION_SIGNAL_TYPES_AMOUNT; ++sig_type_ind){
+
+      msg_to_send[msg_index++] = connection.signal_types[sig_type_ind];
+
+    }
+
+  }
+  ws.binaryAll(msg_to_send, msg_index);
+}
+
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
@@ -104,6 +144,10 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   case WS_EVT_CONNECT:
     sprintf(log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
     Serial.print(log_buffer);
+
+    //Send the board configuration message
+    send_board_config_message();
+
     break;
   case WS_EVT_DISCONNECT:
     sprintf(log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());

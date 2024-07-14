@@ -5,6 +5,13 @@
 #include "../config/board_config.h"
 #include "./led_module.h"
 
+const uint8_t WCC_MSG_ID_LENGTH = 6;
+typedef struct
+{
+    uint8_t id[WCC_MSG_ID_LENGTH];
+    uint8_t is_state_active;
+} WCC_msg;
+
 typedef struct
 {
     uint8_t *val;
@@ -18,6 +25,9 @@ typedef struct
     Value *values;
     uint8_t value_count;
     bool is_active;
+    WCC_msg *wcc_msg;
+    uint8_t wcc_msg_count;
+
 } State;
 
 typedef struct
@@ -196,6 +206,39 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
             ++element_data_start_ind;
 
             current_element.states[state_number] = state;
+
+
+            //Get WCC message IDs for this state
+            state.wcc_msg_count = output_buffer[element_data_start_ind++];
+            ESP_LOGI(TAG, "WCC events for this state: %d", state.value_count);
+
+            state.wcc_msg = (WCC_msg *)malloc(state.wcc_msg_count * sizeof(WCC_msg));
+
+            for (uint8_t msg_number = 0; msg_number < state.wcc_msg_count; ++msg_number)
+            {
+                // Allocate memory for WCC message
+                WCC_msg msg;
+
+                for (unsigned int id_index = 0; id_index < WCC_MSG_ID_LENGTH; ++id_index)
+                {
+                    msg.id[id_index] = output_buffer[element_data_start_ind++];
+                }
+
+                ESP_LOGI(TAG, "WCC msg ID:");
+                for (int i = 0; i < WCC_MSG_ID_LENGTH; i++)
+                {
+                    ESP_LOGI(TAG, "%d: %d", i, msg.id[i]);
+                }
+
+                msg.is_state_active = output_buffer[element_data_start_ind++];
+                ESP_LOGI(TAG, "is state active: %d", msg.is_state_active );
+
+                ESP_LOGI(TAG, "=======================");
+
+                state.wcc_msg[msg_number] = msg;
+
+            }
+
         }
 
         // Iterate over handlers

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet" href="./grids-min.css">
     <link rel="stylesheet" href="./grids-responsive-min.css">
-    <script type="module" src="./action-modal.js"></script>
+    <script type="module" src="./state-details-modal.js"></script>
     <script type="module" src="./storage.js"></script>
 
 </head>
@@ -39,7 +39,7 @@
         <h3 class="section_header">States<button id="new_action_btn" class="new_btn">Add state</button>
         </h3>
 
-        <p class="section_hint">What the decoder should do when a DCC packet, WCC message or message from the web app is
+        <p class="section_hint">What the decoder should do when a DCC packet or WCC message is
             received. For example, turn on top red light on a signal or close barriers on a level crossing.</p>
         <div class="tableFixHead">
 
@@ -84,7 +84,7 @@
                 </tbody>
 
             </table>
-            <p class="no_data_hint" id="no_dcc_packets_hint">No DCC packets received yet</p>
+            <p class="no_data_hint" id="no_dcc_packets_hint">No DCC packets received yet. Connect DCC track or wires to the decoder to see DCC packets.</p>
 
         </div>
     </div>
@@ -120,7 +120,7 @@
     </div>
 
     <script type="module">
-        import { show_new_action, show_edit_action } from "./action-modal.js";
+        import { show_new_action, show_edit_action } from "./state-details-modal.js";
         import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
         import { initWebSocket } from "./api.js";
 
@@ -233,8 +233,6 @@
             show_new_action(reload_states);
         };
 
-        const toBinString = (bytes) =>
-            bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '');
     </script>
 </body>
 

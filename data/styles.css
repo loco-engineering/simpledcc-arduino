@@ -253,14 +253,12 @@ select {
 /* Modal Content/Box */
 .modal-content {
     background-color: #fdfdfd;
-    margin: 10% auto;
+    margin: 2% auto;
     /* 15% from the top and centered */
     padding-top: 30px;
     padding-bottom: 30px;
     padding-left: 20px;
     padding-right: 20px;
-    min-width: 350px;
-    /* Could be more or less, depending on screen size */
     max-width: 400px;
     /* Could be more or less, depending on screen size */
     border-radius: 10px;
@@ -350,8 +348,17 @@ select {
 
 
 .state_settings_input{
-    font-size: 14px;
+    font-size: 13px;
 }
+
+::placeholder {
+    font-size: 13px;
+
+  }
+  
+  ::-ms-input-placeholder { /* Edge 12 -18 */
+    font-size: 14px;
+  }
 
 .state_settings_adv_params{
     padding-top: 5px;

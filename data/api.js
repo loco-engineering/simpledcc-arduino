@@ -2,6 +2,7 @@
 var gateway = `ws://192.168.4.1/ws`;
 
 var websocket;
+export var available_outputs = [];
 
 export function generate_wcc_message(module_settings) {
 
@@ -89,6 +90,22 @@ export function generate_wcc_message(module_settings) {
 
         wcc_msg[wcc_msg_ind++] = state.is_active;
 
+
+        //Set wcc message ids
+        //each message id takes 6 bytes because should be unique inside the layout 
+        const wcc_event_ids_amount = state.wcc_event_ids.length
+        wcc_msg[wcc_msg_ind++] = wcc_event_ids_amount;
+
+        state.wcc_event_ids.forEach(wcc_message_id => {
+            for (var id_ind = 0; id_ind < 6; id_ind += 1) {
+                wcc_msg[wcc_msg_ind++] = wcc_message_id.charCodeAt(id_ind);
+            }
+
+            //Set if the state should be activated or not
+            wcc_msg[wcc_msg_ind++] = 1;
+        });
+
+
     });
 
     //Add handlers
@@ -156,7 +173,9 @@ function onClose(event) {
 async function onMessage(event) {
 
     const buffer = new Uint8Array(await event.data.arrayBuffer());
-    console.log("New message " + buffer.length);
+    console.log("New message. Length: " + buffer.length);
+
+    console.log(Array.apply([], buffer).join(","));
 
     //Parse the message from a decoder
     //Get a type
@@ -238,13 +257,60 @@ async function onMessage(event) {
 
         }
 
+        document.querySelector('#no_dcc_packets_hint').style.display = "none";
+
     }
 
-    document.querySelector('#no_dcc_packets_hint').style.display = "none";
+
+    if (msg_type == 5) {
+        //This a message with a board config
+        //Get the amount board connections
+        let connections_amount = buffer[msg_index++];
+
+
+        available_outputs = [];
+
+        const CONNECTION_NAME_LENGTH = 4; // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
+        const CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
+        const connection_types = ["Digital", "PWM"];
+
+        for (var i = 0; i < connections_amount; i++) {
+
+            var connection = {};
+            connection.name = '';
+            //Get connection name
+            for (var name_ind = 0; name_ind < CONNECTION_NAME_LENGTH; name_ind++) {
+                connection.name += String.fromCharCode(buffer[msg_index++]);
+            }
+
+            connection.output_num = buffer[msg_index++];
+            connection.owner_id = buffer[msg_index++];
+            connection.signal_types = [];
+
+            for (var type_ind = 0; type_ind < CONNECTION_SIGNAL_TYPES_AMOUNT; type_ind++) {
+                const type = buffer[msg_index++];
+                if (type != 0) {
+                    connection.signal_types.push(connection_types[type - 1]);
+                }
+            }
+
+            if (connection.name != '\u0000\u0000\u0000\u0000') {
+                available_outputs.push(connection);
+            }
+
+        }
+
+        console.log("Board connections: " + JSON.stringify(available_outputs));
+    }
+
+
 
     //Autoscoll
     //let dcc_packets_table_el = document.querySelector('#dcc_packets_table_container');
     //dcc_packets_table_el.scrollTop = dcc_packets_table_el.scrollHeight;
 
 }
+
+const toBinString = (bytes) =>
+    bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '');
 

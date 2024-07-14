@@ -1,5 +1,5 @@
 import { add_state, update_state } from "./storage.js";
-
+import {available_outputs} from "./api.js"
 var close_callback = null;
 
 class ActionModal extends HTMLElement {
@@ -21,13 +21,13 @@ class ActionModal extends HTMLElement {
     </div>
 
     <div class="state_text_input">
-    <label class="state_input_text_label" for="state_dcc_packet"> DCC Packet (optional)</label>
-    <input type="text" placeholder="" name="state_dcc_packet" id="state_dcc_packet">
+    <label class="state_input_text_label" for="state_wcc_event"> WCC Message IDs (optional)</label>
+    <input type="text" placeholder="WCC message IDs separated by comma" name="state_wcc_event" id="state_wcc_event">
     </div>
 
     <div class="state_text_input">
-    <label class="state_input_text_label" for="state_wcc_event"> WCC Event (optional)</label>
-    <input type="text" placeholder="" name="state_wcc_event" id="state_wcc_event">
+    <label class="state_input_text_label" for="state_dcc_packet"> DCC Packet (optional)</label>
+    <input type="text" placeholder="" name="state_dcc_packet" id="state_dcc_packet">
     </div>
 
 
@@ -79,6 +79,11 @@ class ActionModal extends HTMLElement {
             current_state.name = document.getElementById("state_name").value;
             current_state.is_active = document.getElementById("state_is_active").value;
 
+            var wcc_event_ids_str = document.getElementById("state_wcc_event").value;
+            if (wcc_event_ids_str != undefined){
+                current_state.wcc_event_ids = wcc_event_ids_str.split(",");
+            }
+
             if (current_state.name == ''){
                 if (current_state.values.length > 0){
                     var name = '';
@@ -117,7 +122,7 @@ export function reload_action_outputs() {
 
         for (let index = 0; index < available_outputs.length; ++index) {
             const output = available_outputs[index];
-            output_select += `<option value="${output.name}">${output.name}</option>`;
+            output_select += `<option value="${index}">${output.name}</option>`;
         }
         output_select += `</select>`;
 
@@ -188,7 +193,7 @@ export function reload_action_outputs() {
 
 
         if (current_state.values[value_index].connection_name != undefined){
-            document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].connection_name;
+            document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].connection_id;
             document.getElementById(`state_value_${value_index}`).value = current_state.values[value_index].value;
 
         }
@@ -222,7 +227,6 @@ export function reload_action_outputs() {
 }
 
 
-var available_outputs = [];
 var current_state = null;
 
 export function save_outputs(){
@@ -230,19 +234,11 @@ export function save_outputs(){
 
     var state_output_els = document.getElementsByClassName('state_output');
     for (var i = 0; i < state_output_els.length; ++i) {
-        const state_connection_name = document.getElementById(`state_output_${i}`).value;
+        const state_connection_id = parseInt(document.getElementById(`state_output_${i}`).value);
+        const state_connection_name = available_outputs[state_connection_id];
         const state_value_val = document.getElementById(`state_value_${i}`).value;
 
-        //Find id of a connection
-        var connection_id = 0;
-        for (var av_i = 0; av_i < available_outputs.length; av_i += 1){
-            const connection = available_outputs[av_i];
-                if (state_connection_name == connection.name){
-                    connection_id = i;
-                }
-        }
-
-        current_state.values.push({connection_name:  state_connection_name, connection_id: connection_id, signal_type: 0, value: parseInt(state_value_val)});
+        current_state.values.push({connection_name:  state_connection_name, connection_id: state_connection_id, signal_type: 0, value: parseInt(state_value_val)});
 
     }
 }
@@ -251,8 +247,6 @@ export function show_new_action(reload_states) {
 
     current_state = {};
     current_state.values = [{}];
-
-    set_available_outputs();
 
     reload_action_outputs();
     document.getElementById("action-modal-container").style.display = "block";
@@ -264,7 +258,6 @@ export function show_edit_action(reload_states, state) {
 
     current_state = state;
 
-    set_available_outputs();
     reload_action_outputs();
 
     document.getElementById("state_name").value = current_state.name;
@@ -273,17 +266,6 @@ export function show_edit_action(reload_states, state) {
     document.getElementById("action-modal-container").style.display = "block";
 
     close_callback = reload_states;
-}
-
-export function set_available_outputs(){
-    available_outputs = [];
-
-    available_outputs.push({name: "O0", signal_types:["PWM"]});
-    available_outputs.push({name: "O1", signal_types:["PWM"]});
-    available_outputs.push({name: "O2", signal_types:["PWM"]});
-
-    available_outputs.push({name: "IO08", signal_types:["Digital", "PWM"]});
-    available_outputs.push({name: "Speaker", signal_types:"AUDIO"});
 }
 
 customElements.define("action-modal", ActionModal);
