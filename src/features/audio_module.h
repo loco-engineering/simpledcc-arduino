@@ -1,3 +1,5 @@
+#ifndef AUDIO_MODULE_H
+#define AUDIO_MODULE_H
 
 #include "test_audio.h"    // The Wav file
 
@@ -183,3 +185,5 @@ void loop_audio()
     if(wav_data_index>=WavHeader.DataSize)               // If we gone past end of data reset back to beginning
     wav_data_index=0;    
 }
+
+#endif

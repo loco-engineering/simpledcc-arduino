@@ -1,6 +1,6 @@
 #### Note: The project is in active development
 
-# DCC (Digital Command Control) / WCC (Wireless Command Control) decoders based on Arduino and ESP32XX SOCs
+# DCC (Digital Command Control) / WCC (Wireless Command Control) decoders based on Arduino and ESP32S3 SOCs
 
 License: Attribution-NonCommercial 4.0 International
 
@@ -44,7 +44,7 @@ The main differences are:
 
 - SimpleDCC/WCC decoders can control trains, vehicles, and layout accessories like signals and turnouts without needing to know the specific types connected. With a traditional decoder, changing a signal aspect requires finding the correct command to send from the command station. With SimpleDCC/WCC, the user defines what action should occur when a specific DCC packet is received. You're not limited to predefined signal aspects or features set by manufacturers like Pico or Marklin. Instead, you can create virtually any state and action you need. No programming is required, but for advanced users, the source code is available for full control over the decoder's behavior.
 
-- You can control almost everything with SimpleDCC/WCC from a command station or web browser, including RGB addressable LEDs, NFC readers, Hall sensors, and more.
+- You can control almost everything with SimpleDCC/WCC from a command station or web browser, including RGB addressable LEDs, NFC readers, Hall sensors, servo motors, DC motors/single solenoids (an external DC motor driver is required) and more.
 
 
 ## Getting Started
@@ -61,11 +61,12 @@ The main differences are:
 
 ## How to build and upload
 
+- Prepare a board with ESP32S3 SoC (2 cores are required to run the firmware that's why other 1-core ESP32xx are not supported in this version)
 - Install Arduino IDE (we test with Arduino IDE 2.3.2)
 - Install ESP32 for Arduino IDE (we test with version 2.0.17, later versions could not work and you will have build errors)
 - Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11), LiteLED (version 1.2.0). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
 - Change configuration in config.h if required
-- (Optional) If you change files in the simpledcc-arduino/data folder, you should recreate and upload SPIFFS to your board (for Arduino 2.2.1 - https://github.com/espx-cz/arduino-spiffs-upload?tab=readme-ov-file, Arduino 1.x.x - https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/)
+- Create and upload SPIFFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner)
 - (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose. If you don't see any logs check "I don't see any logs" below
 - Build and upload the firmware
 

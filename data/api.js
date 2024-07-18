@@ -124,6 +124,23 @@ export function generate_wcc_message(module_settings) {
 
 }
 
+export function generate_wcc_event_msg(wcc_event) {
+
+    var wcc_msg = [];
+    let wcc_msg_ind = 0;
+    wcc_msg[wcc_msg_ind++] = 2; //message type, 2 - WCC event
+
+    for (var id_ind = 0; id_ind < 6; id_ind += 1) {
+        wcc_msg[wcc_msg_ind++] = wcc_event.id.charCodeAt(id_ind);
+    }
+
+    //Set if the state should be activated or not
+    wcc_msg[wcc_msg_ind++] = wcc_event.is_state_active;
+
+    return wcc_msg;
+
+}
+
 const bytesArray = (n, required_length) => {
     const a = []
     a.unshift(n & 255)
@@ -147,6 +164,15 @@ function concatTypedArrays(a, b) { // a, b TypedArray of same type
 
 export function send_wcc_message(module_settings) {
     var message_to_send = generate_wcc_message(module_settings);
+    send_websocket_message(message_to_send);
+}
+
+export function send_wcc_event(wcc_event) {
+    var message_to_send = generate_wcc_event_msg(wcc_event);
+    send_websocket_message(message_to_send);
+}
+
+export function send_websocket_message(message_to_send) {
     if (websocket.readyState == WebSocket.OPEN) {
         let msg = new Uint8Array(message_to_send);
         console.log(msg);
@@ -163,7 +189,10 @@ export function initWebSocket() {
 }
 function onOpen(event) {
     console.log('Connection opened');
-
+    var wcc_test_event = {};
+    wcc_test_event.id = 'eq125k';
+    wcc_test_event.is_state_active = 1;
+    send_wcc_event(wcc_test_event);
 }
 
 function onClose(event) {
@@ -244,6 +273,17 @@ async function onMessage(event) {
                     }
                     description_str = `Function Group: ${function_group_str} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
                     break;
+                case 3:
+                        packet_type_str = "Signal Aspect";
+                        description_str = `Aspect: ${user_data[0]}`;
+                        break;
+                case 4:
+                        packet_type_str = "Turnout";
+                        description_str = `Direction: ${user_data[0]} | Power: ${user_data[1]}`;
+                        if (user_data_length == 3){
+                            description_str += ` | Output Pair: ${user_data[2]}`;
+                        }
+                        break;
                 default:
                     break;
             }

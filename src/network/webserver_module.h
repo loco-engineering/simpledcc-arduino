@@ -114,11 +114,20 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     Serial.println();
     //Check the type - first byte
     if (data[0] == 1){
-      //This message is WCC message, trying to parse
+      //This message is WCC board settings
       //Move a pointer with data to the second byte
       data++;
       handle_wcc_message(data, len);
     }
+
+        //Check the type - first byte
+    if (data[0] == 2){
+      //This message is WCC event
+      //Move a pointer with data to the second byte
+      data++;
+      handle_wcc_event(data, len);
+    }
+
     Serial.println("=======================");
 
   if (info->final && info->index == 0 && info->len == len)
@@ -133,6 +142,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // notifyClients(sensorReadings);
     //}
   }
+  
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)

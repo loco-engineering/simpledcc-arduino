@@ -1,6 +1,6 @@
 #include "NmraDcc.h"
 #include "../network/webserver_module.h"
-
+#include "../handlers/event_handler.h"
 NmraDcc Dcc;
 
 dcc_packet cached_packets[MAX_CACHED_DCC_PACKETS];
@@ -113,6 +113,30 @@ void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint
   }
 }
 
+// This function is called whenever a normal DCC Turnout Packet is received and we're in Board Addressing Mode
+void notifyDccAccTurnoutBoard(uint16_t BoardAddr, uint8_t OutputPair, uint8_t Direction, uint8_t OutputPower)
+{
+  Serial.print("notifyDccAccTurnoutBoard: ");
+  Serial.print(BoardAddr, DEC);
+  Serial.print(',');
+  Serial.print(OutputPair, DEC);
+  Serial.print(',');
+  Serial.print(Direction, DEC);
+  Serial.print(',');
+  Serial.println(OutputPower, HEX);
+
+  // Set packet type
+  cached_packets[cached_packets_count - 1].packet_type = 4; // Turnout Packet
+  // Save address
+  cached_packets[cached_packets_count - 1].address[0] = BoardAddr & 0xff;
+  cached_packets[cached_packets_count - 1].address[1] = (BoardAddr >> 8);
+  // Save user data
+  cached_packets[cached_packets_count - 1].user_data[0] = Direction;
+  cached_packets[cached_packets_count - 1].user_data[1] = OutputPower;
+  cached_packets[cached_packets_count - 1].user_data[2] = OutputPair;
+  cached_packets[cached_packets_count - 1].user_data_length = 3;
+}
+
 // This function is called whenever a normal DCC Turnout Packet is received and we're in Output Addressing Mode
 void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputPower)
 {
@@ -122,6 +146,31 @@ void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputP
   Serial.print(Direction, DEC);
   Serial.print(',');
   Serial.println(OutputPower, HEX);
+
+  // Set packet type
+  cached_packets[cached_packets_count - 1].packet_type = 4; // Turnout Packet
+  // Save address
+  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
+  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+  // Save user data
+  cached_packets[cached_packets_count - 1].user_data[0] = Direction;
+  cached_packets[cached_packets_count - 1].user_data[1] = OutputPower;
+  cached_packets[cached_packets_count - 1].user_data_length = 2;
+
+  process_dcc_turnout(&cached_packets[cached_packets_count - 1]);
+  
+  /*if (Direction == 1){
+
+  }else{
+
+  }
+  if (OutputPower == 1){
+    analogWrite(5, 200);     // back for a motor
+    analogWrite(6, 0);     // back for a motor
+  }else{
+    analogWrite(5, 0);     // back for a motor
+    analogWrite(6, 0);     // back for a motor
+  }*/
 }
 
 // This function is called whenever a DCC Signal Aspect Packet is received
@@ -131,6 +180,15 @@ void notifyDccSigOutputState(uint16_t Addr, uint8_t State)
   Serial.print(Addr, DEC);
   Serial.print(',');
   Serial.println(State, HEX);
+
+  // Set packet type
+  cached_packets[cached_packets_count - 1].packet_type = 3; // Signal Aspect Packet
+  // Save address
+  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
+  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+  // Save user data
+  cached_packets[cached_packets_count - 1].user_data[0] = State;
+  cached_packets[cached_packets_count - 1].user_data_length = 1;
 }
 
 void notifyDccMsg(DCC_MSG *Msg)
@@ -161,9 +219,16 @@ void setup_dcc_module()
 
   Dcc.pin(DCC_PIN, 0);
 
-  Dcc.init(MAN_ID_DIY, 0, 0, 0);
+  Dcc.init(MAN_ID_DIY, 0, CV29_ACCESSORY_DECODER | CV29_OUTPUT_ADDRESS_MODE, 0);
   Serial.print("DCC reader is ready...");
+
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, 0); // back for a motor
 }
+
+double time_from_last_sent_dcc_packet = 0;
 
 void loop_dcc_module()
 {
@@ -173,10 +238,16 @@ void loop_dcc_module()
   //  - cached_packets_count == MAX_CACHED_DCC_PACKETS
   //   or
   //   - every second
-  if (cached_packets_count == MAX_CACHED_DCC_PACKETS)
-  {
-    send_dcc_packets(cached_packets, cached_packets_count);
-    // Reset cached_packets_count
-    cached_packets_count = 0;
-  }
+
+      if (cached_packets_count == MAX_CACHED_DCC_PACKETS || millis() > time_from_last_sent_dcc_packet < 1000){
+        //Time to send packets to the web app over websockets
+        if (cached_packets_count > 0)
+        {
+          send_dcc_packets(cached_packets, cached_packets_count);
+          // Reset cached_packets_count
+          cached_packets_count = 0;
+        }
+        time_from_last_sent_dcc_packet = millis();
+    }
+
 }

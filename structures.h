@@ -1,4 +1,5 @@
-
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
 
 struct dcc_packet{
    uint8_t raw_packet[8];
@@ -24,3 +25,5 @@ struct led_connection{
    double next_on;
    double next_off;
 };
+
+#endif

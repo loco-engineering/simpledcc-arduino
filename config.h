@@ -1,8 +1,8 @@
-//This file includes configuration values for your SimpleDCC decoder
+//This file includes configuration values for your WCC/SimpleDCC decoder
 
 // GPIO that receives DCC Signal 
 #define DCC_PIN     17
-#define MAX_CACHED_DCC_PACKETS 100
+#define MAX_CACHED_DCC_PACKETS 10
 
 //LEDs
 #define MAX_LED_CONNECTIONS 20
