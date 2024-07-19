@@ -1,7 +1,7 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-struct dcc_packet{
+typedef struct DCCPacket{
    uint8_t raw_packet[8];
    uint8_t raw_packet_length;
 

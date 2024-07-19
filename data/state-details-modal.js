@@ -1,5 +1,5 @@
 import { add_state, update_state } from "./storage.js";
-import {available_outputs} from "./api.js"
+import { available_outputs } from "./api.js"
 var close_callback = null;
 
 class ActionModal extends HTMLElement {
@@ -27,12 +27,44 @@ class ActionModal extends HTMLElement {
 
     <div class="state_text_input">
     <label class="state_input_text_label" for="state_dcc_packet"> DCC Packet (optional)</label>
-    <input type="text" placeholder="" name="state_dcc_packet" id="state_dcc_packet">
+    <div class="state_outputs_list_gray">
+    <div class="pure-g">
+
+    <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Address</div></div>
+    <div class="pure-u-1-2 ">
+    <div class="output_cell"><input type="text" placeholder="" name="state_dcc_packet" id="state_dcc_packet_address">
+    </div>
+    </div>
+
+    <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Type</div></div>
+    <div class="pure-u-1-2 "><div class="output_cell">
+    <select class="type_output" id="dcc_packet_type">
+    <option value="0">Select</option>
+    <option value="1">Speed</option>
+    <option value="2">Multifunction</option>
+    <option value="3">Turnout</option>
+    <option value="4">Signal Aspect</option>
+    </select>
+    </div>
+    </div>
+    
+    </div>
+
+    <div class="pure-g" id="state_dcc_packet_advanced_settings">
+
+    </div>
+
+
+
+    
+    </div>
+    </div>
+
     </div>
 
 
             <input class ="state_check_box" type="checkbox" id="state_active" name="state_active">
-            <label class="state_input_text_label" id="state_is_active" for="state_active"> Active</label><br>
+            <label class="state_input_text_label" id="state_is_active" for="state_active"> Is Active Now</label><br>
             
             </div>
             <div class="pure-g ">
@@ -72,34 +104,84 @@ class ActionModal extends HTMLElement {
             console.log("clicked on is active");
         }
 
+        document.querySelector("#dcc_packet_type").addEventListener("change", (event) => {
+            const dcc_packet_type = event.target.value;
+            var advanced_ddc_packet_settings = "";
+
+            if (dcc_packet_type == 3) {
+                advanced_ddc_packet_settings =
+                    `
+                <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Direction</div></div>
+                <div class="pure-u-1-2 ">
+                <div class="output_cell"><input type="text" placeholder="0-5" name="state_dcc_packet"  id="state_dcc_packet_turnout_direction">
+                </div>
+                </div>
+            
+                `;
+
+            }
+
+            document.getElementById("state_dcc_packet_advanced_settings").innerHTML = advanced_ddc_packet_settings;
+
+        });
+
+
         document.getElementById("save_action_settings").onclick = () => {
 
             save_outputs();
-            
+
             current_state.name = document.getElementById("state_name").value;
             current_state.is_active = document.getElementById("state_is_active").value;
 
             var wcc_event_ids_str = document.getElementById("state_wcc_event").value;
-            if (wcc_event_ids_str != undefined){
+            if (wcc_event_ids_str != undefined) {
                 current_state.wcc_event_ids = wcc_event_ids_str.split(",");
             }
 
-            if (current_state.name == ''){
-                if (current_state.values.length > 0){
+            var dcc_packet_addr = document.getElementById("state_dcc_packet_address").value;
+            if (dcc_packet_addr != undefined) {
+                current_state.dcc_packet = {};
+                current_state.dcc_packet.address = dcc_packet_addr;
+
+                //Get the packet type
+                current_state.dcc_packet.type = document.querySelector("#dcc_packet_type").value;
+
+                //Get packet data depending on the packet
+                current_state.dcc_packet.user_data = [];
+                current_state.dcc_packet.user_data_length = 0;
+
+                switch (current_state.dcc_packet.type) {
+                    case 0:
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        current_state.dcc_packet.user_data_length = 1;
+                        current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_turnout_direction").value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (current_state.name == '') {
+                if (current_state.values.length > 0) {
                     var name = '';
                     current_state.values.forEach(value => {
-                        if (value.output != undefined){
+                        if (value.output != undefined) {
                             name += `${value.output} `;
                         }
                     });
                     current_state.name = name;
-                }else{
+                } else {
                     current_state.name = `-`;
                 }
             }
-            if (current_state.id != undefined){
+            if (current_state.id != undefined) {
                 update_state(current_state);
-            }else{
+            } else {
                 add_state(current_state);
             }
 
@@ -141,9 +223,9 @@ export function reload_action_outputs() {
 
         var grid_node = document.createElement('div');
         grid_node.classList.add("pure-g");
-        if (value_index % 2 == 0){
+        if (value_index % 2 == 0) {
             grid_node.classList.add("state_outputs_list_gray");
-        }else{
+        } else {
             grid_node.classList.add("state_outputs_list_gray");
         }
 
@@ -160,14 +242,6 @@ export function reload_action_outputs() {
             <input class="state_settings_input" type="text" id="state_value_${value_index}" value="0">
         </div>
         </div>
-
-        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Action</div></div>
-        <div class="pure-u-1-2 "><div class="output_cell">
-        <select class="type_output" id="state_output_action_${value_index}">
-        <option value="0">None</option>
-        <option value="1">Blink</option>
-        </select>
-        </div></div>
 
         <div class="pure-g">
 
@@ -192,7 +266,7 @@ export function reload_action_outputs() {
         document.querySelector('#output_list').appendChild(grid_node);
 
 
-        if (current_state.values[value_index].connection_name != undefined){
+        if (current_state.values[value_index].connection_name != undefined) {
             document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].connection_id;
             document.getElementById(`state_value_${value_index}`).value = current_state.values[value_index].value;
 
@@ -229,7 +303,7 @@ export function reload_action_outputs() {
 
 var current_state = null;
 
-export function save_outputs(){
+export function save_outputs() {
     current_state.values = [];
 
     var state_output_els = document.getElementsByClassName('state_output');
@@ -238,7 +312,7 @@ export function save_outputs(){
         const state_connection_name = available_outputs[state_connection_id];
         const state_value_val = document.getElementById(`state_value_${i}`).value;
 
-        current_state.values.push({connection_name:  state_connection_name, connection_id: state_connection_id, signal_type: 0, value: parseInt(state_value_val)});
+        current_state.values.push({ connection_name: state_connection_name, connection_id: state_connection_id, signal_type: 0, value: parseInt(state_value_val) });
 
     }
 }

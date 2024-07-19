@@ -338,6 +338,12 @@ select {
     padding: 4px;
 }
 
+.output_cell_dcc_packet {
+    padding: 4px;
+    padding-left: 6px;
+    padding-right: 2px;
+}
+
 .state_icn{
     width: 35px;
     height: 35px;

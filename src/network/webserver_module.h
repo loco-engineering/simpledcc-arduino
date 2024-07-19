@@ -26,9 +26,9 @@ void initWiFi()
   }
 }
 
-void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_count)
+void send_dcc_packets(DCCPacket *cached_packets, uint8_t cached_packets_count)
 {
-  const size_t dcc_packet_size = sizeof(dcc_packet);
+  const size_t dcc_packet_size = sizeof(DCCPacket);
   uint8_t msg_to_send[dcc_packet_size * MAX_CACHED_DCC_PACKETS];
   // Set message type
   msg_to_send[0] = 4;                    // 4 - a message with DCC packets
@@ -38,7 +38,7 @@ void send_dcc_packets(struct dcc_packet *cached_packets, uint8_t cached_packets_
   // Iterate DCC packets in cached_packets and add to a websockets message
   for (int i = 0; i < cached_packets_count; ++i)
   {
-    struct dcc_packet cached_packet = cached_packets[i];
+    DCCPacket cached_packet = cached_packets[i];
     msg_to_send[msg_index++] = cached_packet.packet_type;
     msg_to_send[msg_index++] = cached_packet.address[0];
     msg_to_send[msg_index++] = cached_packet.address[1];

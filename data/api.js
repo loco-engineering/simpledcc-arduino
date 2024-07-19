@@ -105,6 +105,30 @@ export function generate_wcc_message(module_settings) {
             wcc_msg[wcc_msg_ind++] = 1;
         });
 
+        //Set DCC packet for the state
+        //Set DCC packet amount
+        //In current version only 0 or 1 DCC packet is possible
+        if (state.dcc_packet != undefined){
+            wcc_msg[wcc_msg_ind++] = 1; //The state has 1 DCC packet
+
+            //Set DCC packet address
+            const dcc_address = bytesArray(parseInt(state.dcc_packet.address), 2);
+            wcc_msg[wcc_msg_ind++] = dcc_address[0];
+            wcc_msg[wcc_msg_ind++] = dcc_address[1];
+
+            //Set DCC packet type
+            wcc_msg[wcc_msg_ind++] = parseInt(state.dcc_packet.type);
+
+            //Set DCC packet user data
+            wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data_length;
+            for (var data_ind = 0; data_ind < state.dcc_packet.user_data_length; data_ind += 1) {
+                wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data.charCodeAt(data_ind);
+            }
+
+        }else{
+            wcc_msg[wcc_msg_ind++] = 0;
+        }
+
 
     });
 

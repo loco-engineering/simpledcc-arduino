@@ -1,6 +1,8 @@
 #ifndef BOARD_CONFIG_H
 #define BOARD_CONFIG_H
 
+#include "../../structures.h"
+
 typedef enum
 {
     ESP32Sx,
@@ -48,6 +50,9 @@ typedef struct
     bool is_active;
     WCC_event *wcc_msg;
     uint8_t wcc_msg_count;
+
+    DCCPacket *dcc_packets;
+    uint8_t dcc_packet_count;
 
 } State;
 

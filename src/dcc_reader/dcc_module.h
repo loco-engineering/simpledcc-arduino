@@ -3,7 +3,7 @@
 #include "../handlers/event_handler.h"
 NmraDcc Dcc;
 
-dcc_packet cached_packets[MAX_CACHED_DCC_PACKETS];
+DCCPacket cached_packets[MAX_CACHED_DCC_PACKETS];
 uint8_t cached_packets_count = 0;
 
 void notifyDccSpeed(uint16_t Addr, DCC_ADDR_TYPE AddrType, uint8_t Speed, DCC_DIRECTION Dir, DCC_SPEED_STEPS SpeedSteps)

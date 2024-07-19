@@ -4,6 +4,7 @@
 #include "esp32-hal-log.h"
 #include "../config/board_config.h"
 #include "./led_module.h"
+#include "../../structures.h"
 
 static const char *TAG = "HANDLER_MODULE";
 
@@ -202,11 +203,9 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
             ESP_LOGI(TAG, "Is state active %d\n", state.is_active);
             ++element_data_start_ind;
 
-            board_settings.states[state_number] = state;
-
             // Get WCC message IDs for this state
             state.wcc_msg_count = output_buffer[element_data_start_ind++];
-            ESP_LOGI(TAG, "WCC events for this state: %d", state.value_count);
+            ESP_LOGI(TAG, "WCC events for this state: %d", state.wcc_msg_count);
 
             state.wcc_msg = (WCC_event *)malloc(state.wcc_msg_count * sizeof(WCC_event));
 
@@ -233,6 +232,49 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
 
                 state.wcc_msg[msg_number] = msg;
             }
+
+            // Get DCC packet for this state
+            state.dcc_packet_count = output_buffer[element_data_start_ind++];
+            ESP_LOGI(TAG, "WCC events for this state: %d", state.dcc_packet_count);
+
+            if (state.dcc_packet_count != 0)
+            {
+                state.dcc_packets = (DCCPacket *)malloc(state.dcc_packet_count * sizeof(DCCPacket));
+
+                for (uint8_t packet_number = 0; packet_number < state.dcc_packet_count; ++packet_number)
+                {
+                    // Allocate memory for DCC packet
+                    DCCPacket dcc_packet;
+
+                    //Set DCC packet address, 2 bytes
+                    dcc_packet.address[0] = output_buffer[element_data_start_ind++];
+                    dcc_packet.address[1] = output_buffer[element_data_start_ind++];
+
+                    //Set DCC packet type
+                    dcc_packet.packet_type = output_buffer[element_data_start_ind++];
+
+                    //Set DCC packet user data
+                    dcc_packet.user_data_length = output_buffer[element_data_start_ind++];
+
+                    for (unsigned int data_index = 0; data_index < dcc_packet.user_data_length; ++data_index)
+                    {
+                        dcc_packet.user_data[data_index] = output_buffer[element_data_start_ind++];
+                    }
+
+                    ESP_LOGI(TAG, "DCC packet address:");
+                    ESP_LOGI(TAG, "%d", bytes_to_short(dcc_packet.address[0], dcc_packet.address[0]));
+                    ESP_LOGI(TAG, "DCC packet user data:");
+                    for (int i = 0; i < dcc_packet.user_data_length; i++)
+                    {
+                        ESP_LOGI(TAG, "%d: %d", i, dcc_packet.user_data[i]);
+                    }
+                    ESP_LOGI(TAG, "=======================");
+
+                    state.dcc_packets[packet_number] = dcc_packet;
+                }
+            }
+
+            board_settings.states[state_number] = state;
         }
 
         // Send message to a module that should handle this element
