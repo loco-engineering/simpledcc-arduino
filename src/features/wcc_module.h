@@ -262,7 +262,9 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                     }
 
                     ESP_LOGI(TAG, "DCC packet address:");
-                    ESP_LOGI(TAG, "%d", bytes_to_short(dcc_packet.address[0], dcc_packet.address[0]));
+                    ESP_LOGI(TAG, "%d", bytes_to_short(dcc_packet.address[1], dcc_packet.address[0]));
+                    ESP_LOGI(TAG, "DCC packet type:");
+                    ESP_LOGI(TAG, "%d",dcc_packet.packet_type);
                     ESP_LOGI(TAG, "DCC packet user data:");
                     for (int i = 0; i < dcc_packet.user_data_length; i++)
                     {

@@ -93,17 +93,22 @@ export function generate_wcc_message(module_settings) {
 
         //Set wcc message ids
         //each message id takes 6 bytes because should be unique inside the layout 
-        const wcc_event_ids_amount = state.wcc_event_ids.length
-        wcc_msg[wcc_msg_ind++] = wcc_event_ids_amount;
+        if (state.wcc_event_ids != undefined){
+            wcc_msg[wcc_msg_ind++] = state.wcc_event_ids.length;
 
-        state.wcc_event_ids.forEach(wcc_message_id => {
-            for (var id_ind = 0; id_ind < 6; id_ind += 1) {
-                wcc_msg[wcc_msg_ind++] = wcc_message_id.charCodeAt(id_ind);
-            }
+            state.wcc_event_ids.forEach(wcc_message_id => {
+                for (var id_ind = 0; id_ind < 6; id_ind += 1) {
+                    wcc_msg[wcc_msg_ind++] = wcc_message_id.charCodeAt(id_ind);
+                }
+    
+                //Set if the state should be activated or not
+                //Now for tests we set 1
+                wcc_msg[wcc_msg_ind++] = 1;
+            });
 
-            //Set if the state should be activated or not
-            wcc_msg[wcc_msg_ind++] = 1;
-        });
+        }else{
+            wcc_msg[wcc_msg_ind++] = 0;
+        }
 
         //Set DCC packet for the state
         //Set DCC packet amount
@@ -120,9 +125,10 @@ export function generate_wcc_message(module_settings) {
             wcc_msg[wcc_msg_ind++] = parseInt(state.dcc_packet.type);
 
             //Set DCC packet user data
+            console.log("!!!!!!! " + state.dcc_packet.user_data_length );
             wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data_length;
             for (var data_ind = 0; data_ind < state.dcc_packet.user_data_length; data_ind += 1) {
-                wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data.charCodeAt(data_ind);
+                wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data[data_ind];
             }
 
         }else{

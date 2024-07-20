@@ -134,7 +134,7 @@ class ActionModal extends HTMLElement {
             current_state.is_active = document.getElementById("state_is_active").value;
 
             var wcc_event_ids_str = document.getElementById("state_wcc_event").value;
-            if (wcc_event_ids_str != undefined) {
+            if (wcc_event_ids_str != undefined && wcc_event_ids_str != "") {
                 current_state.wcc_event_ids = wcc_event_ids_str.split(",");
             }
 
@@ -150,7 +150,7 @@ class ActionModal extends HTMLElement {
                 current_state.dcc_packet.user_data = [];
                 current_state.dcc_packet.user_data_length = 0;
 
-                switch (current_state.dcc_packet.type) {
+                switch (parseInt(current_state.dcc_packet.type)) {
                     case 0:
                         break;
                     case 1:
