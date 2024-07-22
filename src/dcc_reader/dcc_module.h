@@ -142,6 +142,7 @@ void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputP
 {
   Serial.print("notifyDccAccTurnoutOutput: ");
   Serial.print(Addr, DEC);
+
   Serial.print(',');
   Serial.print(Direction, DEC);
   Serial.print(',');
@@ -150,8 +151,14 @@ void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputP
   // Set packet type
   cached_packets[cached_packets_count - 1].packet_type = 4; // Turnout Packet
   // Save address
+
   cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
   cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+
+
+  Serial.println(cached_packets[cached_packets_count - 1].address[0] );
+  Serial.println(cached_packets[cached_packets_count - 1].address[1]) ;
+
   // Save user data
   cached_packets[cached_packets_count - 1].user_data[0] = Direction;
   cached_packets[cached_packets_count - 1].user_data[1] = OutputPower;
@@ -159,18 +166,6 @@ void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputP
 
   process_dcc_turnout(&cached_packets[cached_packets_count - 1]);
   
-  /*if (Direction == 1){
-
-  }else{
-
-  }
-  if (OutputPower == 1){
-    analogWrite(5, 200);     // back for a motor
-    analogWrite(6, 0);     // back for a motor
-  }else{
-    analogWrite(5, 0);     // back for a motor
-    analogWrite(6, 0);     // back for a motor
-  }*/
 }
 
 // This function is called whenever a DCC Signal Aspect Packet is received
@@ -222,10 +217,6 @@ void setup_dcc_module()
   Dcc.init(MAN_ID_DIY, 0, CV29_ACCESSORY_DECODER | CV29_OUTPUT_ADDRESS_MODE, 0);
   Serial.print("DCC reader is ready...");
 
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-  digitalWrite(7, 0); // back for a motor
 }
 
 double time_from_last_sent_dcc_packet = 0;

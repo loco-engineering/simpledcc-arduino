@@ -49,7 +49,7 @@ export function generate_wcc_message(module_settings) {
     wcc_msg[wcc_msg_ind++] = decoder_msg_length[3];
 
     //Get state amount for this decoder
-    const state_amount = bytesArray(1, 2);
+    const state_amount = bytesArray(module_settings.states.length, 2);
     wcc_msg[wcc_msg_ind++] = state_amount[0];
     wcc_msg[wcc_msg_ind++] = state_amount[1];
 
@@ -86,6 +86,24 @@ export function generate_wcc_message(module_settings) {
                 wcc_msg[wcc_msg_ind++] = value_data[val_ind];
             }*/
 
+            //Set start delay, 2 bytes
+            const start_delay = bytesArray(value.start_delay, 2);
+            wcc_msg[wcc_msg_ind++] = start_delay[0];
+            wcc_msg[wcc_msg_ind++] = start_delay[1];
+
+            //Set on duration, 2 bytes
+            const on_duration = bytesArray(value.on_duration, 2);
+            wcc_msg[wcc_msg_ind++] = on_duration[0];
+            wcc_msg[wcc_msg_ind++] = on_duration[1];
+
+            //Set off duration, 2 bytes
+            const off_duration = bytesArray(value.off_duration, 2);
+            wcc_msg[wcc_msg_ind++] = off_duration[0];
+            wcc_msg[wcc_msg_ind++] = off_duration[1];
+
+            //Set replays, 1 byte
+            wcc_msg[wcc_msg_ind++] = value.replays;
+
         });
 
         wcc_msg[wcc_msg_ind++] = state.is_active;
@@ -93,45 +111,45 @@ export function generate_wcc_message(module_settings) {
 
         //Set wcc message ids
         //each message id takes 6 bytes because should be unique inside the layout 
-        if (state.wcc_event_ids != undefined){
+        if (state.wcc_event_ids != undefined) {
             wcc_msg[wcc_msg_ind++] = state.wcc_event_ids.length;
 
             state.wcc_event_ids.forEach(wcc_message_id => {
                 for (var id_ind = 0; id_ind < 6; id_ind += 1) {
                     wcc_msg[wcc_msg_ind++] = wcc_message_id.charCodeAt(id_ind);
                 }
-    
+
                 //Set if the state should be activated or not
                 //Now for tests we set 1
                 wcc_msg[wcc_msg_ind++] = 1;
             });
 
-        }else{
+        } else {
             wcc_msg[wcc_msg_ind++] = 0;
         }
 
         //Set DCC packet for the state
         //Set DCC packet amount
         //In current version only 0 or 1 DCC packet is possible
-        if (state.dcc_packet != undefined){
+        if (state.dcc_packet != undefined) {
             wcc_msg[wcc_msg_ind++] = 1; //The state has 1 DCC packet
 
             //Set DCC packet address
             const dcc_address = bytesArray(parseInt(state.dcc_packet.address), 2);
-            wcc_msg[wcc_msg_ind++] = dcc_address[0];
             wcc_msg[wcc_msg_ind++] = dcc_address[1];
+            wcc_msg[wcc_msg_ind++] = dcc_address[0];
 
             //Set DCC packet type
             wcc_msg[wcc_msg_ind++] = parseInt(state.dcc_packet.type);
 
             //Set DCC packet user data
-            console.log("!!!!!!! " + state.dcc_packet.user_data_length );
+            console.log("!!!!!!! " + state.dcc_packet.user_data_length);
             wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data_length;
             for (var data_ind = 0; data_ind < state.dcc_packet.user_data_length; data_ind += 1) {
                 wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data[data_ind];
             }
 
-        }else{
+        } else {
             wcc_msg[wcc_msg_ind++] = 0;
         }
 
@@ -304,16 +322,16 @@ async function onMessage(event) {
                     description_str = `Function Group: ${function_group_str} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
                     break;
                 case 3:
-                        packet_type_str = "Signal Aspect";
-                        description_str = `Aspect: ${user_data[0]}`;
-                        break;
+                    packet_type_str = "Signal Aspect";
+                    description_str = `Aspect: ${user_data[0]}`;
+                    break;
                 case 4:
-                        packet_type_str = "Turnout";
-                        description_str = `Direction: ${user_data[0]} | Power: ${user_data[1]}`;
-                        if (user_data_length == 3){
-                            description_str += ` | Output Pair: ${user_data[2]}`;
-                        }
-                        break;
+                    packet_type_str = "Turnout";
+                    description_str = `Direction: ${user_data[0]} | Power: ${user_data[1]}`;
+                    if (user_data_length == 3) {
+                        description_str += ` | Output Pair: ${user_data[2]}`;
+                    }
+                    break;
                 default:
                     break;
             }

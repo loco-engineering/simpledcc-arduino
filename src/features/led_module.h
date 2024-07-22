@@ -8,7 +8,7 @@ const int freq = 5000;
 const int ledChannel = 0;
 const int resolution = 8;
 
-led_connection led_connections[MAX_LED_CONNECTIONS];
+gpio_connection led_connections[MAX_LED_CONNECTIONS];
 uint8_t led_connections_count = 0;
 
 void setup_led()
@@ -28,8 +28,8 @@ void add_led_connection(uint8_t type, uint8_t led_pin, float pwm, unsigned long 
         ledcSetup(led_connections_count, freq, resolution);
         ledcAttachPin(led_pin, led_connections_count);
     }
-    led_connections[led_connections_count].led_pin = led_pin;
-    led_connections[led_connections_count].pwm = pwm;
+    led_connections[led_connections_count].io_pin = led_pin;
+    led_connections[led_connections_count].output_value = pwm;
     led_connections[led_connections_count].connection_index = led_connections_count;
     led_connections[led_connections_count].on_duration = on_duration;
     led_connections[led_connections_count].off_duration = off_duration;
@@ -60,7 +60,7 @@ void loop_led()
 
     for (int i = 0; i < led_connections_count; ++i)
     {
-        led_connection cur_led_connection = led_connections[i];
+        gpio_connection cur_led_connection = led_connections[i];
         if (cur_led_connection.is_enabled)
         {
 
@@ -70,11 +70,11 @@ void loop_led()
                 {
                     if (led_connections[i].type == 0)
                     {
-                        ledd.pwm(led_connections[i].led_pin, led_connections[i].pwm);
+                        ledd.pwm(led_connections[i].io_pin, led_connections[i].output_value);
                     }
                     else
                     {
-                        ledcWrite(led_connections[i].connection_index, (int)(led_connections[i].pwm * 255.0));
+                        ledcWrite(led_connections[i].connection_index, (int)(led_connections[i].output_value * 255.0));
                     }
                 }
             }
@@ -86,11 +86,11 @@ void loop_led()
                     {
                         if (led_connections[i].type == 0)
                         {
-                            ledd.pwm(led_connections[i].led_pin, led_connections[i].pwm);
+                            ledd.pwm(led_connections[i].io_pin, led_connections[i].output_value);
                         }
                         else
                         {
-                            ledcWrite(led_connections[i].connection_index, (int)(led_connections[i].pwm * 255.0));
+                            ledcWrite(led_connections[i].connection_index, (int)(led_connections[i].output_value * 255.0));
                         }
                     }
                     else
@@ -107,7 +107,7 @@ void loop_led()
                     {
                         if (led_connections[i].type == 0)
                         {
-                            ledd.pwm(led_connections[i].led_pin, 0);
+                            ledd.pwm(led_connections[i].io_pin, 0);
                         }
                         else
                         {

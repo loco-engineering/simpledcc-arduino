@@ -193,7 +193,22 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                 }
                 ESP_LOGI(TAG, "=======================");
 
-                add_led_connection(0, value.connection_id, (float)(value.val[0]) / 255.0);
+                // add_led_connection(0, value.connection_id, (float)(value.val[0]) / 255.0);
+
+                value.start_delay = bytes_to_short(output_buffer[element_data_start_ind + 1], output_buffer[element_data_start_ind]);
+                ESP_LOGI(TAG, "Start delay: %d", value.start_delay);
+                element_data_start_ind += 2;
+
+                value.on_duration = bytes_to_short(output_buffer[element_data_start_ind + 1], output_buffer[element_data_start_ind]);
+                ESP_LOGI(TAG, "On duration: %d", value.on_duration);
+                element_data_start_ind += 2;
+
+                value.off_duration = bytes_to_short(output_buffer[element_data_start_ind + 1], output_buffer[element_data_start_ind]);
+                ESP_LOGI(TAG, "Off duration: %d", value.off_duration);
+                element_data_start_ind += 2;
+
+                value.replays = output_buffer[element_data_start_ind++];
+                ESP_LOGI(TAG, "Replays: %d", value.replays);
 
                 state.values[value_number] = value;
             }
@@ -246,14 +261,14 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                     // Allocate memory for DCC packet
                     DCCPacket dcc_packet;
 
-                    //Set DCC packet address, 2 bytes
+                    // Set DCC packet address, 2 bytes
                     dcc_packet.address[0] = output_buffer[element_data_start_ind++];
                     dcc_packet.address[1] = output_buffer[element_data_start_ind++];
 
-                    //Set DCC packet type
+                    // Set DCC packet type
                     dcc_packet.packet_type = output_buffer[element_data_start_ind++];
 
-                    //Set DCC packet user data
+                    // Set DCC packet user data
                     dcc_packet.user_data_length = output_buffer[element_data_start_ind++];
 
                     for (unsigned int data_index = 0; data_index < dcc_packet.user_data_length; ++data_index)
@@ -262,9 +277,9 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                     }
 
                     ESP_LOGI(TAG, "DCC packet address:");
-                    ESP_LOGI(TAG, "%d", bytes_to_short(dcc_packet.address[1], dcc_packet.address[0]));
+                    ESP_LOGI(TAG, "%d", bytes_to_short(dcc_packet.address[0], dcc_packet.address[1]));
                     ESP_LOGI(TAG, "DCC packet type:");
-                    ESP_LOGI(TAG, "%d",dcc_packet.packet_type);
+                    ESP_LOGI(TAG, "%d", dcc_packet.packet_type);
                     ESP_LOGI(TAG, "DCC packet user data:");
                     for (int i = 0; i < dcc_packet.user_data_length; i++)
                     {

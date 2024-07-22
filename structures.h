@@ -13,11 +13,12 @@ typedef struct DCCPacket{
    uint8_t user_data_length;
 };
 
-struct led_connection{
+struct gpio_connection{
    uint8_t type; //0 - LED driver, 1 - GPIO of ESP32
-   uint8_t led_pin;
+   uint8_t signal_type;
+   uint8_t io_pin;
    uint8_t connection_index;
-   float pwm;
+   float output_value;
    bool is_on;
    bool is_enabled;
    unsigned long on_duration;

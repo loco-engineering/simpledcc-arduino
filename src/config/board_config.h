@@ -40,6 +40,12 @@ typedef struct
     uint8_t *val;
     unsigned short val_length;
     uint8_t connection_id;
+
+    uint16_t start_delay;
+    uint16_t on_duration;
+    uint16_t off_duration;
+    uint8_t replays;
+
 } Value;
 
 typedef struct
@@ -60,7 +66,7 @@ typedef struct
 {
     State *states;
     uint8_t module_mac_address[6];
-    uint8_t state_count;
+    uint16_t state_count;
 } BoardSettings;
 
 /* How to add a new board
@@ -103,9 +109,15 @@ void fill_board_connections()
     board_connections[LED_outputs_amount + 2].owner_id = ESP32Sx;
     board_connections[LED_outputs_amount + 2].signal_types[0] = DIGITAL;
     board_connections[LED_outputs_amount + 2].signal_types[1] = PWM;
+
+    sprintf(board_connections[LED_outputs_amount + 3].name, "io07");
+    board_connections[LED_outputs_amount + 3].output_num = 7;
+    board_connections[LED_outputs_amount + 3].owner_id = ESP32Sx;
+    board_connections[LED_outputs_amount + 3].signal_types[0] = DIGITAL;
+    board_connections[LED_outputs_amount + 3].signal_types[1] = PWM;
 }
 
-static BoardSettings board_settings = {
+BoardSettings board_settings = {
     .states = NULL
     };
 

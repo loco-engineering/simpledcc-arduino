@@ -42,8 +42,8 @@ class ActionModal extends HTMLElement {
     <option value="0">Select</option>
     <option value="1">Speed</option>
     <option value="2">Multifunction</option>
-    <option value="3">Turnout</option>
-    <option value="4">Signal Aspect</option>
+    <option value="3">Signal Aspect</option>
+    <option value="4">Turnout</option>
     </select>
     </div>
     </div>
@@ -108,7 +108,7 @@ class ActionModal extends HTMLElement {
             const dcc_packet_type = event.target.value;
             var advanced_ddc_packet_settings = "";
 
-            if (dcc_packet_type == 3) {
+            if (dcc_packet_type == 4) {
                 advanced_ddc_packet_settings =
                     `
                 <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Direction</div></div>
@@ -158,6 +158,8 @@ class ActionModal extends HTMLElement {
                     case 2:
                         break;
                     case 3:
+                        break;
+                    case 4:
                         current_state.dcc_packet.user_data_length = 1;
                         current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_turnout_direction").value;
                         break;
@@ -199,6 +201,7 @@ export function reload_action_outputs() {
 
     for (let value_index = 0; value_index < current_state.values.length; ++value_index) {
 
+        var value = current_state.values[value_index];
         var output_select = `<select class="state_output" id="state_output_${value_index}">`;
         output_select += `<option value="0">Not selected</option>`;
 
@@ -229,6 +232,11 @@ export function reload_action_outputs() {
             grid_node.classList.add("state_outputs_list_gray");
         }
 
+        var start_delay_value = value.start_delay;
+        var on_duration_value = value.on_duration;
+        var off_duration_value = value.off_duration;
+        var replays_value = value.replays;
+
         grid_node.innerHTML = `
     
         <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Name on a decoder</div></div>
@@ -245,14 +253,17 @@ export function reload_action_outputs() {
 
         <div class="pure-g">
 
-        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Start delay</div></div>
-        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" type="text" id="state_value_start_delay${value_index}" placeholder="in ms"></div></div>
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Start delay, ms</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${start_delay_value} type="text" id="state_value_start_delay_${value_index}" placeholder="optional"></div></div>
 
-        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"On" duration</div></div>
-        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" type="text" id="state_value_start_delay${value_index}" placeholder="in ms"></div></div>
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"On" duration, ms</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${on_duration_value} type="text" id="state_value_on_duration_${value_index}" placeholder="optional, 0 - endlessly"></div></div>
 
-        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"Off" duration</div></div>
-        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" type="text" id="state_value_start_delay${value_index}" placeholder="in ms"></div></div>
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"Off" duration, ms</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${off_duration_value} type="text" id="state_value_off_duration_${value_index}" placeholder="optional"></div></div>
+        
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Replays</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${replays_value} type="text" id="state_value_replays_${value_index}" placeholder="optional, 0 - endlessly"></div></div>
         
         <div class="pure-u-1-2 "></div>
         <div class="pure-u-1-2 "><div class="output_cell state_value_cell_btns">
@@ -294,7 +305,7 @@ export function reload_action_outputs() {
 
         save_outputs();
 
-        current_state.values.push({});
+        current_state.values.push({start_delay:0, on_duration:0, off_duration:0, replays:1});
         reload_action_outputs();
     };
 
@@ -312,7 +323,21 @@ export function save_outputs() {
         const state_connection_name = available_outputs[state_connection_id];
         const state_value_val = document.getElementById(`state_value_${i}`).value;
 
-        current_state.values.push({ connection_name: state_connection_name, connection_id: state_connection_id, signal_type: 0, value: parseInt(state_value_val) });
+        const start_delay = parseInt(document.getElementById(`state_value_start_delay_${i}`).value);
+        const on_duration = parseInt(document.getElementById(`state_value_on_duration_${i}`).value);
+        const off_duration = parseInt(document.getElementById(`state_value_off_duration_${i}`).value);
+        const replays = parseInt(document.getElementById(`state_value_replays_${i}`).value);
+
+        current_state.values.push({ 
+            connection_name: state_connection_name, 
+            connection_id: state_connection_id, 
+            signal_type: 0, 
+            value: parseInt(state_value_val),
+            start_delay: start_delay,
+            on_duration: on_duration,
+            off_duration: off_duration,
+            replays: replays
+        });
 
     }
 }
@@ -320,7 +345,7 @@ export function save_outputs() {
 export function show_new_action(reload_states) {
 
     current_state = {};
-    current_state.values = [{}];
+    current_state.values = [{start_delay:0, on_duration:0, off_duration:0, replays:1}];
 
     reload_action_outputs();
     document.getElementById("action-modal-container").style.display = "block";

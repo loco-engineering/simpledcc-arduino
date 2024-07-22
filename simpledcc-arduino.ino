@@ -80,7 +80,7 @@ void loop()
   loop_led();
   //loop_nfc();
   loop_audio();
-
+  loop_gpio_module();
   //Uncomment if you want to check memory leaks and usage
   //Data can be visualized in Serial Plotter"
   //Serial.printf("\nStack:%d,Heap:%lu\n", uxTaskGetStackHighWaterMark(NULL), (unsigned long)ESP.getFreeHeap());
