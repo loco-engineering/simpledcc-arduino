@@ -57,7 +57,7 @@ void process_dcc_turnout(DCCPacket *received_packet)
                                         uint8_t connection_value = value.val[0];
                                         uint8_t connection_id = value.connection_id;
                                         Connection connection = board_connections[connection_id];
-                                        set_pwm(connection.output_num, connection_value, 30);
+                                        set_pwm(connection.output_num, connection_value, value.on_duration);
                                     }
 
                                 }
