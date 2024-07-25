@@ -247,12 +247,17 @@ static void server_handle_OTA_update(AsyncWebServerRequest *request, String file
     { // true to set the size to the current progress
       logmessage = "OTA Complete: " + String(filename) + ",size: " + String(index + len);
       Serial.println(logmessage);
+      request->send(200);
+      delay(500);
+      WiFi.disconnect();
+      delay(500);
+      ESP.restart();
+
     }
     else
     {
       Update.printError(Serial);
     }
-    request->redirect("/");
   }
 }
 
@@ -273,6 +278,16 @@ void setup_webserver()
 
   initWiFi();
   initWebSocket();
+
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+
+  server.onNotFound([](AsyncWebServerRequest *request) {
+    if (request->method() == HTTP_OPTIONS) {
+      request->send(200);
+    } else {
+      request->send(404);
+    }
+  });
 
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)

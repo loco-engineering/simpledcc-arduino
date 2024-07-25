@@ -158,6 +158,28 @@ select {
     margin-bottom: 10px;
 }
 
+/*Horizontal top menu*/
+.top_menu{
+    padding-bottom: 15px;
+    text-align: center;
+    color: #000;
+}
+
+.top_menu a{
+    color: #000;
+
+}
+
+.top_menu a:hover{
+    opacity: 0.6;
+}
+
+.top_menu_active{
+    border-bottom: #000;
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+}
+
 
 
 .common_table {
@@ -377,3 +399,24 @@ select {
     margin-top: 10px;
     margin-right: 10px;
 }
+
+/*Settings*/
+#setting_container{
+    display: none;
+}
+
+.file_loader {
+    display: none;
+    margin-top: 10px;
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #1f1f1f; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

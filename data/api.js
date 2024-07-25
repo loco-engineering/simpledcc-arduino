@@ -1,8 +1,33 @@
 //var gateway = `ws://${window.location.hostname}/ws`;
-var gateway = `ws://192.168.4.1/ws`;
+const base_ip = `192.168.4.1`;
+const gateway = `ws://${base_ip}/ws`;
 
 var websocket;
 export var available_outputs = [];
+
+export async function upload_file() {
+
+    document.querySelector('.file_loader').style.display = "block";
+
+    var input = document.querySelector('#firmware_file_input');
+
+    var data = new FormData()
+    data.append('file1', input.files[0])
+
+
+    try {
+
+        await fetch(`http://${base_ip}/upload`, {
+            method: 'POST',
+            body: data
+        });
+        document.querySelector('.file_loader').style.display = "none";
+
+      } catch (error) {
+        document.querySelector('.file_loader').style.display = "none";
+    }
+
+}
 
 export function generate_wcc_message(module_settings) {
 

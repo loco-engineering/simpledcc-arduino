@@ -69,6 +69,7 @@ void setup()
 
   // Test SPIFFS
   listDir(SPIFFS, "/", 0);
+deleteFile(SPIFFS,"/level_crossing_1.wav");
   // Test audio
   //play_audio_from_header_file();
   
