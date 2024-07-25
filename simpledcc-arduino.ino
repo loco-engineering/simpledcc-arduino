@@ -9,6 +9,8 @@
 #include <ESPmDNS.h>
 #include <PCA9955B.h>
 
+#include <Update.h>
+
 #include "driver/i2s.h"
 
 #include <SPI.h>
@@ -59,7 +61,7 @@ void setup()
   setup_led();
   //setup_nfc();
   setup_status_led();
-  on_status_led();
+  on_status_led(0x0000ff);
 
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
   //add_led_connection(0, 0, 0.5, 1000, 1000, 0);
@@ -67,7 +69,6 @@ void setup()
 
   // Test SPIFFS
   listDir(SPIFFS, "/", 0);
-
   // Test audio
   //play_audio_from_header_file();
   

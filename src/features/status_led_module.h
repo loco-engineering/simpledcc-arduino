@@ -20,8 +20,9 @@ void setup_status_led()
 
     myLED.begin(LED_GPIO, 1);      // initialze the myLED object. Here we have 1 LED attached to the LED_GPIO pin
     myLED.brightness(LED_BRIGHT);  // set the LED photon intensity level
-    myLED.setPixel(0, L_GREEN, 1); // set the LED colour and show it
+    myLED.setPixel(0, L_BLUE, 1); // set the LED colour and show it
     myLED.brightness(0, 1);        // turn the LED on
+
 }
 
 void on_status_led(crgb_t color_in_hex = 0x00ff00)

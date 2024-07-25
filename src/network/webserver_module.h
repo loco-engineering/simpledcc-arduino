@@ -10,6 +10,8 @@ AsyncWebServer server(80);
 // Create a WebSocket object
 AsyncWebSocket ws("/ws");
 
+static void server_handle_upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+
 // Initialize WiFi
 void initWiFi()
 {
@@ -64,7 +66,7 @@ void send_board_config_message()
   uint8_t msg_to_send[dcc_packet_size * connection_amount];
 
   // Set message type
-  msg_to_send[0] = 5;                    // 5 - a message with a board config
+  msg_to_send[0] = 5;                 // 5 - a message with a board config
   msg_to_send[1] = connection_amount; // amount of DCC packates in the message
 
   uint16_t msg_index = 2;
@@ -74,61 +76,62 @@ void send_board_config_message()
   {
     Connection connection = board_connections[i];
 
-    //Fill the connection name
-    for (uint8_t name_ind = 0; name_ind < CONNECTION_NAME_LENGTH; ++name_ind){
+    // Fill the connection name
+    for (uint8_t name_ind = 0; name_ind < CONNECTION_NAME_LENGTH; ++name_ind)
+    {
       msg_to_send[msg_index++] = connection.name[name_ind];
     }
 
-    //Output number on the chip
+    // Output number on the chip
     msg_to_send[msg_index++] = connection.output_num;
 
-    //Chip type
+    // Chip type
     msg_to_send[msg_index++] = connection.owner_id;
 
-    //Fill the signal types this connection can handle
-    for (uint8_t sig_type_ind = 0; sig_type_ind < CONNECTION_SIGNAL_TYPES_AMOUNT; ++sig_type_ind){
+    // Fill the signal types this connection can handle
+    for (uint8_t sig_type_ind = 0; sig_type_ind < CONNECTION_SIGNAL_TYPES_AMOUNT; ++sig_type_ind)
+    {
 
       msg_to_send[msg_index++] = connection.signal_types[sig_type_ind];
-
     }
-
   }
   ws.binaryAll(msg_to_send, msg_index);
 }
 
-
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
-     
-     
-    Serial.println("=======================");
-    Serial.println("New message over WebSocket received");
-    Serial.println("Size");
-    Serial.println(info->len );
-    Serial.println("Content");
-    for(int i=0; i < len; i++) {
-      Serial.print(data[i]);
-      Serial.print("|");
-    }
-    Serial.println();
-    //Check the type - first byte
-    if (data[0] == 1){
-      //This message is WCC board settings
-      //Move a pointer with data to the second byte
-      data++;
-      handle_wcc_message(data, len);
-    }
 
-        //Check the type - first byte
-    if (data[0] == 2){
-      //This message is WCC event
-      //Move a pointer with data to the second byte
-      data++;
-      handle_wcc_event(data, len);
-    }
+  Serial.println("=======================");
+  Serial.println("New message over WebSocket received");
+  Serial.println("Size");
+  Serial.println(info->len);
+  Serial.println("Content");
+  for (int i = 0; i < len; i++)
+  {
+    Serial.print(data[i]);
+    Serial.print("|");
+  }
+  Serial.println();
+  // Check the type - first byte
+  if (data[0] == 1)
+  {
+    // This message is WCC board settings
+    // Move a pointer with data to the second byte
+    data++;
+    handle_wcc_message(data, len);
+  }
 
-    Serial.println("=======================");
+  // Check the type - first byte
+  if (data[0] == 2)
+  {
+    // This message is WCC event
+    // Move a pointer with data to the second byte
+    data++;
+    handle_wcc_event(data, len);
+  }
+
+  Serial.println("=======================");
 
   if (info->final && info->index == 0 && info->len == len)
   {
@@ -142,7 +145,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // notifyClients(sensorReadings);
     //}
   }
-  
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
@@ -155,7 +157,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
     sprintf(log_buffer, "WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
     Serial.print(log_buffer);
 
-    //Send the board configuration message
+    // Send the board configuration message
     send_board_config_message();
 
     break;
@@ -178,6 +180,94 @@ void initWebSocket()
   server.addHandler(&ws);
 }
 
+// Handles media file uploads to the SPIFFS directory
+static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+  // make sure authenticated before allowing upload
+  String logmessage = "Client:" + request->client()->remoteIP().toString() + " " + request->url();
+  Serial.println(logmessage);
+
+  if (!index)
+  {
+    logmessage = "Upload Start: " + String(filename);
+    // open the file on first call and store the file handle in the request object
+    request->_tempFile = SPIFFS.open("/" + filename, "w");
+    Serial.println(logmessage);
+  }
+
+  if (len)
+  {
+    // stream the incoming chunk to the opened file
+    request->_tempFile.write(data, len);
+    logmessage = "Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len);
+    Serial.println(logmessage);
+  }
+
+  if (final)
+  {
+    logmessage = "Upload Complete: " + String(filename) + ",size: " + String(index + len);
+    // close the file handle as the upload is now done
+    request->_tempFile.close();
+    Serial.println(logmessage);
+    request->redirect("/");
+  }
+}
+
+// Handles OTA firmware update
+static void server_handle_OTA_update(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+
+  String logmessage = "Client:" + request->client()->remoteIP().toString() + " " + request->url();
+  Serial.println(logmessage);
+
+  if (!index)
+  {
+    logmessage = "OTA Update Start: " + String(filename);
+    Serial.println(logmessage);
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN))
+    { // start with max available size
+      Update.printError(Serial);
+    }
+  }
+
+  if (len)
+  {
+    // flashing firmware to ESP
+    if (Update.write(data, len) != len)
+    {
+      Update.printError(Serial);
+    }
+    logmessage = "Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len);
+    Serial.println(logmessage);
+  }
+
+  if (final)
+  {
+    if (Update.end(true))
+    { // true to set the size to the current progress
+      logmessage = "OTA Complete: " + String(filename) + ",size: " + String(index + len);
+      Serial.println(logmessage);
+    }
+    else
+    {
+      Update.printError(Serial);
+    }
+    request->redirect("/");
+  }
+}
+
+static void server_handle_upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+  if (filename.endsWith(".bin"))
+  {
+    server_handle_OTA_update(request, filename, index, data, len, final);
+  }
+  else
+  {
+    server_handle_SPIFFS_upload(request, filename, index, data, len, final);
+  }
+}
+
 void setup_webserver()
 {
 
@@ -187,6 +277,10 @@ void setup_webserver()
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(SPIFFS, "/app.html", "text/html"); });
+
+  // run handleUpload function when any file is uploaded
+   server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        request->send(200); }, server_handle_upload);
 
   server.serveStatic("/", SPIFFS, "/");
 
