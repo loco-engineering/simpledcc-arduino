@@ -16,126 +16,174 @@
 </head>
 
 <body>
-    <h1>WCC / SimpleDCC Decoder</h1>
-    <div class="top_menu" id="top_menu">
-        <a class="top_menu_item top_menu_active">Editor</a> |
-        <a class="top_menu_item">Settings</a>
-    </div>
+    <div class="navbar" id="navbar">
 
-    <div id="editor_container">
-        <div class="wifi_set_cont">
-            <h3 class="section_header">States<button id="new_action_btn" class="new_btn">Add state</button>
-            </h3>
-
-            <p class="section_hint">What the decoder should do when a DCC packet or WCC message is
-                received. For example, turn on top red light on a signal or close barriers on a level crossing.</p>
-            <div class="tableFixHead">
-
-                <table id="states_list" class="common_table">
-                    <thead>
-                        <tr>
-                            <th width="60">ICON</th>
-                            <th>NAME</th>
-                            <th width="100">TYPE</th>
-                            <th width="40">ACTIVE</th>
-                            <th width="40"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="states_list_tbody">
-                    </tbody>
-
-                </table>
-
-                <p class="no_data_hint" id="no_states_hint">No states yet. Click on "Add State" above</p>
-
-            </div>
-        </div>
-
-        <div class="wifi_set_cont">
-            <h3 class="section_header">DCC packets</h3>
-            <p class="section_hint">DCC packets filtered by the decoder address or all DCC packets received by the
-                decoder
-                if the decoder address isn't specified</p>
-
-            <div class="tableFixHead" id="dcc_packets_table_container">
-
-                <table id="dcc_packets_table" class="common_table">
-                    <thead>
-                        <tr>
-                            <th width="40">ADDRESS</th>
-                            <th width="100">TYPE</th>
-                            <th>DESCRIPTION</th>
-                            <th width="100">RAW PACKET</th>
-                            <th width="80"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="dcc_packets_tbody">
-                    </tbody>
-
-                </table>
-                <p class="no_data_hint" id="no_dcc_packets_hint">No DCC packets received yet. Connect DCC track or wires
-                    to the decoder to see DCC packets.</p>
-
-            </div>
-        </div>
-
-
-        <div class="wifi_set_cont">
-            <h3 class="section_header">WCC events</h3>
-            <p class="section_hint">Messages received from other decoders and the web app over WCC protocol</p>
-
-            <div class="tableFixHead">
-
-                <table id="dcc_packets" class="common_table">
-                    <thead>
-                        <tr>
-                            <th width="40">ADDRESS</th>
-                            <th width="100">TYPE</th>
-                            <th>DESCRIPTION</th>
-                            <th width="100">RAW PACKET</th>
-                            <th width="80"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-
-                </table>
-
-                <p class="no_data_hint" id="no_dcc_packets_hint">No WCC events received yet</p>
-
-            </div>
-
-            <action-modal></action-modal>
-
+        <div class="top_menu" id="top_menu">
+            <a class="top_menu_item top_menu_active">EDITOR</a> |
+            <a class="top_menu_item">CONTROLLER</a> |
+            <a class="top_menu_item">SETTINGS</a>
         </div>
 
     </div>
+    <div id="editor">
 
-    <div id="settings_container">
+        <div id="editor_container">
+            <div class="wifi_set_cont">
+                <h3 class="section_header">States<button id="new_action_btn" class="new_btn">Add state</button>
+                </h3>
 
-        <div class="wifi_set_cont">
-            <h3 class="section_header">Settings</h3>
-            <h5 class="section_subheader">Firmware Update</h5>
-            <p class="section_hint">Select .bin file and click on Upload to update the firmware. After the firmware is uploaded the decoder will be rebooted.
-            </p>
-            <div class="pure-g">
+                <p class="section_hint">What the decoder should do when a DCC packet or WCC event message is
+                    received. For example, turn on top red light on a signal or play sound on a level crossing, etc.</p>
+                <div class="tableFixHead">
 
-                <div class="pure-u-1-2 ">
-                    <input style="margin-top: 5px;"  type="file" name="file1" id="firmware_file_input"><div class="file_loader"></div>
+                    <table id="states_list" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="60">ICON</th>
+                                <th>NAME</th>
+                                <th width="100">TYPE</th>
+                                <th width="40">ACTIVE</th>
+                                <th width="40"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="states_list_tbody">
+                        </tbody>
+
+                    </table>
+
+                    <p class="no_data_hint" id="no_states_hint">No states yet. Click on "Add State" above</p>
+
                 </div>
+            </div>
 
-                <div class="pure-u-1-2 ">
+            <div class="wifi_set_cont">
+                <h3 class="section_header">DCC Packets</h3>
+                <p class="section_hint">DCC packets received by the
+                    decoder. Use a filter below to hide DCC packets by address and type.</p>
 
-                    <button style=" float: right;   margin-top: 0px;" id="upload_firmware" class="s_wifi">Upload</button>
+                <div class="tableFixHead" id="dcc_packets_table_container">
+
+                    <table id="dcc_packets_table" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="40">ADDRESS</th>
+                                <th width="100">TYPE</th>
+                                <th>DESCRIPTION</th>
+                                <th width="100">RAW PACKET</th>
+                                <th width="80"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="dcc_packets_tbody">
+                        </tbody>
+
+                    </table>
+                    <p class="no_data_hint" id="no_dcc_packets_hint">No DCC packets received yet. Connect tracks or
+                        wires with DCC signal
+                        to the decoder to see DCC packets.</p>
+
                 </div>
             </div>
 
 
+            <div class="wifi_set_cont">
+                <h3 class="section_header">WCC Events</h3>
+                <p class="section_hint">Messages received from other decoders and the web app over WCC protocol</p>
+
+                <div class="tableFixHead">
+
+                    <table id="dcc_packets" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="40">ADDRESS</th>
+                                <th width="100">TYPE</th>
+                                <th>DESCRIPTION</th>
+                                <th width="100">RAW PACKET</th>
+                                <th width="80"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+
+                    </table>
+
+                    <p class="no_data_hint" id="no_dcc_packets_hint">No WCC events received yet</p>
+
+                </div>
+
+                <action-modal></action-modal>
+
+            </div>
+
+
+
+
+            <div class="wifi_set_cont">
+                <h3 class="section_header">Media Manager<button id="" class="new_btn">Upload File</button>
+                </h3>
+                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav files are
+                    supported. After the file is uploaded, go to "Add State" or open a state to edit above, click on
+                    "Add Value" and select in "Name on a decoder" dropdown "Speakers" and you should see all uploaded
+                    files in the "Value" dropdown.</p>
+
+                <div class="tableFixHead">
+
+                    <table id="dcc_packets" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="100">Filename</th>
+                                <th width="40">TYPE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+
+                    </table>
+
+                    <p class="no_data_hint" id="no_dcc_packets_hint">No media files uploaded yet</p>
+
+                </div>
+
+                <action-modal></action-modal>
+
+            </div>
+
+
+
+        </div>
+
+        <div id="settings_container">
+
+            <div class="wifi_set_cont">
+                <h3 class="section_header">Settings</h3>
+                <h5 class="section_subheader">Firmware Update</h5>
+                <p class="section_hint">Select .bin file and click on Upload to update the firmware. After the firmware
+                    is uploaded the decoder will be rebooted.
+                </p>
+                <div class="pure-g">
+
+                    <div class="pure-u-1-2 ">
+                        <input style="margin-top: 5px;" type="file" name="file1" id="firmware_file_input">
+                        <div class="file_loader"></div>
+                    </div>
+
+                    <div class="pure-u-1-2 ">
+
+                        <button style=" float: right;   margin-top: 0px;" id="upload_firmware"
+                            class="s_wifi">Upload</button>
+                    </div>
+                </div>
+
+
+            </div>
+
         </div>
 
     </div>
+
+    <visual-controller id="visual-controller"></visual-controller>
 
     <script type="module">
+        import "./visual-controller.js";
         import { show_new_action, show_edit_action } from "./state-details-modal.js";
         import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
         import { initWebSocket, upload_file } from "./api.js";
@@ -159,14 +207,27 @@
 
                     this.classList.add("top_menu_active");
 
-                    if (this.innerHTML == "Editor") {
+                    if (this.innerHTML == "EDITOR") {
 
                         document.querySelector('#settings_container').style.display = "none";
+                        document.querySelector('#visual-controller').style.display = "none";
                         document.querySelector('#editor_container').style.display = "block";
+                        document.querySelector('#editor').style.display = "block";
+
+                    } else if (this.innerHTML == "CONTROLLER") {
+
+                    document.querySelector('#settings_container').style.display = "none";
+                    document.querySelector('#editor_container').style.display = "none";
+                    document.querySelector('#visual-controller').style.display = "block";
+                    document.querySelector('#editor').style.display = "none";
+
                     } else {
 
                         document.querySelector('#settings_container').style.display = "block";
+                        document.querySelector('#visual-controller').style.display = "none";
                         document.querySelector('#editor_container').style.display = "none";
+                        document.querySelector('#editor').style.display = "block";
+
                     }
                 }
 

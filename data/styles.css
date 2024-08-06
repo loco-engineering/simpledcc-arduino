@@ -1,3 +1,8 @@
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 * {
     font-family: "Lucida Console", "Courier New", monospace;
 }
@@ -160,23 +165,28 @@ select {
 
 /*Horizontal top menu*/
 .top_menu{
-    padding-bottom: 15px;
+    padding-bottom: 20px;
+    line-height: 60px;
     text-align: center;
     color: #000;
 }
 
 .top_menu a{
     color: #000;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 40px;
 
 }
 
 .top_menu a:hover{
     opacity: 0.6;
+    cursor: pointer;
 }
 
 .top_menu_active{
     border-bottom: #000;
-    border-bottom-width: 2px;
+    border-bottom-width: 1px;
     border-bottom-style: solid;
 }
 
@@ -327,6 +337,10 @@ select {
     margin-top: 10px;
 }
 
+#settings_container{
+    display: none;
+}
+
 .state_settings_container {
     padding-top: 10px;
 }
@@ -419,4 +433,21 @@ select {
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+
+  /*Navigation bar*/
+  #navbar{
+    height: 60px;
+    margin-left: 0px;
+    margin-right: 0px;
+    background-color: #eeeeee;
+  }
+
+  /*Visual controller*/
+  #visual-controller{
+    display: none;
+  }
+
+  .canvas_controller{
+    background-color: #e9c46a;
   }
