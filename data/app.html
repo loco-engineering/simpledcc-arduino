@@ -19,7 +19,7 @@
     <div class="navbar" id="navbar">
 
         <div class="top_menu" id="top_menu">
-            <a class="top_menu_item top_menu_active">EDITOR</a> |
+            <a class="top_menu_item top_menu_active">DECODER</a> |
             <a class="top_menu_item">CONTROLLER</a> |
             <a class="top_menu_item">SETTINGS</a>
         </div>
@@ -118,9 +118,13 @@
 
 
             <div class="wifi_set_cont">
-                <h3 class="section_header">Media Manager<button id="" class="new_btn">Upload File</button>
+                <h3 class="section_header">Media Manager<button id="media_file_upload_btn" class="new_btn">Upload File</button>
+                    <span class="media_file_loader"></span>
+                    <input type="file" name="media_file" id="media_file_input" accept=".wav,.aac,.mp3" hidden>
+
                 </h3>
-                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav files are
+
+                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav, .mp3 and .aac files are
                     supported. After the file is uploaded, go to "Add State" or open a state to edit above, click on
                     "Add Value" and select in "Name on a decoder" dropdown "Speakers" and you should see all uploaded
                     files in the "Value" dropdown.</p>
@@ -162,7 +166,7 @@
                 <div class="pure-g">
 
                     <div class="pure-u-1-2 ">
-                        <input style="margin-top: 5px;" type="file" name="file1" id="firmware_file_input">
+                        <input style="margin-top: 5px;" type="file" name="file1" id="firmware_file_input" accept=".bin">
                         <div class="file_loader"></div>
                     </div>
 
@@ -186,7 +190,7 @@
         import "./visual-controller.js";
         import { show_new_action, show_edit_action } from "./state-details-modal.js";
         import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
-        import { initWebSocket, upload_file } from "./api.js";
+        import { initWebSocket, upload_file, upload_media_file } from "./api.js";
 
         set_decoder_id("some_id"); //Replace with decoder mac address
         //clear_project();
@@ -196,7 +200,7 @@
 
         function onLoad(event) {
             initWebSocket();
-            initButton();
+            initButtons();
 
             var top_menu_item_els = document.getElementsByClassName('top_menu_item');
             for (var i = 0; i < top_menu_item_els.length; ++i) {
@@ -207,7 +211,7 @@
 
                     this.classList.add("top_menu_active");
 
-                    if (this.innerHTML == "EDITOR") {
+                    if (this.innerHTML == "DECODER") {
 
                         document.querySelector('#settings_container').style.display = "none";
                         document.querySelector('#visual-controller').style.display = "none";
@@ -314,9 +318,11 @@
 
         }
 
-        function initButton() {
+        function initButtons() {
             document.getElementById('upload_firmware').addEventListener('click', upload_file);
+            document.getElementById('media_file_upload_btn').addEventListener('click', upload_media_file);
         }
+
         function connectToWiFi() {
             let ssid = document.getElementById('ssid').value;
             let passwd = document.getElementById('passwd').value;

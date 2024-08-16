@@ -52,6 +52,7 @@ class VisualController extends HTMLElement {
         let SCROLL_SENSITIVITY = 0.0005
 
         async function draw() {
+
             canvas.width = document.documentElement.clientWidth;
             canvas.height = document.documentElement.clientHeight - navbar_height;
 
@@ -73,7 +74,52 @@ class VisualController extends HTMLElement {
                 ctx.drawImage(background_img, left, top, w, h);
             }
 
-            requestAnimationFrame(draw)
+
+            //Draw test objects
+
+            // Create gradient
+            ctx.beginPath();
+
+            if (ctx.filter === "none") {
+                ctx.filter = "blur(15px)";
+            }
+            else { // Safari still doesn't support ctx.filter...
+                ctx.shadowColor = "#e9c46a";
+                ctx.shadowBlur = 10; // x2
+                ctx.shadowOffsetX = 10;
+                ctx.translate(-100, 0); // we draw the actual shape outside of the visible context
+            }
+
+
+            ctx.fillStyle = "#e9c46a";
+            ctx.globalAlpha = 0.5;
+            ctx.rect(-10, -120, 40, 80);
+
+            //ctx.arc(0, -80, 20, 0, Math.PI*2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            ctx.beginPath();
+
+            if (ctx.filter === "none") {
+                ctx.filter = "blur(15px)";
+            }
+            else { // Safari still doesn't support ctx.filter...
+                ctx.shadowColor = "#e9c46a";
+                ctx.shadowBlur = 10; // x2
+                ctx.shadowOffsetX = 10;
+                ctx.translate(-100, 0); // we draw the actual shape outside of the visible context
+            }
+
+            ctx.fillStyle = "#e9c46a";
+            ctx.globalAlpha = 0.5;
+            ctx.rect(-10, -120, 40, 80);
+
+            //ctx.arc(0, -80, 20, 0, Math.PI*2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            //requestAnimationFrame(draw)
         }
 
         // Gets the relevant location from a mouse or single touch event

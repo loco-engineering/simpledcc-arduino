@@ -3,6 +3,8 @@
 
 #include "test_audio.h"    // The Wav file
 
+Audio audio;
+
 static const i2s_port_t i2s_num = I2S_NUM_0; // i2s port number
 unsigned const char *wav_data = 0;
 uint32_t wav_data_index = 0; // index offset into "wav_data" for current  data t send to I2S
@@ -170,8 +172,20 @@ void play_audio_from_header_file()
     }
 }
 
+void play_audio_from_spiffs(){
+
+    audio.setPinout(13, 14, 12);
+    audio.setVolume(5); // default 0...21
+
+    audio.connecttoFS(SPIFFS, "/sample3.aac"); // SPIFFS
+
+}
+
 void loop_audio()
 {
+
+        audio.loop();
+
 
     if (wav_data == 0){
         return;

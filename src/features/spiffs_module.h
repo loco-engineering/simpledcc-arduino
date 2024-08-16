@@ -1,5 +1,10 @@
+
+#ifndef SPIFFS_MODULE_H
+#define SPIFFS_MODULE_H
+
 #include "FS.h"
 #include "SPIFFS.h"
+#include "../features/wcc_module.h"
 
 #define FORMAT_SPIFFS_IF_FAILED true
 
@@ -99,3 +104,5 @@ void deleteFile(fs::FS &fs, const char *path) {
     Serial.println("- delete failed");
   }
 }
+
+#endif

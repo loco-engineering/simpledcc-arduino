@@ -23,9 +23,53 @@ export async function upload_file() {
         });
         document.querySelector('.file_loader').style.display = "none";
 
-      } catch (error) {
+    } catch (error) {
         document.querySelector('.file_loader').style.display = "none";
     }
+
+}
+
+export async function upload_media_file() {
+
+    var input = document.querySelector('#media_file_input');
+
+    input.onchange = async e => {
+
+        var file = input.files[0]; //this is an array
+        var fileSize = file.size;
+        var fileSizeInKB = (fileSize / 1024); // this would be in kilobytes defaults to bytes
+
+        if (fileSizeInKB > 2 * 1024) {
+
+            alert(`This file is too big: ${(fileSizeInKB/1024).toFixed(2)} MB . Maximum allowed size is 2 MB. `);
+
+        } else {
+
+            document.querySelector('.media_file_loader').style.display = "block";
+
+            var data = new FormData()
+            data.append('file1', file)
+
+            try {
+
+                await fetch(`http://${base_ip}/upload`, {
+                    method: 'POST',
+                    body: data
+                });
+                document.querySelector('.media_file_loader').style.display = "none";
+
+            } catch (error) {
+                document.querySelector('.media_file_loader').style.display = "none";
+            }
+
+
+        }
+
+    }
+
+
+    input.click();
+
 
 }
 

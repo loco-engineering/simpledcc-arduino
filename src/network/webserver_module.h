@@ -3,6 +3,7 @@
 #define WEBSERVER_MODULE_H
 
 #include "../features/wcc_module.h"
+#include "../features/spiffs_module.h"
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -98,6 +99,102 @@ void send_board_config_message()
   ws.binaryAll(msg_to_send, msg_index);
 }
 
+void send_media_files_list()
+{
+  fs::FS fs = SPIFFS;
+  const char *dirname = "/";
+  uint8_t levels = 0;
+
+  // Fill a message
+  uint8_t *msg;
+
+  size_t msg_index = 0;
+
+  Serial.printf("Fill WCC message with media files in : %s\r\n", dirname);
+  // We allocate 100 bytes but will reallocate memory if 100 bytes are not enough
+  uint16_t allocated_bytes = 100;
+  uint8_t files_amount = 0;
+
+  msg = (uint8_t *)ps_calloc(allocated_bytes, sizeof(uint8_t));
+
+  // Set message type
+  msg[0] = 6; // 6 - a message with media files
+  msg[1] = 0; // amount of files in the message, we'll fill that value with real value later
+  msg_index = 2;
+
+  File root = fs.open(dirname);
+  if (!root)
+  {
+    Serial.println("- failed to open directory");
+    return;
+  }
+  if (!root.isDirectory())
+  {
+    Serial.println(" - not a directory");
+    return;
+  }
+
+  File file = root.openNextFile();
+  while (file)
+  {
+    if (file.isDirectory())
+    {
+      Serial.print("  DIR : ");
+      Serial.println(file.name());
+      if (levels)
+      {
+        listDir(fs, file.path(), levels - 1);
+      }
+    }
+    else
+    {
+
+      if (strstr(file.name(), ".wav") != NULL
+      || strstr(file.name(), ".aac") != NULL
+      || strstr(file.name(), ".mp3") != NULL)
+      {
+
+        Serial.print("  FILE: ");
+        Serial.print(file.name());
+
+        // Check if it's a supported media file
+        uint8_t *file_name = (uint8_t *)file.name();
+
+        for (uint8_t c = *file_name; c != '\0'; c = *++file_name)
+        {
+          msg[msg_index++] = c;
+          if (msg_index == allocated_bytes)
+          {
+            allocated_bytes += 100;
+            // Reallocate memory
+            msg = (uint8_t *)ps_realloc(msg, allocated_bytes);
+          }
+        }
+
+        Serial.print("\tSIZE: ");
+        Serial.println(file.size());
+
+        ++files_amount;
+      }
+      file = root.openNextFile();
+    }
+  }
+
+  msg[1] = files_amount; // amount of files in the message
+
+  Serial.println("msg to send with files");
+  for (int i = 0; i < msg_index; i++)
+  {
+    Serial.print(msg[i]);
+    Serial.print("|");
+  }
+  Serial.println();
+
+  ws.binaryAll(msg, msg_index);
+
+  free(msg);
+}
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
@@ -159,6 +256,9 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
     // Send the board configuration message
     send_board_config_message();
+
+    // Send a list with media files
+    send_media_files_list();
 
     break;
   case WS_EVT_DISCONNECT:
@@ -252,7 +352,6 @@ static void server_handle_OTA_update(AsyncWebServerRequest *request, String file
       WiFi.disconnect();
       delay(500);
       ESP.restart();
-
     }
     else
     {
@@ -281,21 +380,21 @@ void setup_webserver()
 
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
 
-  server.onNotFound([](AsyncWebServerRequest *request) {
+  server.onNotFound([](AsyncWebServerRequest *request)
+                    {
     if (request->method() == HTTP_OPTIONS) {
       request->send(200);
     } else {
       request->send(404);
-    }
-  });
+    } });
 
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(SPIFFS, "/app.html", "text/html"); });
 
   // run handleUpload function when any file is uploaded
-   server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
-        request->send(200); }, server_handle_upload);
+  server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
+            { request->send(200); }, server_handle_upload);
 
   server.serveStatic("/", SPIFFS, "/");
 

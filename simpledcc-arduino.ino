@@ -18,6 +18,8 @@
 
 #include <LiteLED.h>
 
+#include <Audio.h>
+
 #include "src/dcc_reader/dcc_module.h"
 #include "src/features/led_module.h"
 #include "src/features/nfc_module.h"
@@ -69,9 +71,10 @@ void setup()
 
   // Test SPIFFS
   listDir(SPIFFS, "/", 0);
-deleteFile(SPIFFS,"/level_crossing_1.wav");
+
   // Test audio
   //play_audio_from_header_file();
+  play_audio_from_spiffs();
   
 }
 
