@@ -131,11 +131,14 @@
 
                 <div class="tableFixHead">
 
-                    <table id="dcc_packets" class="common_table">
+                    <table id="media_files_table" class="common_table">
                         <thead>
                             <tr>
-                                <th width="100">Filename</th>
-                                <th width="40">TYPE</th>
+                                <th >Filename</th>
+                                <th width="60">TYPE</th>
+                                <th width="40"></th>
+                                <th width="40"></th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -143,7 +146,7 @@
 
                     </table>
 
-                    <p class="no_data_hint" id="no_dcc_packets_hint">No media files uploaded yet</p>
+                    <p class="no_data_hint" id="no_media_files_hint">No media files uploaded yet</p>
 
                 </div>
 
@@ -190,7 +193,7 @@
         import "./visual-controller.js";
         import { show_new_action, show_edit_action } from "./state-details-modal.js";
         import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
-        import { initWebSocket, upload_file, upload_media_file } from "./api.js";
+        import { initWebSocket, upload_file, upload_media_file, send_wcc_manage_media_file } from "./api.js";
 
         set_decoder_id("some_id"); //Replace with decoder mac address
         //clear_project();

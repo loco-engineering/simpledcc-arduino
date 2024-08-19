@@ -99,9 +99,9 @@ void send_board_config_message()
   ws.binaryAll(msg_to_send, msg_index);
 }
 
-void send_media_files_list()
+void reload_and_send_media_files_list()
 {
-  fs::FS fs = SPIFFS;
+  fs::FS fs = LittleFS;
   const char *dirname = "/";
   uint8_t levels = 0;
 
@@ -134,6 +134,27 @@ void send_media_files_list()
     return;
   }
 
+  // Clean and allocate new memory for media files list
+  // ToDo: Arduino cannot allocate dynamic memory for a struct with File inside so now we just used predefined array of MediaFile
+  /*if (board_settings.media_files != NULL)
+  {
+    // Iterate and clean states
+    for (unsigned int file_number = 0; file_number < board_settings.media_files_amount; ++file_number)
+    {
+      MediaFile media_file = board_settings.media_files[file_number];
+      if (media_file.file_name != NULL)
+      {
+        free(media_file.file_name);
+      }
+    }
+
+    free(board_settings.media_files);
+    board_settings.media_files = NULL;
+    board_settings.media_files_amount = 0;
+  }
+
+  board_settings.media_files = (MediaFile *)ps_malloc(10* sizeof(MediaFile));*/
+
   File file = root.openNextFile();
   while (file)
   {
@@ -149,16 +170,29 @@ void send_media_files_list()
     else
     {
 
-      if (strstr(file.name(), ".wav") != NULL
-      || strstr(file.name(), ".aac") != NULL
-      || strstr(file.name(), ".mp3") != NULL)
+      if (strstr(file.name(), ".wav") != NULL || strstr(file.name(), ".aac") != NULL || strstr(file.name(), ".mp3") != NULL)
       {
 
         Serial.print("  FILE: ");
         Serial.print(file.name());
 
-        // Check if it's a supported media file
+        board_settings.media_files[files_amount].file_name = (char *)ps_malloc(strlen(file.name()) * sizeof(char));
+        Serial.println("1");
+
+        strcpy(board_settings.media_files[files_amount].file_name, file.name());
+        board_settings.media_files[files_amount].status = 0;
+        Serial.println("2");
+
+        // Open file and keep File ref
+        char path[50] = "/";
+        strcat(path, file.name());
+        Serial.print(path);
+
+        board_settings.media_files[files_amount].file = LittleFS.open(path);
+        Serial.println("3");
+
         uint8_t *file_name = (uint8_t *)file.name();
+        Serial.println("4");
 
         for (uint8_t c = *file_name; c != '\0'; c = *++file_name)
         {
@@ -181,6 +215,7 @@ void send_media_files_list()
   }
 
   msg[1] = files_amount; // amount of files in the message
+  board_settings.media_files_amount = files_amount;
 
   Serial.println("msg to send with files");
   for (int i = 0; i < msg_index; i++)
@@ -228,6 +263,15 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     handle_wcc_event(data, len);
   }
 
+  // Check the type - first byte
+  if (data[0] == 3)
+  {
+    // This message is WCC message to manage media files
+    // Move a pointer with data to the second byte
+    data++;
+    handle_wcc_media_file_message(data, len);
+  }
+
   Serial.println("=======================");
 
   if (info->final && info->index == 0 && info->len == len)
@@ -240,7 +284,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // String sensorReadings = getSensorReadings();
     // Serial.print(sensorReadings);
     // notifyClients(sensorReadings);
-    //}
+    //} width="180"
   }
 }
 
@@ -258,7 +302,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
     send_board_config_message();
 
     // Send a list with media files
-    send_media_files_list();
+    //reload_and_send_media_files_list();
 
     break;
   case WS_EVT_DISCONNECT:
@@ -280,6 +324,9 @@ void initWebSocket()
   server.addHandler(&ws);
 }
 
+size_t cache_ind = 0;
+uint8_t cache_data[10000];
+
 // Handles media file uploads to the SPIFFS directory
 static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
@@ -291,7 +338,20 @@ static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String f
   {
     logmessage = "Upload Start: " + String(filename);
     // open the file on first call and store the file handle in the request object
-    request->_tempFile = SPIFFS.open("/" + filename, "w");
+
+    int headers = request->headers();
+    for (uint8_t i = 0; i < headers; i++)
+    {
+        AsyncWebHeader* h = request->getHeader(i);
+      if (strcmp(h->name().c_str(), "del-prev") == 0)
+      {
+        Serial.println("Deleting prev media file");
+        deleteFile(LittleFS, String("/" + filename).c_str());
+      }
+    }
+
+    request->_tempFile = LittleFS.open("/" + filename, FILE_APPEND);
+
     Serial.println(logmessage);
   }
 
@@ -299,6 +359,20 @@ static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String f
   {
     // stream the incoming chunk to the opened file
     request->_tempFile.write(data, len);
+
+    /*if (cache_ind > 8000){
+
+      request->_tempFile.write(cache_data, cache_ind);
+      cache_ind = 0;
+
+    }
+
+ for (size_t i = 0; i < len; i++) {
+            cache_data[cache_ind + i] = data[i];
+        }
+
+     cache_ind += len;*/
+
     logmessage = "Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len);
     Serial.println(logmessage);
   }
@@ -307,7 +381,12 @@ static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String f
   {
     logmessage = "Upload Complete: " + String(filename) + ",size: " + String(index + len);
     // close the file handle as the upload is now done
+
+    /*     request->_tempFile.write(cache_data, cache_ind);
+     cache_ind = 0;*/
     request->_tempFile.close();
+    listDir(LittleFS, "/", 0);
+
     Serial.println(logmessage);
     request->redirect("/");
   }
@@ -379,6 +458,7 @@ void setup_webserver()
   initWebSocket();
 
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "*");
 
   server.onNotFound([](AsyncWebServerRequest *request)
                     {
@@ -390,13 +470,13 @@ void setup_webserver()
 
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(SPIFFS, "/app.html", "text/html"); });
+            { request->send(LittleFS, "/app.html", "text/html"); });
 
   // run handleUpload function when any file is uploaded
   server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
             { request->send(200); }, server_handle_upload);
 
-  server.serveStatic("/", SPIFFS, "/");
+  server.serveStatic("/", LittleFS, "/");
 
   // Start server
   server.begin();

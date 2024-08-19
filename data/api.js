@@ -4,6 +4,7 @@ const gateway = `ws://${base_ip}/ws`;
 
 var websocket;
 export var available_outputs = [];
+export var media_files = [];
 
 export async function upload_file() {
 
@@ -41,25 +42,45 @@ export async function upload_media_file() {
 
         if (fileSizeInKB > 2 * 1024) {
 
-            alert(`This file is too big: ${(fileSizeInKB/1024).toFixed(2)} MB . Maximum allowed size is 2 MB. `);
+            alert(`This file is too big: ${(fileSizeInKB / 1024).toFixed(2)} MB . Maximum allowed size is 2 MB. `);
 
         } else {
 
             document.querySelector('.media_file_loader').style.display = "block";
 
-            var data = new FormData()
-            data.append('file1', file)
+            const chunkSize = 1024 * 20; // size of each chunk (20KB)
+            let start = 0;
 
-            try {
+            while (start < file.size) {
+                var headers = {};
+                if (start == 0) {
+                    headers = { "del-prev": "" };
+                }
+                await uploadChunk(file.slice(start, start + chunkSize), file.name, headers);
+                start += chunkSize;
+            }
 
-                await fetch(`http://${base_ip}/upload`, {
-                    method: 'POST',
-                    body: data
-                });
-                document.querySelector('.media_file_loader').style.display = "none";
+            document.querySelector('.media_file_loader').style.display = "none";
 
-            } catch (error) {
-                document.querySelector('.media_file_loader').style.display = "none";
+
+            async function uploadChunk(chunk, file_name, headers = {}, retries = 3) {
+                var data = new FormData()
+                data.append('file1', chunk, file_name)
+
+                try {
+                    await fetch(`http://${base_ip}/upload`, {
+                        method: 'POST',
+                        headers: headers,
+                        body: data
+                    });
+                } catch (error) {
+                    if (retries > 0) {
+                        await uploadChunk(chunk, file_name, headers, retries - 1);
+                    } else {
+                        console.error('Failed to upload chunk: ', error);
+                        document.querySelector('.media_file_loader').style.display = "none";
+                    }
+                }
             }
 
 
@@ -258,6 +279,24 @@ export function generate_wcc_event_msg(wcc_event) {
 
 }
 
+export function generate_wcc_media_file_msg(filename, action_type) {
+
+    var wcc_msg = [];
+    let wcc_msg_ind = 0;
+    wcc_msg[wcc_msg_ind++] = 3; //message type, 3 - manage a media file
+    wcc_msg[wcc_msg_ind++] = action_type;
+
+    //Fille file name
+    for (var id_ind = 0; id_ind < filename.length; id_ind += 1) {
+        wcc_msg[wcc_msg_ind++] = filename.charCodeAt(id_ind);
+    }
+    //Set if the state should be activated or not
+    wcc_msg[wcc_msg_ind++] = '\0';
+
+    return wcc_msg;
+
+}
+
 const bytesArray = (n, required_length) => {
     const a = []
     a.unshift(n & 255)
@@ -286,6 +325,11 @@ export function send_wcc_message(module_settings) {
 
 export function send_wcc_event(wcc_event) {
     var message_to_send = generate_wcc_event_msg(wcc_event);
+    send_websocket_message(message_to_send);
+}
+
+export function send_wcc_manage_media_file(filename, action_type) {
+    var message_to_send = generate_wcc_media_file_msg(filename, action_type);
     send_websocket_message(message_to_send);
 }
 
@@ -460,7 +504,71 @@ async function onMessage(event) {
         console.log("Board connections: " + JSON.stringify(available_outputs));
     }
 
+    if (msg_type == 6) {
 
+        //This a message with a board config
+        //Get the amount board connections
+        let media_files_amount = buffer[msg_index++];
+        media_files = [];
+
+        for (var i = 0; i < media_files_amount; i++) {
+
+            var media_file = {};
+            media_file.name = '';
+            //Get connection name
+            var name_char = String.fromCharCode(buffer[msg_index++]);
+            while (name_char != '\0') {
+                media_file.name += name_char;
+                name_char = String.fromCharCode(buffer[msg_index++]);
+            }
+
+            media_files.push(media_file);
+
+            //Add a cell to the DCC packets list
+            var tr_node = document.createElement('tr');
+            tr_node.classList.add("service_cell");
+            tr_node.innerHTML = `<td>${media_file.name}</td><td>AUDIO</td><td><button class="delete_btn play_file_btn" data-name="${media_file.name}" data-state="0"><img class="delete_btn_icn" src="/play.png"></button></td><td><button class="delete_btn"><img class="delete_btn_icn" src="/delete.png"></button></td>`;
+            document.querySelector('#media_files_table').innerHTML = '';
+            document.querySelector('#media_files_table').appendChild(tr_node);
+
+        }
+
+        document.querySelector('#no_media_files_hint').style.display = "none";
+
+        document.querySelectorAll('.play_file_btn').forEach(btn => {
+            btn.addEventListener('click', function handleClick(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                //Find a selected product
+
+                media_files.forEach((file, index) => {
+                    if (file.name == this.dataset.name) {
+
+                        console.log('play ' + file.name);
+
+                        if (this.dataset.state == "0") {
+                            this.innerHTML = `<img class="delete_btn_icn" src="/stop.png">`;
+                            this.dataset.state = "1";
+                            send_wcc_manage_media_file(file.name, 0);
+
+                        } else {
+                            this.innerHTML = `<img class="delete_btn_icn" src="/play.png">`;
+                            this.dataset.state = "0";
+                            send_wcc_manage_media_file(file.name, 1);
+
+                        }
+
+
+                    }
+                });
+
+            });
+        });
+
+        console.log(media_files);
+
+    }
 
     //Autoscoll
     //let dcc_packets_table_el = document.querySelector('#dcc_packets_table_container');

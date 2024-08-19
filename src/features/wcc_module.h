@@ -5,6 +5,7 @@
 #include "../config/board_config.h"
 #include "./led_module.h"
 #include "../../structures.h"
+#include "./audio_module.h"
 
 static const char *TAG = "HANDLER_MODULE";
 
@@ -343,6 +344,40 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
     ESP_LOGI(TAG, "is state active: %d", msg.is_state_active);
 
     ESP_LOGI(TAG, "============================");
+}
+
+/*Message format:
+[1] - action type, 0 - play a file, 1 - stop, 2 - delete file
+[2]...until char '\0' - file name*/
+void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
+{
+
+    Serial.println("New WCC media file message is received");
+
+    // Check what should we do with a media file
+    uint8_t action_type = output_buffer[0];
+    char *file_name = (char *)ps_calloc(buffer_size, sizeof(char));
+
+    // Load a file name
+    uint8_t filename_ind = 1;
+
+    for (; output_buffer[filename_ind] != '\0'; ++filename_ind)
+    {
+        file_name[filename_ind - 1] = (char)output_buffer[filename_ind];
+    }
+
+    file_name[filename_ind] = '\0';
+    Serial.print(file_name);
+
+        char path[50] = "/"; 
+        strcat(path, file_name); 
+
+    play_audio_from_spiffs(path);
+
+    free(file_name);
+
+    ESP_LOGI(TAG, "============================");
+
 }
 
 #endif

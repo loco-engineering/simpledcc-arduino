@@ -62,12 +62,30 @@ typedef struct
 
 } State;
 
+
+//Media files
+typedef struct
+{
+    char *file_name;
+    uint8_t status;         // 0 - stopped, 1 - playing, 2 -paused
+    uint8_t volume; 
+    File file;
+    uint32_t wav_data_index;
+    uint32_t wav_data_size;
+} MediaFile;
+
 typedef struct
 {
     State *states;
     uint8_t module_mac_address[6];
     uint16_t state_count;
+
+    MediaFile media_files[40];
+    uint16_t media_files_amount;
+
 } BoardSettings;
+
+
 
 /* How to add a new board
 - Update the connection_amount with amount of connections on your board

@@ -1,9 +1,9 @@
 #ifndef AUDIO_MODULE_H
 #define AUDIO_MODULE_H
 
-#include "test_audio.h"    // The Wav file
+#include "test_audio.h" // The Wav file
 
-Audio audio;
+// Audio audio;
 
 static const i2s_port_t i2s_num = I2S_NUM_0; // i2s port number
 unsigned const char *wav_data = 0;
@@ -47,7 +47,7 @@ static const i2s_config_t i2s_config = {
 static const i2s_pin_config_t pin_config = {
     .bck_io_num = 13,                // The bit clock connectiom, goes to pin 27 of ESP32
     .ws_io_num = 14,                 // Word select, also known as word select or left right clock
-    .data_out_num = 12,           // Data out from the ESP32, connect to DIN on 38357A
+    .data_out_num = 12,              // Data out from the ESP32, connect to DIN on 38357A
     .data_in_num = I2S_PIN_NO_CHANGE // we are not interested in I2S data into the ESP32
 };
 
@@ -156,48 +156,104 @@ void DumpWAVHeader(WavHeader_Struct *Wav)
     Serial.println(Wav->DataSize);
 }
 
-
 void play_audio_from_header_file()
 {
-    memcpy(&WavHeader, &audio_data_from_h_file, 44); // Copy the header part of the wav data into our structure
-    DumpWAVHeader(&WavHeader);                 // Dump the header data to serial, optional!
+    const unsigned char *WavFile = audio_data_from_h_file;
+    memcpy(&WavHeader, WavFile, 44); // Copy the header part of the wav data into our structure
+    DumpWAVHeader(&WavHeader);       // Dump the header data to serial, optional!
     if (ValidWavData(&WavHeader))
     {
         i2s_driver_install(i2s_num, &i2s_config, 0, NULL);   // ESP32 will allocated resources to run I2S
         i2s_set_pin(i2s_num, &pin_config);                   // Tell it the pins you will be using
         i2s_set_sample_rates(i2s_num, WavHeader.SampleRate); // set sample rate
-        wav_data = audio_data_from_h_file;                   // set to start of data
-        wav_data += 44;
+        wav_data = WavFile + 44;
         wav_data_index = 0;
     }
 }
 
-void play_audio_from_spiffs(){
+void setup_audio()
+{
+    i2s_driver_install(i2s_num, &i2s_config, 0, NULL); // ESP32 will allocated resources to run I2S
+    i2s_set_pin(i2s_num, &pin_config);                 // Tell it the pins you will be using
+}
 
-    audio.setPinout(13, 14, 12);
-    audio.setVolume(5); // default 0...21
+void play_audio_from_spiffs(const char *filename)
+{
+    
+    Serial.println("Trying to find audio file: ");
+    Serial.print(filename);
 
-    audio.connecttoFS(SPIFFS, "/sample3.aac"); // SPIFFS
+    // Find a media file and update status to 1
+    for (uint8_t file_ind = 0; file_ind < board_settings.media_files_amount; ++file_ind)
+    {
+        MediaFile file = board_settings.media_files[file_ind];
 
+        if (strcmp(file.file_name, filename) == 0)
+        {
+            if (board_settings.media_files[file_ind].file.available())
+            {
+                board_settings.media_files[file_ind].status = 1;
+
+                uint8_t wav_header[44];
+                board_settings.media_files[file_ind].file.read(wav_header, 44);
+                memcpy(&WavHeader, wav_header, 44); // Copy the header part of the wav data into our structure
+                DumpWAVHeader(&WavHeader);          // Dump the header data to serial, optional!
+                if (ValidWavData(&WavHeader))
+                {
+                    i2s_set_sample_rates(i2s_num, WavHeader.SampleRate); // set sample rate
+                                                                         // file.seek(44);
+                }
+
+
+                board_settings.media_files[file_ind].wav_data_size = WavHeader.DataSize;
+                board_settings.media_files[file_ind].wav_data_index = 0;
+            }
+        }
+    }
 }
 
 void loop_audio()
 {
 
-        audio.loop();
+    // Iterate over madia files with status 1 and play them
 
+    uint8_t pcm_data[4] = {0};
+    bool is_should_play = false;
 
-    if (wav_data == 0){
-        return;
+    for (uint8_t file_ind = 0; file_ind < board_settings.media_files_amount; ++file_ind)
+    {
+
+        MediaFile file = board_settings.media_files[file_ind];
+        if (file.status == 1)
+        {
+
+            uint8_t cur_pcm_data[8] = {0};
+
+            file.file.read(cur_pcm_data, 8);
+
+            for (uint8_t ind = 0; ind < 8; ind += 2)
+            {
+                *((int16_t *)(pcm_data + ind)) += *((int16_t *)(cur_pcm_data+ind));
+                *((int16_t *)(pcm_data + ind)) /= 10;
+            }
+
+            board_settings.media_files[file_ind].wav_data_index += 8;
+
+            if (board_settings.media_files[file_ind].wav_data_index >= file.wav_data_size) // If we gone past end of data reset back to beginning
+            {
+                    Serial.print("Restart audio");
+
+                board_settings.media_files[file_ind].wav_data_index = 0;
+                file.file.seek(44);
+            }
+
+            is_should_play = true;
+        }
     }
-
+    if (is_should_play){
     size_t BytesWritten; // Returned by the I2S write routine, we are not interested in it
-
-    i2s_write(i2s_num, wav_data + wav_data_index, 4, &BytesWritten, portMAX_DELAY);
-    wav_data_index += 4;
-
-    if(wav_data_index>=WavHeader.DataSize)               // If we gone past end of data reset back to beginning
-    wav_data_index=0;    
+    i2s_write(i2s_num, pcm_data, 8, &BytesWritten, portMAX_DELAY);
+    }
 }
 
 #endif
