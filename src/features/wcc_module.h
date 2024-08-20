@@ -2,12 +2,15 @@
 #define WCC_MODULE_H
 
 #include "esp32-hal-log.h"
+#include "../network/webserver_module.h"
 #include "../config/board_config.h"
 #include "./led_module.h"
 #include "../../structures.h"
 #include "./audio_module.h"
+#include "../handlers/event_handler.h"
 
 static const char *TAG = "HANDLER_MODULE";
+void reload_and_send_media_files_list();
 
 #define bytes_to_u16(MSB, LSB) (((unsigned int)((unsigned char)MSB)) & 255) << 8 | (((unsigned char)LSB) & 255)
 
@@ -343,6 +346,7 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
     msg.is_state_active = output_buffer[element_data_start_ind++];
     ESP_LOGI(TAG, "is state active: %d", msg.is_state_active);
 
+    process_wcc_event(msg);
     ESP_LOGI(TAG, "============================");
 }
 
@@ -355,7 +359,7 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
     Serial.println("New WCC media file message is received");
 
     // Check what should we do with a media file
-    uint8_t action_type = output_buffer[0];
+    uint8_t action_type = output_buffer[0]; // 0 - stop, 1 - start, 2 - pause, 3 - delete
     char *file_name = (char *)ps_calloc(buffer_size, sizeof(char));
 
     // Load a file name
@@ -369,15 +373,37 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
     file_name[filename_ind] = '\0';
     Serial.print(file_name);
 
-        char path[50] = "/"; 
-        strcat(path, file_name); 
+    if (action_type >= 0 && action_type <= 2)
+    {
+        play_audio_from_spiffs(file_name, action_type);
+    }
+    else if (action_type == 3)
+    {
+        
+        ESP_LOGI(TAG, "Removing file %s",file_name);
 
-    play_audio_from_spiffs(path);
+        // Close a file
+        for (uint8_t file_ind = 0; file_ind < board_settings.media_files_amount; ++file_ind)
+        {
+            MediaFile file = board_settings.media_files[file_ind];
+
+            if (strcmp(file.file_name, file_name) == 0)
+            {
+                file.file.close();
+            }
+        }
+        // Remove from LittleFS
+        char path[50] = "/";
+        strcat(path, file_name);
+        LittleFS.remove(path);
+
+        // Reload files and send to the client
+        reload_and_send_media_files_list();
+    }
 
     free(file_name);
 
     ESP_LOGI(TAG, "============================");
-
 }
 
 #endif

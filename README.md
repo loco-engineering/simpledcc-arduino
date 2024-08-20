@@ -65,9 +65,8 @@ The main differences are:
 - Install Arduino IDE (we test with Arduino IDE 2.3.2)
 - Install ESP32 for Arduino IDE (we test with version 2.0.17, later versions could not work and you will have build errors)
 - Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11), LiteLED (version 1.2.0). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
-- Install ESP32-audioI2S - https://github.com/schreibfaul1/ESP32-audioI2S/wiki#can-the-arduino-ide-be-used
 - Change configuration in config.h if required
-- Create and upload SPIFFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner)
+- Create and upload LittleFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner). You should update partions.csv file with your flash amount: open particions.csv and set spiffs size according your board flash size 
 - (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose. If you don't see any logs check "I don't see any logs" below
 - Build and upload the firmware
 

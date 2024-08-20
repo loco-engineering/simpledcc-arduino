@@ -72,6 +72,7 @@ typedef struct
     File file;
     uint32_t wav_data_index;
     uint32_t wav_data_size;
+    uint8_t channels;
 } MediaFile;
 
 typedef struct

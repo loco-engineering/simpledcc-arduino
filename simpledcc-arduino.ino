@@ -20,8 +20,6 @@
 
 #include <LiteLED.h>
 
-#include <Audio.h>
-
 #include "src/dcc_reader/dcc_module.h"
 #include "src/features/led_module.h"
 #include "src/features/nfc_module.h"
@@ -81,7 +79,7 @@ void setup()
   //setup_nfc();
   setup_status_led();
   setup_audio();
-  on_status_led(0x0000ff);
+  on_status_led(0x00ff00);
 
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
   //add_led_connection(0, 0, 0.5, 1000, 1000, 0);
@@ -89,7 +87,7 @@ void setup()
 
   // Test SPIFFS
   //deleteFile(LittleFS, "/level_crossing_1.wav");
-  //deleteFile(LittleFS, "/level_crossing.wav");
+  //deleteFile(LittleFS, "/train.wav");
 
   listDir(LittleFS, "/", 0);
 
@@ -97,8 +95,8 @@ void setup()
   //play_audio_from_header_file();
 
   reload_and_send_media_files_list();
-  play_audio_from_spiffs("train.wav");
-  //play_audio_from_spiffs("level_crossing_1.wav");
+  //play_audio_from_spiffs("train_mon_16bit_32khz.wav", 0);
+  //play_audio_from_spiffs("lev_cros1_mon_16bit_32k.wav", 0);
 
 
   Serial.println("LittleFS used space size in bytes");
@@ -111,12 +109,12 @@ void setup()
 
 void loop()
 {
-  //loop_dcc_module();
+  loop_dcc_module();
   loop_webserver();
-  //loop_led();
+  loop_led();
   //loop_nfc();
   loop_audio();
-  //loop_gpio_module();
+  loop_gpio_module();
   //Uncomment if you want to check memory leaks and usage
   //Data can be visualized in Serial Plotter"
   //Serial.printf("\nStack:%d,Heap:%lu\n", uxTaskGetStackHighWaterMark(NULL), (unsigned long)ESP.getFreeHeap());

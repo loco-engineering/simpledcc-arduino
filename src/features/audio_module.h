@@ -177,9 +177,9 @@ void setup_audio()
     i2s_set_pin(i2s_num, &pin_config);                 // Tell it the pins you will be using
 }
 
-void play_audio_from_spiffs(const char *filename)
+void play_audio_from_spiffs(const char *filename, uint8_t action)
 {
-    
+
     Serial.println("Trying to find audio file: ");
     Serial.print(filename);
 
@@ -190,11 +190,16 @@ void play_audio_from_spiffs(const char *filename)
 
         if (strcmp(file.file_name, filename) == 0)
         {
+            //If we should stop sound just update the status, we shouldn't check wav 
+            if (action != 1){
+                board_settings.media_files[file_ind].status = action;
+            }
+
             if (board_settings.media_files[file_ind].file.available())
             {
-                board_settings.media_files[file_ind].status = 1;
 
                 uint8_t wav_header[44];
+                file.file.seek(0);
                 board_settings.media_files[file_ind].file.read(wav_header, 44);
                 memcpy(&WavHeader, wav_header, 44); // Copy the header part of the wav data into our structure
                 DumpWAVHeader(&WavHeader);          // Dump the header data to serial, optional!
@@ -202,11 +207,12 @@ void play_audio_from_spiffs(const char *filename)
                 {
                     i2s_set_sample_rates(i2s_num, WavHeader.SampleRate); // set sample rate
                                                                          // file.seek(44);
+                    board_settings.media_files[file_ind].status = action;
+
+                    board_settings.media_files[file_ind].wav_data_size = WavHeader.DataSize;
+                    board_settings.media_files[file_ind].channels = WavHeader.NumChannels;
+                    board_settings.media_files[file_ind].wav_data_index = 0;
                 }
-
-
-                board_settings.media_files[file_ind].wav_data_size = WavHeader.DataSize;
-                board_settings.media_files[file_ind].wav_data_index = 0;
             }
         }
     }
@@ -217,7 +223,9 @@ void loop_audio()
 
     // Iterate over madia files with status 1 and play them
 
-    uint8_t pcm_data[4] = {0};
+    const uint8_t bytes_to_read = 4; // bytes to read in mono
+
+    uint8_t pcm_data[2 * bytes_to_read] = {0};
     bool is_should_play = false;
 
     for (uint8_t file_ind = 0; file_ind < board_settings.media_files_amount; ++file_ind)
@@ -227,21 +235,40 @@ void loop_audio()
         if (file.status == 1)
         {
 
-            uint8_t cur_pcm_data[8] = {0};
+            uint8_t cur_pcm_data[2 * bytes_to_read] = {0};
 
-            file.file.read(cur_pcm_data, 8);
-
-            for (uint8_t ind = 0; ind < 8; ind += 2)
+            if (file.channels == 1)
             {
-                *((int16_t *)(pcm_data + ind)) += *((int16_t *)(cur_pcm_data+ind));
-                *((int16_t *)(pcm_data + ind)) /= 10;
+                uint8_t cur_mono_pcm_data[bytes_to_read] = {0};
+
+                file.file.read(cur_mono_pcm_data, bytes_to_read);
+
+                for (uint8_t ind = 0; ind < bytes_to_read; ind += 2)
+                {
+                    cur_pcm_data[2 * ind] = cur_mono_pcm_data[ind];
+                    cur_pcm_data[2 * ind + 1] = cur_mono_pcm_data[ind + 1];
+
+                    cur_pcm_data[2 * ind + 2] = cur_mono_pcm_data[ind];
+                    cur_pcm_data[2 * ind + 3] = cur_mono_pcm_data[ind + 1];
+                }
+                board_settings.media_files[file_ind].wav_data_index += bytes_to_read;
+            }
+            else
+            {
+
+                file.file.read(cur_pcm_data, 2 * bytes_to_read); // in stereo we read x2 bytes (2 channels)
+                board_settings.media_files[file_ind].wav_data_index += 2 * bytes_to_read;
             }
 
-            board_settings.media_files[file_ind].wav_data_index += 8;
+            for (uint8_t ind = 0; ind < 2 * bytes_to_read; ind += 2)
+            {
+                *((int16_t *)(pcm_data + ind)) += *((int16_t *)(cur_pcm_data + ind));
+                *((int16_t *)(pcm_data + ind)) /= 2;
+            }
 
             if (board_settings.media_files[file_ind].wav_data_index >= file.wav_data_size) // If we gone past end of data reset back to beginning
             {
-                    Serial.print("Restart audio");
+                Serial.print("Restart audio");
 
                 board_settings.media_files[file_ind].wav_data_index = 0;
                 file.file.seek(44);
@@ -250,9 +277,10 @@ void loop_audio()
             is_should_play = true;
         }
     }
-    if (is_should_play){
-    size_t BytesWritten; // Returned by the I2S write routine, we are not interested in it
-    i2s_write(i2s_num, pcm_data, 8, &BytesWritten, portMAX_DELAY);
+    if (is_should_play)
+    {
+        size_t BytesWritten; // Returned by the I2S write routine, we are not interested in it
+        i2s_write(i2s_num, pcm_data, 8, &BytesWritten, portMAX_DELAY);
     }
 }
 

@@ -120,12 +120,12 @@
             <div class="wifi_set_cont">
                 <h3 class="section_header">Media Manager<button id="media_file_upload_btn" class="new_btn">Upload File</button>
                     <span class="media_file_loader"></span>
-                    <input type="file" name="media_file" id="media_file_input" accept=".wav,.aac,.mp3" hidden>
+                    <input type="file" name="media_file" id="media_file_input" accept=".wav" hidden>
 
                 </h3>
 
-                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav, .mp3 and .aac files are
-                    supported. After the file is uploaded, go to "Add State" or open a state to edit above, click on
+                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav files with 16-bit samples are
+                    supported. All uploaded files should be with the same Sample Rate (24 kHz, 32 kHz, 44.1 kHz, etc.). Mono (1 channel) is recommended to save space on a board. After the file is uploaded, go to "Add State" or open a state to edit above, click on
                     "Add Value" and select in "Name on a decoder" dropdown "Speakers" and you should see all uploaded
                     files in the "Value" dropdown.</p>
 

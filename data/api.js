@@ -506,6 +506,8 @@ async function onMessage(event) {
 
     if (msg_type == 6) {
 
+        document.querySelector('#media_files_table').innerHTML = '';
+
         //This a message with a board config
         //Get the amount board connections
         let media_files_amount = buffer[msg_index++];
@@ -527,8 +529,7 @@ async function onMessage(event) {
             //Add a cell to the DCC packets list
             var tr_node = document.createElement('tr');
             tr_node.classList.add("service_cell");
-            tr_node.innerHTML = `<td>${media_file.name}</td><td>AUDIO</td><td><button class="delete_btn play_file_btn" data-name="${media_file.name}" data-state="0"><img class="delete_btn_icn" src="/play.png"></button></td><td><button class="delete_btn"><img class="delete_btn_icn" src="/delete.png"></button></td>`;
-            document.querySelector('#media_files_table').innerHTML = '';
+            tr_node.innerHTML = `<td>${media_file.name}</td><td>AUDIO</td><td><button class="delete_btn play_file_btn" data-name="${media_file.name}" data-state="0"><img class="delete_btn_icn" src="/play.png"></button></td><td><button class="delete_btn delete_file_btn" data-name="${media_file.name}"><img class="delete_btn_icn" src="/delete.png"></button></td>`;
             document.querySelector('#media_files_table').appendChild(tr_node);
 
         }
@@ -550,16 +551,35 @@ async function onMessage(event) {
                         if (this.dataset.state == "0") {
                             this.innerHTML = `<img class="delete_btn_icn" src="/stop.png">`;
                             this.dataset.state = "1";
-                            send_wcc_manage_media_file(file.name, 0);
+                            send_wcc_manage_media_file(file.name, 1);
 
                         } else {
                             this.innerHTML = `<img class="delete_btn_icn" src="/play.png">`;
                             this.dataset.state = "0";
-                            send_wcc_manage_media_file(file.name, 1);
+                            send_wcc_manage_media_file(file.name, 0);
 
                         }
 
 
+                    }
+                });
+
+            });
+        });
+
+
+        document.querySelectorAll('.delete_file_btn').forEach(btn => {
+            btn.addEventListener('click', function handleClick(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                //Find a selected product
+
+                media_files.forEach((file, index) => {
+                    if (file.name == this.dataset.name) {
+                        if (confirm(`Do you really want to delete ${file.name} from the board?`) == true) {
+                            send_wcc_manage_media_file(file.name, 3);
+                        }
                     }
                 });
 

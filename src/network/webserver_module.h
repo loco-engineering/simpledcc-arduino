@@ -177,22 +177,16 @@ void reload_and_send_media_files_list()
         Serial.print(file.name());
 
         board_settings.media_files[files_amount].file_name = (char *)ps_malloc(strlen(file.name()) * sizeof(char));
-        Serial.println("1");
 
         strcpy(board_settings.media_files[files_amount].file_name, file.name());
         board_settings.media_files[files_amount].status = 0;
-        Serial.println("2");
 
         // Open file and keep File ref
         char path[50] = "/";
         strcat(path, file.name());
-        Serial.print(path);
-
         board_settings.media_files[files_amount].file = LittleFS.open(path);
-        Serial.println("3");
 
         uint8_t *file_name = (uint8_t *)file.name();
-        Serial.println("4");
 
         for (uint8_t c = *file_name; c != '\0'; c = *++file_name)
         {
@@ -204,10 +198,7 @@ void reload_and_send_media_files_list()
             msg = (uint8_t *)ps_realloc(msg, allocated_bytes);
           }
         }
-
-        Serial.print("\tSIZE: ");
-        Serial.println(file.size());
-
+        msg[msg_index++] = '\0';
         ++files_amount;
       }
       file = root.openNextFile();
@@ -302,7 +293,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
     send_board_config_message();
 
     // Send a list with media files
-    //reload_and_send_media_files_list();
+    reload_and_send_media_files_list();
 
     break;
   case WS_EVT_DISCONNECT:
@@ -342,7 +333,7 @@ static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String f
     int headers = request->headers();
     for (uint8_t i = 0; i < headers; i++)
     {
-        AsyncWebHeader* h = request->getHeader(i);
+      AsyncWebHeader *h = request->getHeader(i);
       if (strcmp(h->name().c_str(), "del-prev") == 0)
       {
         Serial.println("Deleting prev media file");
@@ -389,6 +380,9 @@ static void server_handle_SPIFFS_upload(AsyncWebServerRequest *request, String f
 
     Serial.println(logmessage);
     request->redirect("/");
+
+    // Reload files and send to the client
+    reload_and_send_media_files_list();
   }
 }
 
