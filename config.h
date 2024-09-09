@@ -2,6 +2,7 @@
 
 // GPIO that receives DCC Signal 
 #define DCC_PIN     17
+//#define DCC_PIN     7
 #define MAX_CACHED_DCC_PACKETS 10
 
 //LEDs

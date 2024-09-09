@@ -11,6 +11,8 @@ typedef struct DCCPacket{
 
    uint8_t user_data[10];
    uint8_t user_data_length;
+
+   uint8_t packet_amount;
 };
 
 struct gpio_connection{

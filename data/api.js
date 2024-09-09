@@ -351,7 +351,9 @@ export function initWebSocket() {
 function onOpen(event) {
     console.log('Connection opened');
     var wcc_test_event = {};
-    wcc_test_event.id = 'eq125k';
+    //wcc_test_event.id = 'eq125k';
+    wcc_test_event.id = 'eq125a';
+
     wcc_test_event.is_state_active = 1;
     send_wcc_event(wcc_test_event);
 }
@@ -403,6 +405,8 @@ async function onMessage(event) {
 
             }
 
+            var packet_amount = buffer[msg_index++];
+
             switch (packet_type) {
                 case 0:
                     description_str = "No description available";
@@ -452,7 +456,7 @@ async function onMessage(event) {
             //Add a cell to the DCC packets list
             var tr_node = document.createElement('tr');
             tr_node.classList.add("service_cell");
-            tr_node.innerHTML = `<td>${address}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><button id="table_btn" class="table_btn">Add action</button></td>`;
+            tr_node.innerHTML = `<td>${address}</td><td>${packet_amount}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><button id="table_btn" class="table_btn">Add state</button></td>`;
 
             document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
 

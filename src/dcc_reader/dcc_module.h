@@ -18,16 +18,40 @@ void notifyDccSpeed(uint16_t Addr, DCC_ADDR_TYPE AddrType, uint8_t Speed, DCC_DI
   Serial.print(" Dir: ");
   Serial.println((Dir == DCC_DIR_FWD) ? "Forward" : "Reverse");
 
+    uint8_t cur_packet_index = cached_packets_count - 1;
+
   // Set packet type
-  cached_packets[cached_packets_count - 1].packet_type = 1;
+  cached_packets[cur_packet_index].packet_type = 1;
   // Save address
-  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
-  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+  cached_packets[cur_packet_index].address[0] = Addr & 0xff;
+  cached_packets[cur_packet_index].address[1] = (Addr >> 8);
   // Save user data
-  cached_packets[cached_packets_count - 1].user_data[0] = Speed;
-  cached_packets[cached_packets_count - 1].user_data[1] = Dir;
-  cached_packets[cached_packets_count - 1].user_data[2] = SpeedSteps;
-  cached_packets[cached_packets_count - 1].user_data_length = 3;
+  cached_packets[cur_packet_index].user_data[0] = Speed;
+  cached_packets[cur_packet_index].user_data[1] = Dir;
+  cached_packets[cur_packet_index].user_data[2] = SpeedSteps;
+  cached_packets[cur_packet_index].user_data_length = 3;
+
+  cached_packets[cur_packet_index].packet_amount = 1;
+
+  //Check if the previous packet the same
+  if (cached_packets_count > 1){
+    uint8_t prev_packet_index = cur_packet_index - 1;
+
+    if (cached_packets[prev_packet_index].packet_type == cached_packets[cur_packet_index].packet_type &&
+      cached_packets[prev_packet_index].address[0] == cached_packets[cur_packet_index].address[0] &&
+      cached_packets[prev_packet_index].address[1] == cached_packets[cur_packet_index].address[1] &&
+      cached_packets[prev_packet_index].user_data_length == cached_packets[cur_packet_index].user_data_length &&
+      cached_packets[prev_packet_index].user_data[0] == cached_packets[cur_packet_index].user_data[0] &&
+      cached_packets[prev_packet_index].user_data[1] == cached_packets[cur_packet_index].user_data[1] &&
+      cached_packets[prev_packet_index].user_data[2] == cached_packets[cur_packet_index].user_data[2]){
+        //Increase the amount of packets of the previous packet
+          cached_packets[prev_packet_index].packet_amount++;
+          cached_packets_count--; // we should reduce the counter because we don't add a new packet
+
+      }
+
+  }
+  
 };
 
 void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint8_t FuncState)
@@ -38,15 +62,35 @@ void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint
   Serial.print("  Function Group: ");
   Serial.print(FuncGrp, DEC);
 
+    uint8_t cur_packet_index = cached_packets_count - 1;
+
   // Set packet type
-  cached_packets[cached_packets_count - 1].packet_type = 2;
+  cached_packets[cur_packet_index].packet_type = 2;
   // Save address
-  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
-  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+  cached_packets[cur_packet_index].address[0] = Addr & 0xff;
+  cached_packets[cur_packet_index].address[1] = (Addr >> 8);
   // Save user data
-  cached_packets[cached_packets_count - 1].user_data[0] = FuncGrp;
-  cached_packets[cached_packets_count - 1].user_data[1] = FuncState;
-  cached_packets[cached_packets_count - 1].user_data_length = 2;
+  cached_packets[cur_packet_index].user_data[0] = FuncGrp;
+  cached_packets[cur_packet_index].user_data[1] = FuncState;
+  cached_packets[cur_packet_index].user_data_length = 2;
+  cached_packets[cur_packet_index].packet_amount = 1;
+
+//Check if the previous packet the same
+  if (cached_packets_count > 1){
+    uint8_t prev_packet_index = cur_packet_index - 1;
+
+    if (cached_packets[prev_packet_index].packet_type == cached_packets[cur_packet_index].packet_type &&
+      cached_packets[prev_packet_index].address[0] == cached_packets[cur_packet_index].address[0] &&
+      cached_packets[prev_packet_index].address[1] == cached_packets[cur_packet_index].address[1] &&
+      cached_packets[prev_packet_index].user_data_length == cached_packets[cur_packet_index].user_data_length &&
+      cached_packets[prev_packet_index].user_data[0] == cached_packets[cur_packet_index].user_data[0] &&
+      cached_packets[prev_packet_index].user_data[1] == cached_packets[cur_packet_index].user_data[1]){
+        //Increase the amount of packets of the previous packet
+          cached_packets[prev_packet_index].packet_amount++;
+          cached_packets_count--; // we should reduce the counter because we don't add a new packet
+      }
+
+  }
 
   switch (FuncGrp)
   {
@@ -125,16 +169,40 @@ void notifyDccAccTurnoutBoard(uint16_t BoardAddr, uint8_t OutputPair, uint8_t Di
   Serial.print(',');
   Serial.println(OutputPower, HEX);
 
+    uint8_t cur_packet_index = cached_packets_count - 1;
+
   // Set packet type
-  cached_packets[cached_packets_count - 1].packet_type = 4; // Turnout Packet
+  cached_packets[cur_packet_index].packet_type = 4; // Turnout Packet
   // Save address
-  cached_packets[cached_packets_count - 1].address[0] = BoardAddr & 0xff;
-  cached_packets[cached_packets_count - 1].address[1] = (BoardAddr >> 8);
+  cached_packets[cur_packet_index].address[0] = BoardAddr & 0xff;
+  cached_packets[cur_packet_index].address[1] = (BoardAddr >> 8);
   // Save user data
-  cached_packets[cached_packets_count - 1].user_data[0] = Direction;
-  cached_packets[cached_packets_count - 1].user_data[1] = OutputPower;
-  cached_packets[cached_packets_count - 1].user_data[2] = OutputPair;
-  cached_packets[cached_packets_count - 1].user_data_length = 3;
+  cached_packets[cur_packet_index].user_data[0] = Direction;
+  cached_packets[cur_packet_index].user_data[1] = OutputPower;
+  cached_packets[cur_packet_index].user_data[2] = OutputPair;
+  cached_packets[cur_packet_index].user_data_length = 3;
+
+    cached_packets[cur_packet_index].packet_amount = 1;
+
+//Check if the previous packet the same
+  if (cached_packets_count > 1){
+    uint8_t prev_packet_index = cur_packet_index - 1;
+
+    if (cached_packets[prev_packet_index].packet_type == cached_packets[cur_packet_index].packet_type &&
+      cached_packets[prev_packet_index].address[0] == cached_packets[cur_packet_index].address[0] &&
+      cached_packets[prev_packet_index].address[1] == cached_packets[cur_packet_index].address[1] &&
+      cached_packets[prev_packet_index].user_data_length == cached_packets[cur_packet_index].user_data_length &&
+      cached_packets[prev_packet_index].user_data[0] == cached_packets[cur_packet_index].user_data[0] &&
+      cached_packets[prev_packet_index].user_data[1] == cached_packets[cur_packet_index].user_data[1] &&
+      cached_packets[prev_packet_index].user_data[2] == cached_packets[cur_packet_index].user_data[2]){
+        //Increase the amount of packets of the previous packet
+          cached_packets[prev_packet_index].packet_amount++;
+          cached_packets_count--; // we should reduce the counter because we don't add a new packet
+
+      }
+
+  }
+
 }
 
 // This function is called whenever a normal DCC Turnout Packet is received and we're in Output Addressing Mode
@@ -148,24 +216,41 @@ void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputP
   Serial.print(',');
   Serial.println(OutputPower, HEX);
 
+    uint8_t cur_packet_index = cached_packets_count - 1;
+
   // Set packet type
-  cached_packets[cached_packets_count - 1].packet_type = 4; // Turnout Packet
+  cached_packets[cur_packet_index].packet_type = 4; // Turnout Packet
   // Save address
 
-  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
-  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
-
-
-  Serial.println(cached_packets[cached_packets_count - 1].address[0] );
-  Serial.println(cached_packets[cached_packets_count - 1].address[1]) ;
+  cached_packets[cur_packet_index].address[0] = Addr & 0xff;
+  cached_packets[cur_packet_index].address[1] = (Addr >> 8);
 
   // Save user data
-  cached_packets[cached_packets_count - 1].user_data[0] = Direction;
-  cached_packets[cached_packets_count - 1].user_data[1] = OutputPower;
-  cached_packets[cached_packets_count - 1].user_data_length = 2;
+  cached_packets[cur_packet_index].user_data[0] = Direction;
+  cached_packets[cur_packet_index].user_data[1] = OutputPower;
+  cached_packets[cur_packet_index].user_data_length = 2;
+    cached_packets[cur_packet_index].packet_amount = 1;
 
-  process_dcc_turnout(&cached_packets[cached_packets_count - 1]);
+  process_dcc_turnout(&cached_packets[cur_packet_index]);
   
+  //Check if the previous packet the same
+  if (cached_packets_count > 1){
+    uint8_t prev_packet_index = cur_packet_index - 1;
+
+    if (cached_packets[prev_packet_index].packet_type == cached_packets[cur_packet_index].packet_type &&
+      cached_packets[prev_packet_index].address[0] == cached_packets[cur_packet_index].address[0] &&
+      cached_packets[prev_packet_index].address[1] == cached_packets[cur_packet_index].address[1] &&
+      cached_packets[prev_packet_index].user_data_length == cached_packets[cur_packet_index].user_data_length &&
+      cached_packets[prev_packet_index].user_data[0] == cached_packets[cur_packet_index].user_data[0] &&
+      cached_packets[prev_packet_index].user_data[1] == cached_packets[cur_packet_index].user_data[1]){
+        //Increase the amount of packets of the previous packet
+          cached_packets[prev_packet_index].packet_amount++;
+          cached_packets_count--; // we should reduce the counter because we don't add a new packet
+
+      }
+
+  }
+
 }
 
 // This function is called whenever a DCC Signal Aspect Packet is received
@@ -176,18 +261,46 @@ void notifyDccSigOutputState(uint16_t Addr, uint8_t State)
   Serial.print(',');
   Serial.println(State, HEX);
 
+    uint8_t cur_packet_index = cached_packets_count - 1;
+
   // Set packet type
-  cached_packets[cached_packets_count - 1].packet_type = 3; // Signal Aspect Packet
+  cached_packets[cur_packet_index].packet_type = 3; // Signal Aspect Packet
   // Save address
-  cached_packets[cached_packets_count - 1].address[0] = Addr & 0xff;
-  cached_packets[cached_packets_count - 1].address[1] = (Addr >> 8);
+  cached_packets[cur_packet_index].address[0] = Addr & 0xff;
+  cached_packets[cur_packet_index].address[1] = (Addr >> 8);
   // Save user data
-  cached_packets[cached_packets_count - 1].user_data[0] = State;
-  cached_packets[cached_packets_count - 1].user_data_length = 1;
+  cached_packets[cur_packet_index].user_data[0] = State;
+  cached_packets[cur_packet_index].user_data_length = 1;
+
+    cached_packets[cur_packet_index].packet_amount = 1;
+
+  process_dcc_signal(&cached_packets[cur_packet_index]);
+
+  //Check if the previous packet the same
+  if (cached_packets_count > 1){
+    uint8_t prev_packet_index = cur_packet_index - 1;
+
+    if (cached_packets[prev_packet_index].packet_type == cached_packets[cur_packet_index].packet_type  &&
+      cached_packets[prev_packet_index].address[0] == cached_packets[cur_packet_index].address[0] &&
+      cached_packets[prev_packet_index].address[1] == cached_packets[cur_packet_index].address[1] &&
+      cached_packets[prev_packet_index].user_data_length == cached_packets[cur_packet_index].user_data_length &&
+      cached_packets[prev_packet_index].user_data[0] == cached_packets[cur_packet_index].user_data[0] ){
+        //Increase the amount of packets of the previous packet
+          cached_packets[prev_packet_index].packet_amount++;
+          cached_packets_count--; // we should reduce the counter because we don't add a new packet
+
+      }
+
+  }
 }
 
 void notifyDccMsg(DCC_MSG *Msg)
 {
+  //Skip idle DCC packets
+  if (Msg->Size == 3 && Msg->Data[0] == 0xFF && Msg->Data[1] == 0 && Msg->Data[2] == 0xFF){
+    return;
+  }
+
   Serial.print("notifyDccMsg: ");
 
   String ws_msg = "";
@@ -205,6 +318,7 @@ void notifyDccMsg(DCC_MSG *Msg)
   cached_packets[cached_packets_count].raw_packet_length = Msg->Size;
   // Reset the DCC packet type to undefined
   cached_packets[cached_packets_count].packet_type = 0;
+  cached_packets[cached_packets_count].user_data_length = 1;
 
   ++cached_packets_count;
 }
@@ -215,6 +329,7 @@ void setup_dcc_module()
   Dcc.pin(DCC_PIN, 0);
 
   Dcc.init(MAN_ID_DIY, 0, CV29_ACCESSORY_DECODER | CV29_OUTPUT_ADDRESS_MODE, 0);
+  //Dcc.init(MAN_ID_DIY, 0, 0, 0);
   Serial.print("DCC reader is ready...");
 
 }
@@ -230,7 +345,7 @@ void loop_dcc_module()
   //   or
   //   - every second
 
-      if (cached_packets_count == MAX_CACHED_DCC_PACKETS || millis() > time_from_last_sent_dcc_packet < 1000){
+      if (cached_packets_count == MAX_CACHED_DCC_PACKETS || millis() - time_from_last_sent_dcc_packet > 2000){
         //Time to send packets to the web app over websockets
         if (cached_packets_count > 0)
         {

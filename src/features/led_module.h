@@ -14,7 +14,7 @@ uint8_t led_connections_count = 0;
 void setup_led()
 {
     Wire.begin(11, 10);
-    ledd.begin(1.0);
+    ledd.begin(0.1);
 }
 
 // on_duration, off_duration, start_delay - values in milliseconds

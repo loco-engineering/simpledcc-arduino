@@ -61,12 +61,16 @@ The main differences are:
 
 ## How to build and upload
 
+Steps below are tested with ESP32-S3-WROOM-1-N16R8 modules. All Loco.Engineering boards are shipped with the default firmware that's why you shouldn't upload the firmware manually.
+
 - Prepare a board with ESP32S3 SoC (2 cores are required to run the firmware that's why other 1-core ESP32xx are not supported in this version)
 - Install Arduino IDE (we test with Arduino IDE 2.3.2)
 - Install ESP32 for Arduino IDE (we test with version 2.0.17, later versions could not work and you will have build errors)
 - Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11), LiteLED (version 1.2.0). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
 - Change configuration in config.h if required
-- Create and upload LittleFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner). You should update partions.csv file with your flash amount: open particions.csv and set spiffs size according your board flash size 
+- Set Flash Size to what your board has (Tools -> Flash Size) and rename partitions-4MB-flash.csv or partitions-16MB-flash.csv depending on the flash size to partitions.csv.
+- Set PSRAM type to OPI PSRAM (Tools -> PSRAM -> OPI PSRAM) if you use a module like ESP32-S3-WROOM-1-N...R... or QSPI PSRAM if you use ESP32-S3FH4R2 SoC.
+- Create and upload LittleFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner). You should update partions.csv file with your flash amount: open particions.csv and set spiffs size according your board flash size
 - (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose. If you don't see any logs check "I don't see any logs" below
 - Build and upload the firmware
 

@@ -20,7 +20,7 @@
 
         <div class="top_menu" id="top_menu">
             <a class="top_menu_item top_menu_active">DECODER</a> |
-            <a class="top_menu_item">CONTROLLER</a> |
+           <!-- <a class="top_menu_item">CONTROLLER</a> |-->
             <a class="top_menu_item">SETTINGS</a>
         </div>
 
@@ -66,11 +66,12 @@
                     <table id="dcc_packets_table" class="common_table">
                         <thead>
                             <tr>
-                                <th width="40">ADDRESS</th>
-                                <th width="100">TYPE</th>
+                                <th width="40">ADDR</th>
+                                <th width="30">QTY</th>
+                                <th width="80">TYPE</th>
                                 <th>DESCRIPTION</th>
                                 <th width="100">RAW PACKET</th>
-                                <th width="80"></th>
+                                <th width="40"></th>
                             </tr>
                         </thead>
                         <tbody id="dcc_packets_tbody">
@@ -86,7 +87,8 @@
 
 
             <div class="wifi_set_cont">
-                <h3 class="section_header">WCC Events</h3>
+                <h3 class="section_header">WCC Events<button id="send_event_btn" class="new_btn">Send event</button>
+                </h3>
                 <p class="section_hint">Messages received from other decoders and the web app over WCC protocol</p>
 
                 <div class="tableFixHead">
@@ -111,6 +113,7 @@
                 </div>
 
                 <action-modal></action-modal>
+                <event-modal></event-modal>
 
             </div>
 
@@ -149,8 +152,6 @@
                     <p class="no_data_hint" id="no_media_files_hint">No media files uploaded yet</p>
 
                 </div>
-
-                <action-modal></action-modal>
 
             </div>
 
@@ -192,6 +193,7 @@
     <script type="module">
         import "./visual-controller.js";
         import { show_new_action, show_edit_action } from "./state-details-modal.js";
+        import { show_event_modal } from "./event-modal.js";
         import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
         import { initWebSocket, upload_file, upload_media_file, send_wcc_manage_media_file } from "./api.js";
 
@@ -347,6 +349,10 @@
 
         document.getElementById("new_action_btn").onclick = () => {
             show_new_action(reload_states);
+        };
+
+        document.getElementById("send_event_btn").onclick = () => {
+            show_event_modal();
         };
 
     </script>

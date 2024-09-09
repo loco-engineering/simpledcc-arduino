@@ -16,6 +16,7 @@ static void server_handle_upload(AsyncWebServerRequest *request, String filename
 // Initialize WiFi
 void initWiFi()
 {
+  WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);
   WiFi.softAP(WIFI_SSID, WIFI_PASSWORD);
 
   IPAddress IP = WiFi.softAPIP();
@@ -56,6 +57,9 @@ void send_dcc_packets(DCCPacket *cached_packets, uint8_t cached_packets_count)
     {
       msg_to_send[msg_index++] = cached_packet.user_data[k];
     }
+
+    msg_to_send[msg_index++] = cached_packet.packet_amount;
+
   }
   ws.binaryAll(msg_to_send, msg_index);
 }
