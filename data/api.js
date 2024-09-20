@@ -12,21 +12,115 @@ export async function upload_file() {
 
     var input = document.querySelector('#firmware_file_input');
 
-    var data = new FormData()
-    data.append('file1', input.files[0])
+    /*for (var ind = 0; ind < input.files.length; ind += 1) {
+        var data = new FormData()
+        data.append('file1', input.files[ind])
 
 
-    try {
+        try {
 
-        await fetch(`http://${base_ip}/upload`, {
-            method: 'POST',
-            body: data
-        });
-        document.querySelector('.file_loader').style.display = "none";
+            await fetch(`http://${base_ip}/upload`, {
+                method: 'POST',
+                body: data
+            });
+            document.querySelector('.file_loader').style.display = "none";
 
-    } catch (error) {
-        document.querySelector('.file_loader').style.display = "none";
+        } catch (error) {
+            document.querySelector('.file_loader').style.display = "none";
+        }
+    }*/
+
+
+
+
+    for (var ind = 0; ind < input.files.length; ind += 1) {
+
+        var file = input.files[ind]; //this is an array
+
+        if (file.name.includes(".bin")) {
+            var data = new FormData()
+            data.append('file1', file)
+
+            try {
+
+                await fetch(`http://${base_ip}/upload`, {
+                    method: 'POST',
+                    body: data
+                });
+                document.querySelector('.file_loader').style.display = "none";
+
+                if (ind == input.files.length - 1){
+                    await fetch(`http://${base_ip}/reboot`, {
+                        method: 'GET'
+                    });
+                }
+
+            } catch (error) {
+                document.querySelector('.file_loader').style.display = "none";
+            }
+        } else {
+
+            var fileSize = file.size;
+            var fileSizeInKB = (fileSize / 1024); // this would be in kilobytes defaults to bytes
+
+            if (fileSizeInKB > 2 * 1024) {
+
+                alert(`This file is too big: ${(fileSizeInKB / 1024).toFixed(2)} MB . Maximum allowed size is 2 MB. `);
+
+            } else {
+
+                document.querySelector('.file_loader').style.display = "block";
+
+                const chunkSize = 1024 * 20; // size of each chunk (20KB)
+                let start = 0;
+
+                while (start < file.size) {
+                    var headers = {};
+                    if (start == 0) {
+                        headers = { "del-prev": "" };
+                    }
+                    await uploadChunk(file.slice(start, start + chunkSize), file.name, headers);
+                    start += chunkSize;
+                }
+
+                document.querySelector('.file_loader').style.display = "none";
+
+                if (ind == input.files.length - 1){
+                    await fetch(`http://${base_ip}/reboot`, {
+                        method: 'GET'
+                    });
+                }
+
+                async function uploadChunk(chunk, file_name, headers = {}, retries = 3) {
+                    var data = new FormData()
+                    data.append('file1', chunk, file_name)
+
+                    try {
+                        await fetch(`http://${base_ip}/upload`, {
+                            method: 'POST',
+                            headers: headers,
+                            body: data
+                        });
+                    } catch (error) {
+                        if (retries > 0) {
+                            await uploadChunk(chunk, file_name, headers, retries - 1);
+                        } else {
+                            console.error('Failed to upload chunk: ', error);
+                            document.querySelector('.file_loader').style.display = "none";
+                        }
+                    }
+                }
+
+
+            }
+
+        }
+
+
     }
+
+
+
 
 }
 
@@ -456,9 +550,13 @@ async function onMessage(event) {
             //Add a cell to the DCC packets list
             var tr_node = document.createElement('tr');
             tr_node.classList.add("service_cell");
-            tr_node.innerHTML = `<td>${address}</td><td>${packet_amount}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><button id="table_btn" class="table_btn">Add state</button></td>`;
+            tr_node.innerHTML = `<td>${address}</td><td>${packet_amount}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><!--<button id="table_btn" class="table_btn">Add state</button>--></td>`;
 
             document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
+
+            if (document.querySelector('#dcc_packets_tbody').children.length > 200) {
+                document.querySelector('#dcc_packets_tbody').removeChild(document.querySelector('#dcc_packets_tbody').children[0]);
+            }
 
         }
 
@@ -533,7 +631,7 @@ async function onMessage(event) {
             //Add a cell to the DCC packets list
             var tr_node = document.createElement('tr');
             tr_node.classList.add("service_cell");
-            tr_node.innerHTML = `<td>${media_file.name}</td><td>AUDIO</td><td><button class="delete_btn play_file_btn" data-name="${media_file.name}" data-state="0"><img class="delete_btn_icn" src="/play.png"></button></td><td><button class="delete_btn delete_file_btn" data-name="${media_file.name}"><img class="delete_btn_icn" src="/delete.png"></button></td>`;
+            tr_node.innerHTML = `<td>${media_file.name}</td><td>AUDIO</td><td><button class="delete_btn play_file_btn" data-name="${media_file.name}" data-state="0"><img class="delete_btn_icn" src="./play.png"></button></td><td><button class="delete_btn delete_file_btn" data-name="${media_file.name}"><img class="delete_btn_icn" src="./delete.png"></button></td>`;
             document.querySelector('#media_files_table').appendChild(tr_node);
 
         }

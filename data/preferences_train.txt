@@ -1,0 +1,4 @@
+dcc_pin=7;
+i2s_bck_pin=37;
+i2s_ws_pin=36;
+i2s_data_pin=35;

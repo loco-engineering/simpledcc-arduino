@@ -108,6 +108,19 @@ class ActionModal extends HTMLElement {
             const dcc_packet_type = event.target.value;
             var advanced_ddc_packet_settings = "";
 
+            if (dcc_packet_type == 3) {
+                advanced_ddc_packet_settings =
+                    `
+                <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Aspect Number</div></div>
+                <div class="pure-u-1-2 ">
+                <div class="output_cell"><input type="text" placeholder="0,1,2, etc." name="state_dcc_packet"  id="state_dcc_packet_aspect_number">
+                </div>
+                </div>
+            
+                `;
+
+            }
+
             if (dcc_packet_type == 4) {
                 advanced_ddc_packet_settings =
                     `
@@ -158,6 +171,8 @@ class ActionModal extends HTMLElement {
                     case 2:
                         break;
                     case 3:
+                        current_state.dcc_packet.user_data_length = 1;
+                        current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_aspect_number").value;
                         break;
                     case 4:
                         current_state.dcc_packet.user_data_length = 1;
@@ -267,7 +282,7 @@ export function reload_action_outputs() {
         
         <div class="pure-u-1-2 "></div>
         <div class="pure-u-1-2 "><div class="output_cell state_value_cell_btns">
-        <button class="delete_btn delete_output" data-id="${value_index}"><img class="delete_btn_icn" src="/delete.png"></button>
+        <button class="delete_btn delete_output" data-id="${value_index}"><img class="delete_btn_icn" src="./delete.png"></button>
 
         </div></div>
 

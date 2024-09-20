@@ -6,12 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Loco.Engineering Decoder Settings</title>
 
-    <link rel="stylesheet" href="./base-min.css">
     <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./grids-min.css">
-    <link rel="stylesheet" href="./grids-responsive-min.css">
-    <script type="module" src="./state-details-modal.js"></script>
-    <script type="module" src="./storage.js"></script>
 
 </head>
 
@@ -20,7 +15,7 @@
 
         <div class="top_menu" id="top_menu">
             <a class="top_menu_item top_menu_active">DECODER</a> |
-           <!-- <a class="top_menu_item">CONTROLLER</a> |-->
+            <!-- <a class="top_menu_item">CONTROLLER</a> |-->
             <a class="top_menu_item">SETTINGS</a>
         </div>
 
@@ -71,7 +66,7 @@
                                 <th width="80">TYPE</th>
                                 <th>DESCRIPTION</th>
                                 <th width="100">RAW PACKET</th>
-                                <th width="40"></th>
+                                <!--<th width="40"></th>-->
                             </tr>
                         </thead>
                         <tbody id="dcc_packets_tbody">
@@ -121,14 +116,18 @@
 
 
             <div class="wifi_set_cont">
-                <h3 class="section_header">Media Manager<button id="media_file_upload_btn" class="new_btn">Upload File</button>
+                <h3 class="section_header">Media Manager<button id="media_file_upload_btn" class="new_btn">Upload
+                        File</button>
                     <span class="media_file_loader"></span>
                     <input type="file" name="media_file" id="media_file_input" accept=".wav" hidden>
 
                 </h3>
 
-                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav files with 16-bit samples are
-                    supported. All uploaded files should be with the same Sample Rate (24 kHz, 32 kHz, 44.1 kHz, etc.). Mono (1 channel) is recommended to save space on a board. After the file is uploaded, go to "Add State" or open a state to edit above, click on
+                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav files
+                    with 16-bit samples are
+                    supported. All uploaded files should be with the same Sample Rate (24 kHz, 32 kHz, 44.1 kHz, etc.).
+                    Mono (1 channel) is recommended to save space on a board. After the file is uploaded, go to "Add
+                    State" or open a state to edit above, click on
                     "Add Value" and select in "Name on a decoder" dropdown "Speakers" and you should see all uploaded
                     files in the "Value" dropdown.</p>
 
@@ -137,7 +136,7 @@
                     <table id="media_files_table" class="common_table">
                         <thead>
                             <tr>
-                                <th >Filename</th>
+                                <th>Filename</th>
                                 <th width="60">TYPE</th>
                                 <th width="40"></th>
                                 <th width="40"></th>
@@ -164,13 +163,23 @@
             <div class="wifi_set_cont">
                 <h3 class="section_header">Settings</h3>
                 <h5 class="section_subheader">Firmware Update</h5>
-                <p class="section_hint">Select .bin file and click on Upload to update the firmware. After the firmware
-                    is uploaded the decoder will be rebooted.
+                <p class="section_hint"></p>
+<ul class="section_hint">
+<li> Download the latest firmware from <a href="https://loco.engineering/firmware" target="__blank">loco.engineering/firmware</a>. <b>Note:</b> If you are currently connected to the decoder's WiFi, disconnect and connect to your router/modem or Internet to download the firmware. Don't forget to connect to the decoder's WiFi again before uploading files.
+</li>
+   <li> Unzip the downloaded file to access the firmware files.</li>
+
+    <li> Click on "Choose Files" below, and select all files from the unzipped folder.</li>
+
+        <li> Click on "Upload" to update the firmware. The upload process may take up to a minute.</li>
+
+            <li>Once the upload is complete, the decoder will automatically reboot.</li>
+</ul>
                 </p>
                 <div class="pure-g">
 
                     <div class="pure-u-1-2 ">
-                        <input style="margin-top: 5px;" type="file" name="file1" id="firmware_file_input" accept=".bin">
+                        <input style="margin-top: 5px;" type="file" name="file1" multiple id="firmware_file_input">
                         <div class="file_loader"></div>
                     </div>
 
@@ -191,7 +200,7 @@
     <visual-controller id="visual-controller"></visual-controller>
 
     <script type="module">
-        import "./visual-controller.js";
+        //import "./visual-controller.js";
         import { show_new_action, show_edit_action } from "./state-details-modal.js";
         import { show_event_modal } from "./event-modal.js";
         import { set_decoder_id, load_local_project, add_state, clear_project, delete_state } from "./storage.js";
@@ -225,10 +234,10 @@
 
                     } else if (this.innerHTML == "CONTROLLER") {
 
-                    document.querySelector('#settings_container').style.display = "none";
-                    document.querySelector('#editor_container').style.display = "none";
-                    document.querySelector('#visual-controller').style.display = "block";
-                    document.querySelector('#editor').style.display = "none";
+                        document.querySelector('#settings_container').style.display = "none";
+                        document.querySelector('#editor_container').style.display = "none";
+                        document.querySelector('#visual-controller').style.display = "block";
+                        document.querySelector('#editor').style.display = "none";
 
                     } else {
 
@@ -267,7 +276,7 @@
                 tr_node.dataset.id = state.id;
 
                 tr_node.innerHTML = `<td ><div class="state_icn"></div></td><td>${state.name}</td><td></td><td></td><td class="delete_state_btn" data-id="${state.id}" style="text-align:center;">
-                    <button class="delete_btn"><img class="delete_btn_icn" src="/delete.png"></button>
+                    <button class="delete_btn"><img class="delete_btn_icn" src="./delete.png"></button>
                     </td>`;
 
                 document.querySelector('#states_list_tbody').appendChild(tr_node);

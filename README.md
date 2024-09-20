@@ -50,16 +50,16 @@ The main differences are:
 ## Getting Started
 
 - Purchase a [Loco.Engineering](https://loco.engineering) decoder or build your own (any ESP32S3 dev board can serve as a WCC decoder when powered by USB, but for handling DCC signals, you'll need a DCC converter with a DC drop-down circuit).
-- (Optional for Loco.Engineering decoders, required for custom decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload the firmware to the decoder (follow the steps in "How to build and upload").
+- (Optional for Loco.Engineering decoders, required for custom decoders) Open simpledcc-arduino.ino in Arduino IDE (we test with Arduino IDE 2.3.2) and upload the firmware to the decoder (follow the steps in "How to build and upload"). All Loco.Engineering decoders are shipped with firmware.
 - (Optional for WCC but required for DCC) Connect the decoder to DCC-enabled wires or track.
 - Power the decoder
-- On your phone, tablet, or laptop, connect to a Wi-Fi network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in config.h if you're using custom hardware.
-- Open http://loco.local or http://192.168.4.1 in your browser.
+- On your phone, tablet, or laptop, connect to a Wi-Fi network named loco-xxxxx, where xxxxx is the serial number on your Loco.Engineering decoder or the wifi_network_name string in data/preferences.txt if you're using custom hardware. The default password is "loco.eng".
+- Open http://loco.local or http://192.168.4.1 (in case if http://loco.local doesn't work) in your browser.
 - If your DCC command station is sending messages to the connected track/wires, you should see them in your browser. Use filters to hide unwanted messages.
 - To add actions for the decoder to perform when receiving a specific DCC packet, click "Add state" next to that packet. Loco.Engineering decoders have marked outputs for connecting wires from accessories/trains/vehicles, so you'll know that a red LED on a semaphore is connected to output number 5, etc.
 
 
-## How to build and upload
+## How to build and upload custom firmware
 
 Steps below are tested with ESP32-S3-WROOM-1-N16R8 modules. All Loco.Engineering boards are shipped with the default firmware that's why you shouldn't upload the firmware manually.
 
@@ -68,11 +68,13 @@ Steps below are tested with ESP32-S3-WROOM-1-N16R8 modules. All Loco.Engineering
 - Install ESP32 for Arduino IDE (we test with version 2.0.17, later versions could not work and you will have build errors)
 - Install libraries: AsyncTCP (tested with version 1.1.4), ESPAsyncTCP (1.2.4), ESPAsyncWebServer (tested with 3.1.0), LEDDriver_NXP_Arduino (tested with 1.0.2), I2C_device_Arduino (remove 2 tests file after you install it - Arduino/libraries/I2C_device_Arduino/src/test_LM75B.h and .cpp with the same name otherwise you'll get errors during building), MFRC522 (tested with 1.4.11), LiteLED (version 1.2.0). Don't forget to select "Install all dependencies" if Arduino IDE asks about that.
 - Change configuration in config.h if required
+- Change configuration in preferences.txt if required. The "board_type" is used to read board specific settings like GPIOs used for I2S. If the "board_type" is "train", the firmware loads GPIO settings from preferences_train.txt, if "accessory" - from "preferences_accessory.txt". You can add your own preferences_...txt file, don't forget to update "board_type" in preferences.txt if you use own preferences_...txt file.
 - Set Flash Size to what your board has (Tools -> Flash Size) and rename partitions-4MB-flash.csv or partitions-16MB-flash.csv depending on the flash size to partitions.csv.
 - Set PSRAM type to OPI PSRAM (Tools -> PSRAM -> OPI PSRAM) if you use a module like ESP32-S3-WROOM-1-N...R... or QSPI PSRAM if you use ESP32-S3FH4R2 SoC.
-- Create and upload LittleFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner). You should update partions.csv file with your flash amount: open particions.csv and set spiffs size according your board flash size
 - (Optional) To show all logs from your decoder, enable Verbose Debug Mode. Select Tools-> Core Debug Level -> Verbose. If you don't see any logs check "I don't see any logs" below
+- Launch the board in the boot mode - hold the "Boot" button, press the "Reset" button and unhold hte "Boot" button
 - Build and upload the firmware
+- Create and upload LittleFS image with files in the simpledcc-arduino/data folder - https://github.com/earlephilhower/arduino-littlefs-upload (for Arduino 2.2.1 and higner). You should update partions.csv file with your flash amount: open particions.csv and set spiffs size according your board flash size
 
 
 ## I don't see any logs
@@ -87,6 +89,32 @@ In case if you use Loco.Engineering decoder and don't see any logs in Arduino ID
 - Select "JTAG Adapter" as "Integrated USB JTAG"
 - Select and load the Sketch that will be debugged
 - Build and Upload it
+
+## Additional notes
+
+- To handle multifunction and accessory DCC packets at the same time, the code below has been commented in NmraDCC.cpp file:
+
+```
+if (DccProcState.Flags & FLAGS_DCC_ACCESSORY_DECODER)
+    {
+        // and this isn't an Ops Mode Write or we are NOT faking the Multifunction Ops mode address in CV 33+34 or
+        // it's not our fake address, then return
+        if ( (CmdMasked != 0b11100000) || (DccProcState.OpsModeAddressBaseCV == 0))
+            return ;
+
+        uint16_t FakeOpsAddr = readCV (DccProcState.OpsModeAddressBaseCV) | (readCV (DccProcState.OpsModeAddressBaseCV + 1) << 8) ;
+        uint16_t OpsAddr = Addr & 0x3FFF ;
+
+        if (OpsAddr != FakeOpsAddr)
+            return ;
+    }
+
+    // We are looking for FLAGS_MY_ADDRESS_ONLY but it does not match and it is not a Broadcast Address then return
+    else if ( (DccProcState.Flags & FLAGS_MY_ADDRESS_ONLY) && (Addr != getMyAddr()) && (Addr != 0))
+        return ;
+```
+
+If you use your own version of NmraDCC (the repository includes the default version of NmraDCC when you download or clone the repository), you should comment the code above otherwise the decoder will be able to handle only accessory packets.
 
 ## Contact Us
 

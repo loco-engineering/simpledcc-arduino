@@ -3,7 +3,6 @@
 #define SPIFFS_MODULE_H
 
 #include "FS.h"
-#include "SPIFFS.h"
 #include "../features/wcc_module.h"
 
 #define FORMAT_SPIFFS_IF_FAILED true
@@ -39,20 +38,23 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
   }
 }
 
-void readFile(fs::FS &fs, const char *path) {
+String readFile(fs::FS &fs, const char *path) {
   Serial.printf("Reading file: %s\r\n", path);
 
   File file = fs.open(path);
+  String file_content = "";
+
   if (!file || file.isDirectory()) {
     Serial.println("- failed to open file for reading");
-    return;
+    return "";
   }
 
   Serial.println("- read from file:");
   while (file.available()) {
-    Serial.write(file.read());
+    file_content += file.readString();
   }
   file.close();
+  return file_content;
 }
 
 void writeFile(fs::FS &fs, const char *path, const char *message) {

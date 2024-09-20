@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loco.Engineering Decoder Settings</title>
+
+    <link rel="stylesheet" href="./styles.css">
+
+</head>
+
+<body>
+    <div class="navbar" id="navbar">
+
+        <div class="top_menu" id="top_menu">
+            <a class="top_menu_item top_menu_active">DECODER</a> |
+            <!-- <a class="top_menu_item">CONTROLLER</a> |-->
+            <a class="top_menu_item">SETTINGS</a>
+        </div>
+
+    </div>
+    <div id="editor">
+
+        <div id="editor_container">
+            <div class="wifi_set_cont">
+                <h3 class="section_header">States<button id="new_action_btn" class="new_btn">Add state</button>
+                </h3>
+
+                <p class="section_hint">What the decoder should do when a DCC packet or WCC event message is
+                    received. For example, turn on top red light on a signal or play sound on a level crossing, etc.</p>
+                <div class="tableFixHead">
+
+                    <table id="states_list" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="60">ICON</th>
+                                <th>NAME</th>
+                                <th width="100">TYPE</th>
+                                <th width="40">ACTIVE</th>
+                                <th width="40"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="states_list_tbody">
+                        </tbody>
+
+                    </table>
+
+                    <p class="no_data_hint" id="no_states_hint">No states yet. Click on "Add State" above</p>
+
+                </div>
+            </div>
+
+            <div class="wifi_set_cont">
+                <h3 class="section_header">DCC Packets</h3>
+                <p class="section_hint">DCC packets received by the
+                    decoder. Use a filter below to hide DCC packets by address and type.</p>
+
+                <div class="tableFixHead" id="dcc_packets_table_container">
+
+                    <table id="dcc_packets_table" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="40">ADDR</th>
+                                <th width="30">QTY</th>
+                                <th width="80">TYPE</th>
+                                <th>DESCRIPTION</th>
+                                <th width="100">RAW PACKET</th>
+                                <!--<th width="40"></th>-->
+                            </tr>
+                        </thead>
+                        <tbody id="dcc_packets_tbody">
+                        </tbody>
+
+                    </table>
+                    <p class="no_data_hint" id="no_dcc_packets_hint">No DCC packets received yet. Connect tracks or
+                        wires with DCC signal
+                        to the decoder to see DCC packets.</p>
+
+                </div>
+            </div>
+
+
+            <div class="wifi_set_cont">
+                <h3 class="section_header">WCC Events<button id="send_event_btn" class="new_btn">Send event</button>
+                </h3>
+                <p class="section_hint">Messages received from other decoders and the web app over WCC protocol</p>
+
+                <div class="tableFixHead">
+
+                    <table id="dcc_packets" class="common_table">
+                        <thead>
+                            <tr>
+                                <th width="40">ADDRESS</th>
+                                <th width="100">TYPE</th>
+                                <th>DESCRIPTION</th>
+                                <th width="100">RAW PACKET</th>
+                                <th width="80"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+
+                    </table>
+
+                    <p class="no_data_hint" id="no_dcc_packets_hint">No WCC events received yet</p>
+
+                </div>
+
+                <action-modal></action-modal>
+                <event-modal></event-modal>
+
+            </div>
+
+
+
+
+            <div class="wifi_set_cont">
+                <h3 class="section_header">Media Manager<button id="media_file_upload_btn" class="new_btn">Upload
+                        File</button>
+                    <span class="media_file_loader"></span>
+                    <input type="file" name="media_file" id="media_file_input" accept=".wav" hidden>
+
+                </h3>
+
+                <p class="section_hint">To play audio, you should upload media files to the decoder. Only .wav files
+                    with 16-bit samples are
+                    supported. All uploaded files should be with the same Sample Rate (24 kHz, 32 kHz, 44.1 kHz, etc.).
+                    Mono (1 channel) is recommended to save space on a board. After the file is uploaded, go to "Add
+                    State" or open a state to edit above, click on
+                    "Add Value" and select in "Name on a decoder" dropdown "Speakers" and you should see all uploaded
+                    files in the "Value" dropdown.</p>
+
+                <div class="tableFixHead">
+
+                    <table id="media_files_table" class="common_table">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th width="60">TYPE</th>
+                                <th width="40"></th>
+                                <th width="40"></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+
+                    </table>
+
+                    <p class="no_data_hint" id="no_media_files_hint">No media files uploaded yet</p>
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+        <div id="settings_container">
+
+            <div class="wifi_set_cont">
+                <h3 class="section_header">Settings</h3>
+                <h5 class="section_subheader">Firmware Update</h5>
+                <p class="section_hint">Select .bin file and click on Upload to update the firmware. After the firmware
+                    is uploaded the decoder will be rebooted.
+                </p>
+                <div class="pure-g">
+
+                    <div class="pure-u-1-2 ">
+                        <input style="margin-top: 5px;" type="file" name="file1" multiple id="firmware_file_input">
+                        <div class="file_loader"></div>
+                    </div>
+
+                    <div class="pure-u-1-2 ">
+
+                        <button style=" float: right;   margin-top: 0px;" id="upload_firmware"
+                            class="s_wifi">Upload</button>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <visual-controller id="visual-controller"></visual-controller>
+
+    <script type="module">
+
+        //var gateway = `ws://${window.location.hostname}/ws`;
+        const base_ip = `192.168.4.1`;
+        const gateway = `ws://${base_ip}/ws`;
+
+        var websocket;
+        export var available_outputs = [];
+        export var media_files = [];
+
+        export async function upload_file() {
+
+            document.querySelector('.file_loader').style.display = "block";
+
+            var input = document.querySelector('#firmware_file_input');
+
+            /*for (var ind = 0; ind < input.files.length; ind += 1) {
+                var data = new FormData()
+                data.append('file1', input.files[ind])
+        
+        
+                try {
+        
+                    await fetch(`http://${base_ip}/upload`, {
+                        method: 'POST',
+                        body: data
+                    });
+                    document.querySelector('.file_loader').style.display = "none";
+        
+                } catch (error) {
+                    document.querySelector('.file_loader').style.display = "none";
+                }
+            }*/
+
+
+
+
+            for (var ind = 0; ind < input.files.length; ind += 1) {
+
+                var file = input.files[ind]; //this is an array
+                var fileSize = file.size;
+                var fileSizeInKB = (fileSize / 1024); // this would be in kilobytes defaults to bytes
+
+                if (fileSizeInKB > 2 * 1024) {
+
+                    alert(`This file is too big: ${(fileSizeInKB / 1024).toFixed(2)} MB . Maximum allowed size is 2 MB. `);
+
+                } else {
+
+                    document.querySelector('.file_loader').style.display = "block";
+
+                    const chunkSize = 1024 * 20; // size of each chunk (20KB)
+                    let start = 0;
+
+                    while (start < file.size) {
+                        var headers = {};
+                        if (start == 0) {
+                            headers = { "del-prev": "" };
+                        }
+                        await uploadChunk(file.slice(start, start + chunkSize), file.name, headers);
+                        start += chunkSize;
+                    }
+
+                    document.querySelector('.file_loader').style.display = "none";
+
+
+                    async function uploadChunk(chunk, file_name, headers = {}, retries = 3) {
+                        var data = new FormData()
+                        data.append('file1', chunk, file_name)
+
+                        try {
+                            await fetch(`http://${base_ip}/upload`, {
+                                method: 'POST',
+                                headers: headers,
+                                body: data
+                            });
+                        } catch (error) {
+                            if (retries > 0) {
+                                await uploadChunk(chunk, file_name, headers, retries - 1);
+                            } else {
+                                console.error('Failed to upload chunk: ', error);
+                                document.querySelector('.file_loader').style.display = "none";
+                            }
+                        }
+                    }
+
+
+                }
+
+            }
+
+
+
+
+        }
+
+        export async function upload_media_file() {
+
+            var input = document.querySelector('#media_file_input');
+
+            input.onchange = async e => {
+
+                var file = input.files[0]; //this is an array
+                var fileSize = file.size;
+                var fileSizeInKB = (fileSize / 1024); // this would be in kilobytes defaults to bytes
+
+                if (fileSizeInKB > 2 * 1024) {
+
+                    alert(`This file is too big: ${(fileSizeInKB / 1024).toFixed(2)} MB . Maximum allowed size is 2 MB. `);
+
+                } else {
+
+                    document.querySelector('.media_file_loader').style.display = "block";
+
+                    const chunkSize = 1024 * 20; // size of each chunk (20KB)
+                    let start = 0;
+
+                    while (start < file.size) {
+                        var headers = {};
+                        if (start == 0) {
+                            headers = { "del-prev": "" };
+                        }
+                        await uploadChunk(file.slice(start, start + chunkSize), file.name, headers);
+                        start += chunkSize;
+                    }
+
+                    document.querySelector('.media_file_loader').style.display = "none";
+
+
+                    async function uploadChunk(chunk, file_name, headers = {}, retries = 3) {
+                        var data = new FormData()
+                        data.append('file1', chunk, file_name)
+
+                        try {
+                            await fetch(`http://${base_ip}/upload`, {
+                                method: 'POST',
+                                headers: headers,
+                                body: data
+                            });
+                        } catch (error) {
+                            if (retries > 0) {
+                                await uploadChunk(chunk, file_name, headers, retries - 1);
+                            } else {
+                                console.error('Failed to upload chunk: ', error);
+                                document.querySelector('.media_file_loader').style.display = "none";
+                            }
+                        }
+                    }
+
+
+                }
+
+            }
+
+
+            input.click();
+
+
+        }
+
+        export function generate_wcc_message(module_settings) {
+
+            var wcc_msg = [];
+            let wcc_msg_ind = 0;
+            wcc_msg[wcc_msg_ind++] = 1; //message type, 1 - WCC message
+
+            //Add WCC protocol version
+            const protocol_version = bytesArray(110, 2);
+            wcc_msg[wcc_msg_ind++] = protocol_version[0];
+            wcc_msg[wcc_msg_ind++] = protocol_version[1];
+
+
+            //Add project version
+            const project_version = bytesArray(329, 3);
+            wcc_msg[wcc_msg_ind++] = project_version[0];
+            wcc_msg[wcc_msg_ind++] = project_version[1];
+            wcc_msg[wcc_msg_ind++] = project_version[2];
+
+            //Add project version
+            const decoder_amount = bytesArray(1, 3);
+            wcc_msg[wcc_msg_ind++] = decoder_amount[0];
+            wcc_msg[wcc_msg_ind++] = decoder_amount[1];
+            wcc_msg[wcc_msg_ind++] = decoder_amount[2];
+
+            //NOTE: Now we send information about only 1 decoder because this web app allows to setup just one decoder
+
+            //Add Mac address of a decoder
+            wcc_msg[wcc_msg_ind++] = 0xdc;
+            wcc_msg[wcc_msg_ind++] = 0x54;
+            wcc_msg[wcc_msg_ind++] = 0x75;
+            wcc_msg[wcc_msg_ind++] = 0xd8;
+            wcc_msg[wcc_msg_ind++] = 0xf8;
+            wcc_msg[wcc_msg_ind++] = 0x30;
+
+
+            //Add the message length for the decoder with mac address we just parsed above
+            //Note: we don't use it until we have settings for only one decoder inside this WCC message
+            //That's why we send just random number
+            const decoder_msg_length = bytesArray(858, 4);
+            wcc_msg[wcc_msg_ind++] = decoder_msg_length[0];
+            wcc_msg[wcc_msg_ind++] = decoder_msg_length[1];
+            wcc_msg[wcc_msg_ind++] = decoder_msg_length[2];
+            wcc_msg[wcc_msg_ind++] = decoder_msg_length[3];
+
+            //Get state amount for this decoder
+            const state_amount = bytesArray(module_settings.states.length, 2);
+            wcc_msg[wcc_msg_ind++] = state_amount[0];
+            wcc_msg[wcc_msg_ind++] = state_amount[1];
+
+            //Fill states
+            //Each state has 
+            //- id, unique inside a decoder
+            //- output_id (we set relations between output_id and physical outputs in board_config.h file)
+            //- value to send to output_id
+            //- status - is active this state or not
+
+            module_settings.states.forEach(state => {
+                //Set state's id
+                for (var id_ind = 0; id_ind < state.id.length; id_ind += 1) {
+                    wcc_msg[wcc_msg_ind++] = state.id.charCodeAt(id_ind);
+                }
+
+                //Set value amount
+                wcc_msg[wcc_msg_ind++] = state.values.length;
+
+                state.values.forEach(value => {
+
+                    //Set state's connection_id, 1 byte
+                    wcc_msg[wcc_msg_ind++] = value.connection_id;
+
+                    //Set state's value length in bytes, 2 bytes
+                    const value_length = bytesArray(1, 2);
+                    wcc_msg[wcc_msg_ind++] = value_length[0];
+                    wcc_msg[wcc_msg_ind++] = value_length[1];
+
+                    //Set state's value
+                    wcc_msg[wcc_msg_ind++] = value.value;
+
+                    /*for (var val_ind = 0; val_ind < value_length; val_ind += 1) {
+                        wcc_msg[wcc_msg_ind++] = value_data[val_ind];
+                    }*/
+
+                    //Set start delay, 2 bytes
+                    const start_delay = bytesArray(value.start_delay, 2);
+                    wcc_msg[wcc_msg_ind++] = start_delay[0];
+                    wcc_msg[wcc_msg_ind++] = start_delay[1];
+
+                    //Set on duration, 2 bytes
+                    const on_duration = bytesArray(value.on_duration, 2);
+                    wcc_msg[wcc_msg_ind++] = on_duration[0];
+                    wcc_msg[wcc_msg_ind++] = on_duration[1];
+
+                    //Set off duration, 2 bytes
+                    const off_duration = bytesArray(value.off_duration, 2);
+                    wcc_msg[wcc_msg_ind++] = off_duration[0];
+                    wcc_msg[wcc_msg_ind++] = off_duration[1];
+
+                    //Set replays, 1 byte
+                    wcc_msg[wcc_msg_ind++] = value.replays;
+
+                });
+
+                wcc_msg[wcc_msg_ind++] = state.is_active;
+
+
+                //Set wcc message ids
+                //each message id takes 6 bytes because should be unique inside the layout 
+                if (state.wcc_event_ids != undefined) {
+                    wcc_msg[wcc_msg_ind++] = state.wcc_event_ids.length;
+
+                    state.wcc_event_ids.forEach(wcc_message_id => {
+                        for (var id_ind = 0; id_ind < 6; id_ind += 1) {
+                            wcc_msg[wcc_msg_ind++] = wcc_message_id.charCodeAt(id_ind);
+                        }
+
+                        //Set if the state should be activated or not
+                        //Now for tests we set 1
+                        wcc_msg[wcc_msg_ind++] = 1;
+                    });
+
+                } else {
+                    wcc_msg[wcc_msg_ind++] = 0;
+                }
+
+                //Set DCC packet for the state
+                //Set DCC packet amount
+                //In current version only 0 or 1 DCC packet is possible
+                if (state.dcc_packet != undefined) {
+                    wcc_msg[wcc_msg_ind++] = 1; //The state has 1 DCC packet
+
+                    //Set DCC packet address
+                    const dcc_address = bytesArray(parseInt(state.dcc_packet.address), 2);
+                    wcc_msg[wcc_msg_ind++] = dcc_address[1];
+                    wcc_msg[wcc_msg_ind++] = dcc_address[0];
+
+                    //Set DCC packet type
+                    wcc_msg[wcc_msg_ind++] = parseInt(state.dcc_packet.type);
+
+                    //Set DCC packet user data
+                    console.log("!!!!!!! " + state.dcc_packet.user_data_length);
+                    wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data_length;
+                    for (var data_ind = 0; data_ind < state.dcc_packet.user_data_length; data_ind += 1) {
+                        wcc_msg[wcc_msg_ind++] = state.dcc_packet.user_data[data_ind];
+                    }
+
+                } else {
+                    wcc_msg[wcc_msg_ind++] = 0;
+                }
+
+
+            });
+
+            //Add handlers
+            //Now we don't send handlers
+            //Set handler ammount, 2 bytes
+            wcc_msg[wcc_msg_ind++] = 0;
+            wcc_msg[wcc_msg_ind++] = 0;
+
+            //Add events
+            //Now we don't send events
+            //Set event ammount, 2 bytes
+            wcc_msg[wcc_msg_ind++] = 0;
+            wcc_msg[wcc_msg_ind++] = 0;
+
+            return wcc_msg;
+
+        }
+
+        export function generate_wcc_event_msg(wcc_event) {
+
+            var wcc_msg = [];
+            let wcc_msg_ind = 0;
+            wcc_msg[wcc_msg_ind++] = 2; //message type, 2 - WCC event
+
+            for (var id_ind = 0; id_ind < 6; id_ind += 1) {
+                wcc_msg[wcc_msg_ind++] = wcc_event.id.charCodeAt(id_ind);
+            }
+
+            //Set if the state should be activated or not
+            wcc_msg[wcc_msg_ind++] = wcc_event.is_state_active;
+
+            return wcc_msg;
+
+        }
+
+        export function generate_wcc_media_file_msg(filename, action_type) {
+
+            var wcc_msg = [];
+            let wcc_msg_ind = 0;
+            wcc_msg[wcc_msg_ind++] = 3; //message type, 3 - manage a media file
+            wcc_msg[wcc_msg_ind++] = action_type;
+
+            //Fille file name
+            for (var id_ind = 0; id_ind < filename.length; id_ind += 1) {
+                wcc_msg[wcc_msg_ind++] = filename.charCodeAt(id_ind);
+            }
+            //Set if the state should be activated or not
+            wcc_msg[wcc_msg_ind++] = '\0';
+
+            return wcc_msg;
+
+        }
+
+        const bytesArray = (n, required_length) => {
+            const a = []
+            a.unshift(n & 255)
+            while (n >= 256) {
+                n = n >>> 8
+                a.unshift(n & 255)
+            }
+            var bytes_arr = new Uint8Array(a);
+            if (required_length != undefined && bytes_arr.length < required_length) {
+                bytes_arr = concatTypedArrays(Uint8Array.from(new Array(required_length - bytes_arr.length).fill(0)), bytes_arr);
+            }
+            return bytes_arr;
+        }
+
+        function concatTypedArrays(a, b) { // a, b TypedArray of same type
+            var c = new (a.constructor)(a.length + b.length);
+            c.set(a, 0);
+            c.set(b, a.length);
+            return c;
+        }
+
+        export function send_wcc_message(module_settings) {
+            var message_to_send = generate_wcc_message(module_settings);
+            send_websocket_message(message_to_send);
+        }
+
+        export function send_wcc_event(wcc_event) {
+            var message_to_send = generate_wcc_event_msg(wcc_event);
+            send_websocket_message(message_to_send);
+        }
+
+        export function send_wcc_manage_media_file(filename, action_type) {
+            var message_to_send = generate_wcc_media_file_msg(filename, action_type);
+            send_websocket_message(message_to_send);
+        }
+
+        export function send_websocket_message(message_to_send) {
+            if (websocket.readyState == WebSocket.OPEN) {
+                let msg = new Uint8Array(message_to_send);
+                console.log(msg);
+                websocket.send(msg);
+            }
+        }
+
+        export function initWebSocket() {
+            console.log('Trying to open a WebSocket connection...');
+            websocket = new WebSocket(gateway);
+            websocket.onopen = onOpen;
+            websocket.onclose = onClose;
+            websocket.onmessage = onMessage;
+        }
+        function onOpen(event) {
+            console.log('Connection opened');
+            var wcc_test_event = {};
+            //wcc_test_event.id = 'eq125k';
+            wcc_test_event.id = 'eq125a';
+
+            wcc_test_event.is_state_active = 1;
+            send_wcc_event(wcc_test_event);
+        }
+
+        function onClose(event) {
+            console.log('Connection closed');
+            setTimeout(initWebSocket, 2000);
+        }
+        async function onMessage(event) {
+
+            const buffer = new Uint8Array(await event.data.arrayBuffer());
+            console.log("New message. Length: " + buffer.length);
+
+            console.log(Array.apply([], buffer).join(","));
+
+            //Parse the message from a decoder
+            //Get a type
+            var msg_index = 0;
+            let msg_type = buffer[msg_index++];
+
+            if (msg_type == 4) {
+                //This a message with DCC packets
+                //Get the amount of DCC packets
+                let dcc_packets_amount = buffer[msg_index++];
+                for (var i = 0; i < dcc_packets_amount; i++) {
+                    let packet_type = buffer[msg_index++];
+                    var packet_type_str = "Unknown";
+                    var description_str = "";
+
+                    let adr_1 = buffer[msg_index++];
+                    let adr_2 = buffer[msg_index++];
+
+                    let address = (((adr_2 & 0xFF) << 8) | (adr_1 & 0xFF));
+                    let raw_packet_length = buffer[msg_index++];
+
+                    var raw_packet = [];
+                    var raw_packet_str = "";
+
+                    for (var k = 0; k < raw_packet_length; k++) {
+                        raw_packet[k] = buffer[msg_index++];
+                        raw_packet_str += toBinString(Uint8Array.from([raw_packet[k]])) + " ";
+                    }
+
+                    let user_data_length = buffer[msg_index++];
+
+                    var user_data = [];
+                    for (var k = 0; k < user_data_length; k++) {
+                        user_data[k] = buffer[msg_index++];
+
+                    }
+
+                    var packet_amount = buffer[msg_index++];
+
+                    switch (packet_type) {
+                        case 0:
+                            description_str = "No description available";
+                            address = "-";
+                            break;
+                        case 1:
+                            packet_type_str = "Speed";
+                            description_str = `Speed: ${user_data[0]} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
+                            break;
+                        case 2:
+                            packet_type_str = "Function";
+                            //Get the function group
+                            var function_group_str = "0 - 4";
+                            switch (user_data[0]) {
+                                case 2:
+                                    function_group_str = "5 - 8";
+                                    break;
+                                case 3:
+                                    function_group_str = "9 - 12";
+                                    break;
+                                case 4:
+                                    function_group_str = "13 - 20";
+                                    break;
+                                case 5:
+                                    function_group_str = "21 - 28";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            description_str = `Function Group: ${function_group_str} | Steps: ${user_data[2]} | Dir: ${user_data[1] ? 'Forward' : 'Reverse'}`
+                            break;
+                        case 3:
+                            packet_type_str = "Signal Aspect";
+                            description_str = `Aspect: ${user_data[0]}`;
+                            break;
+                        case 4:
+                            packet_type_str = "Turnout";
+                            description_str = `Direction: ${user_data[0]} | Power: ${user_data[1]}`;
+                            if (user_data_length == 3) {
+                                description_str += ` | Output Pair: ${user_data[2]}`;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    //Add a cell to the DCC packets list
+                    var tr_node = document.createElement('tr');
+                    tr_node.classList.add("service_cell");
+                    tr_node.innerHTML = `<td>${address}</td><td>${packet_amount}</td><td>${packet_type_str}</td><td>${description_str}</td><td>${raw_packet_str}</td><td><!--<button id="table_btn" class="table_btn">Add state</button>--></td>`;
+
+                    document.querySelector('#dcc_packets_tbody').appendChild(tr_node);
+
+                    if (document.querySelector('#dcc_packets_tbody').children.length > 200) {
+                        document.querySelector('#dcc_packets_tbody').removeChild(document.querySelector('#dcc_packets_tbody').children[0]);
+                    }
+
+                }
+
+                document.querySelector('#no_dcc_packets_hint').style.display = "none";
+
+            }
+
+
+            if (msg_type == 5) {
+                //This a message with a board config
+                //Get the amount board connections
+                let connections_amount = buffer[msg_index++];
+
+
+                available_outputs = [];
+
+                const CONNECTION_NAME_LENGTH = 4; // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
+                const CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
+                const connection_types = ["Digital", "PWM"];
+
+                for (var i = 0; i < connections_amount; i++) {
+
+                    var connection = {};
+                    connection.name = '';
+                    //Get connection name
+                    for (var name_ind = 0; name_ind < CONNECTION_NAME_LENGTH; name_ind++) {
+                        connection.name += String.fromCharCode(buffer[msg_index++]);
+                    }
+
+                    connection.output_num = buffer[msg_index++];
+                    connection.owner_id = buffer[msg_index++];
+                    connection.signal_types = [];
+
+                    for (var type_ind = 0; type_ind < CONNECTION_SIGNAL_TYPES_AMOUNT; type_ind++) {
+                        const type = buffer[msg_index++];
+                        if (type != 0) {
+                            connection.signal_types.push(connection_types[type - 1]);
+                        }
+                    }
+
+                    if (connection.name != '\u0000\u0000\u0000\u0000') {
+                        available_outputs.push(connection);
+                    }
+
+                }
+
+                console.log("Board connections: " + JSON.stringify(available_outputs));
+            }
+
+            if (msg_type == 6) {
+
+                document.querySelector('#media_files_table').innerHTML = '';
+
+                //This a message with a board config
+                //Get the amount board connections
+                let media_files_amount = buffer[msg_index++];
+                media_files = [];
+
+                for (var i = 0; i < media_files_amount; i++) {
+
+                    var media_file = {};
+                    media_file.name = '';
+                    //Get connection name
+                    var name_char = String.fromCharCode(buffer[msg_index++]);
+                    while (name_char != '\0') {
+                        media_file.name += name_char;
+                        name_char = String.fromCharCode(buffer[msg_index++]);
+                    }
+
+                    media_files.push(media_file);
+
+                    //Add a cell to the DCC packets list
+                    var tr_node = document.createElement('tr');
+                    tr_node.classList.add("service_cell");
+                    tr_node.innerHTML = `<td>${media_file.name}</td><td>AUDIO</td><td><button class="delete_btn play_file_btn" data-name="${media_file.name}" data-state="0"><img class="delete_btn_icn" src="./play.png"></button></td><td><button class="delete_btn delete_file_btn" data-name="${media_file.name}"><img class="delete_btn_icn" src="./delete.png"></button></td>`;
+                    document.querySelector('#media_files_table').appendChild(tr_node);
+
+                }
+
+                document.querySelector('#no_media_files_hint').style.display = "none";
+
+                document.querySelectorAll('.play_file_btn').forEach(btn => {
+                    btn.addEventListener('click', function handleClick(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        //Find a selected product
+
+                        media_files.forEach((file, index) => {
+                            if (file.name == this.dataset.name) {
+
+                                console.log('play ' + file.name);
+
+                                if (this.dataset.state == "0") {
+                                    this.innerHTML = `<img class="delete_btn_icn" src="/stop.png">`;
+                                    this.dataset.state = "1";
+                                    send_wcc_manage_media_file(file.name, 1);
+
+                                } else {
+                                    this.innerHTML = `<img class="delete_btn_icn" src="/play.png">`;
+                                    this.dataset.state = "0";
+                                    send_wcc_manage_media_file(file.name, 0);
+
+                                }
+
+
+                            }
+                        });
+
+                    });
+                });
+
+
+                document.querySelectorAll('.delete_file_btn').forEach(btn => {
+                    btn.addEventListener('click', function handleClick(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        //Find a selected product
+
+                        media_files.forEach((file, index) => {
+                            if (file.name == this.dataset.name) {
+                                if (confirm(`Do you really want to delete ${file.name} from the board?`) == true) {
+                                    send_wcc_manage_media_file(file.name, 3);
+                                }
+                            }
+                        });
+
+                    });
+                });
+
+                console.log(media_files);
+
+            }
+
+            //Autoscoll
+            //let dcc_packets_table_el = document.querySelector('#dcc_packets_table_container');
+            //dcc_packets_table_el.scrollTop = dcc_packets_table_el.scrollHeight;
+
+        }
+
+        const toBinString = (bytes) =>
+            bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        var project_settings = null;
+        var current_decoder_id = null;
+
+        export function get_project_settings() {
+            return project_settings;
+        }
+
+        export function set_decoder_id(decoder_id) {
+            current_decoder_id = decoder_id;
+        }
+
+        export function clear_project() {
+            localStorage.removeItem(current_decoder_id);
+        }
+
+        export function load_local_project() {
+
+            project_settings = localStorage.getItem(current_decoder_id);
+            if (project_settings == undefined) {
+                project_settings = {};
+                project_settings.states = [];
+            } else {
+                project_settings = JSON.parse(project_settings);
+            }
+
+            console.log("Loaded a project:" + JSON.stringify(project_settings));
+            return project_settings;
+
+        }
+
+        export function save_local_project() {
+            localStorage.setItem(current_decoder_id, JSON.stringify(project_settings));
+
+            //Resend WCC message with project updates
+            //var test_wcc_msg = [ /*first byte - message type - WCC*/0x01, 0x00, 0x01, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0xdc, 0x54, 0x75, 0xd8, 0xf8, 0x30, 0x00, 0x00, 0x00, 0x07, 0x01, 0x01, 0x04, 0x06,/*states start*/ 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x08, 0x01 /*States End*/, 0x00, 0x00, 0x00, 0x00];
+            send_wcc_message(project_settings);
+        }
+
+        export function add_state(state) {
+            state.id = generate_id();
+            project_settings.states.push(state);
+            save_local_project();
+            return state
+        }
+
+        export function delete_state(state_id) {
+            project_settings.states.forEach((state, index) => {
+                if (state.id == state_id) {
+                    project_settings.states.splice(index, 1);
+                    save_local_project();
+                    return;
+                }
+            });
+        }
+
+        export function update_state(state) {
+            save_local_project();
+        }
+
+        function generate_id() {
+            var firstPart = (Math.random() * 46656) | 0;
+            var secondPart = (Math.random() * 46656) | 0;
+            firstPart = ("000" + firstPart.toString(36)).slice(-3);
+            secondPart = ("000" + secondPart.toString(36)).slice(-3);
+            return firstPart + secondPart;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        class EventModal extends HTMLElement {
+            constructor() {
+                super();
+
+                this.innerHTML = /*html*/`
+    <div id="event-modal-container" class="modal">
+        <div class="modal-content">
+            <div class="modal-content-container">  
+
+            <span class="action_modal_title">Send Event</span>
+            <hr>
+            <div class="state_settings_container">
+
+            </div>
+
+            </div>
+        </div>
+    </div>
+        `;
+
+                document.getElementById("close_event_modal").onclick = function () {
+                    document.getElementById("event-modal-container").style.display = "none";
+                }
+
+                document.getElementById("send_event").onclick = () => {
+
+                };
+            }
+        }
+
+        export function show_event_modal() {
+
+            document.getElementById("event-modal-container").style.display = "block";
+
+        }
+
+        customElements.define("event-modal", EventModal);
+
+
+
+
+
+
+
+
+        class ActionModal extends HTMLElement {
+            constructor() {
+                super();
+
+                this.innerHTML = /*html*/`
+    <div id="action-modal-container" class="modal">
+        <div class="modal-content">
+            <div class="modal-content-container">  
+
+            <span class="action_modal_title">State Settings</span>
+            <hr>
+            <div class="state_settings_container">
+
+    <div class="state_text_input">
+     <label class="state_input_text_label"for="state_name"> Name (optional)</label>
+    <input type="text" placeholder="" name="state_name" id="state_name">
+    </div>
+
+    <div class="state_text_input">
+    <label class="state_input_text_label" for="state_wcc_event"> WCC Message IDs (optional)</label>
+    <input type="text" placeholder="WCC message IDs separated by comma" name="state_wcc_event" id="state_wcc_event">
+    </div>
+
+    <div class="state_text_input">
+    <label class="state_input_text_label" for="state_dcc_packet"> DCC Packet (optional)</label>
+    <div class="state_outputs_list_gray">
+    <div class="pure-g">
+
+    <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Address</div></div>
+    <div class="pure-u-1-2 ">
+    <div class="output_cell"><input type="text" placeholder="" name="state_dcc_packet" id="state_dcc_packet_address">
+    </div>
+    </div>
+
+    <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Type</div></div>
+    <div class="pure-u-1-2 "><div class="output_cell">
+    <select class="type_output" id="dcc_packet_type">
+    <option value="0">Select</option>
+    <option value="1">Speed</option>
+    <option value="2">Multifunction</option>
+    <option value="3">Signal Aspect</option>
+    <option value="4">Turnout</option>
+    </select>
+    </div>
+    </div>
+    
+    </div>
+
+    <div class="pure-g" id="state_dcc_packet_advanced_settings">
+
+    </div>
+
+
+
+    
+    </div>
+    </div>
+
+    </div>
+
+
+            <input class ="state_check_box" type="checkbox" id="state_active" name="state_active">
+            <label class="state_input_text_label" id="state_is_active" for="state_active"> Is Active Now</label><br>
+            
+            </div>
+            <div class="pure-g ">
+
+            <div class="pure-u-1-2 ">
+            <span class="action_modal_title">Outputs & values</span>
+            </div>
+
+            <div class="pure-u-1-2">
+            <button style="margin-top:20px; margin-left:4px;" id="new_output_value_btn" class="new_btn new_action_btn">Add value</button>
+            </div>
+
+            </div>
+            <hr>
+
+            <div class="output_values_table">
+
+            <div id="output_list">
+            </div>
+        </div>
+
+                <div style="display: flex; width:300px; margin: auto; padding-top:10px;">
+                    <button id="save_action_settings" class="s_wifi">Save</button>
+                    <button id="close_action_settings" class="s_wifi">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+        `;
+
+                document.getElementById("close_action_settings").onclick = function () {
+                    document.getElementById("action-modal-container").style.display = "none";
+                }
+
+                document.getElementById("state_is_active").onclick = function () {
+                    console.log("clicked on is active");
+                }
+
+                document.querySelector("#dcc_packet_type").addEventListener("change", (event) => {
+                    const dcc_packet_type = event.target.value;
+                    var advanced_ddc_packet_settings = "";
+
+                    if (dcc_packet_type == 3) {
+                        advanced_ddc_packet_settings =
+                            `
+                <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Aspect Number</div></div>
+                <div class="pure-u-1-2 ">
+                <div class="output_cell"><input type="text" placeholder="0,1,2, etc." name="state_dcc_packet"  id="state_dcc_packet_aspect_number">
+                </div>
+                </div>
+            
+                `;
+
+                    }
+
+                    if (dcc_packet_type == 4) {
+                        advanced_ddc_packet_settings =
+                            `
+                <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Direction</div></div>
+                <div class="pure-u-1-2 ">
+                <div class="output_cell"><input type="text" placeholder="0-5" name="state_dcc_packet"  id="state_dcc_packet_turnout_direction">
+                </div>
+                </div>
+            
+                `;
+
+                    }
+
+                    document.getElementById("state_dcc_packet_advanced_settings").innerHTML = advanced_ddc_packet_settings;
+
+                });
+
+
+                document.getElementById("save_action_settings").onclick = () => {
+
+                    save_outputs();
+
+                    current_state.name = document.getElementById("state_name").value;
+                    current_state.is_active = document.getElementById("state_is_active").value;
+
+                    var wcc_event_ids_str = document.getElementById("state_wcc_event").value;
+                    if (wcc_event_ids_str != undefined && wcc_event_ids_str != "") {
+                        current_state.wcc_event_ids = wcc_event_ids_str.split(",");
+                    }
+
+                    var dcc_packet_addr = document.getElementById("state_dcc_packet_address").value;
+                    if (dcc_packet_addr != undefined) {
+                        current_state.dcc_packet = {};
+                        current_state.dcc_packet.address = dcc_packet_addr;
+
+                        //Get the packet type
+                        current_state.dcc_packet.type = document.querySelector("#dcc_packet_type").value;
+
+                        //Get packet data depending on the packet
+                        current_state.dcc_packet.user_data = [];
+                        current_state.dcc_packet.user_data_length = 0;
+
+                        switch (parseInt(current_state.dcc_packet.type)) {
+                            case 0:
+                                break;
+                            case 1:
+                                break;
+                            case 2:
+                                break;
+                            case 3:
+                                current_state.dcc_packet.user_data_length = 1;
+                                current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_aspect_number").value;
+                                break;
+                            case 4:
+                                current_state.dcc_packet.user_data_length = 1;
+                                current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_turnout_direction").value;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (current_state.name == '') {
+                        if (current_state.values.length > 0) {
+                            var name = '';
+                            current_state.values.forEach(value => {
+                                if (value.output != undefined) {
+                                    name += `${value.output} `;
+                                }
+                            });
+                            current_state.name = name;
+                        } else {
+                            current_state.name = `-`;
+                        }
+                    }
+                    if (current_state.id != undefined) {
+                        update_state(current_state);
+                    } else {
+                        add_state(current_state);
+                    }
+
+                    close_callback();
+
+                    document.getElementById("action-modal-container").style.display = "none";
+
+                };
+            }
+        }
+
+        export function reload_action_outputs() {
+            //Add a cell to the action outputs list
+            document.querySelector('#output_list').innerHTML = "";
+
+            for (let value_index = 0; value_index < current_state.values.length; ++value_index) {
+
+                var value = current_state.values[value_index];
+                var output_select = `<select class="state_output" id="state_output_${value_index}">`;
+                output_select += `<option value="0">Not selected</option>`;
+
+                for (let index = 0; index < available_outputs.length; ++index) {
+                    const output = available_outputs[index];
+                    output_select += `<option value="${index}">${output.name}</option>`;
+                }
+                output_select += `</select>`;
+
+                var type_select = `<select class="type_output" id="type_output_${value_index}">`;
+                type_select += `<option value="0">Not selected</option>`;
+
+                for (let index = 0; index < 1; ++index) {
+                    type_select += `<option value="gpio">GPIO</option>`;
+                }
+                type_select += `</select>`;
+
+                /*var tr_node = document.createElement('tr');
+                tr_node.classList.add("service_cell");
+                tr_node.innerHTML = `<td height="40">${output_select}</td><td height="40">${type_select}</td><input type="text" id="state_value_${value_index}" placeholder="0 - 255"></td>`;
+                document.querySelector('#action_outputs_tbody').appendChild(tr_node);*/
+
+                var grid_node = document.createElement('div');
+                grid_node.classList.add("pure-g");
+                if (value_index % 2 == 0) {
+                    grid_node.classList.add("state_outputs_list_gray");
+                } else {
+                    grid_node.classList.add("state_outputs_list_gray");
+                }
+
+                var start_delay_value = value.start_delay;
+                var on_duration_value = value.on_duration;
+                var off_duration_value = value.off_duration;
+                var replays_value = value.replays;
+
+                grid_node.innerHTML = `
+    
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Name on a decoder</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">${output_select}</div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Type</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">${type_select}</div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Value</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell">
+            <input class="state_settings_input" type="text" id="state_value_${value_index}" value="0">
+        </div>
+        </div>
+
+        <div class="pure-g">
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Start delay, ms</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${start_delay_value} type="text" id="state_value_start_delay_${value_index}" placeholder="optional"></div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"On" duration, ms</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${on_duration_value} type="text" id="state_value_on_duration_${value_index}" placeholder="optional, 0 - endlessly"></div></div>
+
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">"Off" duration, ms</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${off_duration_value} type="text" id="state_value_off_duration_${value_index}" placeholder="optional"></div></div>
+        
+        <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Replays</div></div>
+        <div class="pure-u-1-2 "><div class="output_cell"><input class="state_settings_input" value=${replays_value} type="text" id="state_value_replays_${value_index}" placeholder="optional, 0 - endlessly"></div></div>
+        
+        <div class="pure-u-1-2 "></div>
+        <div class="pure-u-1-2 "><div class="output_cell state_value_cell_btns">
+        <button class="delete_btn delete_output" data-id="${value_index}"><img class="delete_btn_icn" src="./delete.png"></button>
+
+        </div></div>
+
+        </div>
+        `;
+
+                document.querySelector('#output_list').appendChild(grid_node);
+
+
+                if (current_state.values[value_index].connection_name != undefined) {
+                    document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].connection_id;
+                    document.getElementById(`state_value_${value_index}`).value = current_state.values[value_index].value;
+
+                }
+
+            }
+
+            const cells = document.querySelectorAll('.delete_output');
+            cells.forEach(cell => {
+                cell.addEventListener('click', function handleClick(event) {
+                    event.preventDefault();
+
+                    current_state.values.splice(this.dataset.id, 1);
+                    reload_action_outputs();
+
+                });
+            });
+
+            /*var tr_node = document.createElement('tr');
+            tr_node.classList.add("service_cell");
+            tr_node.innerHTML = `<td class="add_output_value_cell"><button id="new_output_value_btn" class="new_btn new_action_btn">Add value</button></td><td  class="add_output_value_cell"></td>`;
+            document.querySelector('#action_outputs_tbody').appendChild(tr_node);*/
+
+            document.getElementById("new_output_value_btn").onclick = () => {
+
+                save_outputs();
+
+                current_state.values.push({ start_delay: 0, on_duration: 0, off_duration: 0, replays: 1 });
+                reload_action_outputs();
+            };
+
+        }
+
+
+        var current_state = null;
+
+        export function save_outputs() {
+            current_state.values = [];
+
+            var state_output_els = document.getElementsByClassName('state_output');
+            for (var i = 0; i < state_output_els.length; ++i) {
+                const state_connection_id = parseInt(document.getElementById(`state_output_${i}`).value);
+                const state_connection_name = available_outputs[state_connection_id];
+                const state_value_val = document.getElementById(`state_value_${i}`).value;
+
+                const start_delay = parseInt(document.getElementById(`state_value_start_delay_${i}`).value);
+                const on_duration = parseInt(document.getElementById(`state_value_on_duration_${i}`).value);
+                const off_duration = parseInt(document.getElementById(`state_value_off_duration_${i}`).value);
+                const replays = parseInt(document.getElementById(`state_value_replays_${i}`).value);
+
+                current_state.values.push({
+                    connection_name: state_connection_name,
+                    connection_id: state_connection_id,
+                    signal_type: 0,
+                    value: parseInt(state_value_val),
+                    start_delay: start_delay,
+                    on_duration: on_duration,
+                    off_duration: off_duration,
+                    replays: replays
+                });
+
+            }
+        }
+
+        export function show_new_action(reload_states) {
+
+            current_state = {};
+            current_state.values = [{ start_delay: 0, on_duration: 0, off_duration: 0, replays: 1 }];
+
+            reload_action_outputs();
+            document.getElementById("action-modal-container").style.display = "block";
+
+            close_callback = reload_states;
+        }
+
+        export function show_edit_action(reload_states, state) {
+
+            current_state = state;
+
+            reload_action_outputs();
+
+            document.getElementById("state_name").value = current_state.name;
+            document.getElementById("state_is_active").value = current_state.is_active;
+
+            document.getElementById("action-modal-container").style.display = "block";
+
+            close_callback = reload_states;
+        }
+
+        customElements.define("action-modal", ActionModal);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        class VisualController extends HTMLElement {
+
+            //Example of canvas zooming from https://codepen.io/chengarda/pen/wRxoyB
+            constructor() {
+                super();
+
+                this.innerHTML = /*html*/`
+    <input id="background_image" type="file" accept="image/*">
+
+    <canvas id="canvas_ctrl" class="canvas_controller">
+
+
+    </canvas>
+    
+    `;
+
+                var canvas_el = document.getElementById("canvas_ctrl");
+                const ctx = canvas_el.getContext('2d');
+
+                let navbar_height = document.querySelector('#navbar').offsetHeight;
+
+                canvas_el.width = document.documentElement.clientWidth;
+                canvas_el.height = document.documentElement.clientHeight - navbar_height;
+
+                var background_img = null;
+
+                document.getElementById("background_image").addEventListener("change", function (e) {
+
+                    const fileName = e.target.files[0].name;
+                    const reader = new FileReader();
+                    reader.readAsDataURL(e.target.files[0]);
+                    reader.onload = event => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            compress_image(img, 0.5, 0.7);
+                        }
+                    }
+
+
+                });
+
+                let canvas = canvas_el;
+
+                var cameraOffset = { x: canvas.width / 2, y: canvas.height / 2 }
+                let cameraZoom = 1
+                let MAX_ZOOM = 5
+                let MIN_ZOOM = 0.1
+                let SCROLL_SENSITIVITY = 0.0005
+
+                async function draw() {
+
+                    canvas.width = document.documentElement.clientWidth;
+                    canvas.height = document.documentElement.clientHeight - navbar_height;
+
+                    // Translate to the canvas centre before zooming - so you'll always zoom on what you're looking directly at
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.scale(cameraZoom, cameraZoom);
+                    ctx.translate(-canvas.width / 2 + cameraOffset.x, -canvas.height / 2 + cameraOffset.y);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    if (background_img != null) {
+                        var scale = Math.min(canvas_el.width / background_img.width, canvas_el.height / background_img.height);
+
+                        var w = background_img.width * scale;
+                        var h = background_img.height * scale;
+
+                        var left = - w / 2;
+                        var top = - h / 2;
+
+                        ctx.drawImage(background_img, left, top, w, h);
+                    }
+
+
+                    //Draw test objects
+
+                    // Create gradient
+                    ctx.beginPath();
+
+                    if (ctx.filter === "none") {
+                        ctx.filter = "blur(15px)";
+                    }
+                    else { // Safari still doesn't support ctx.filter...
+                        ctx.shadowColor = "#e9c46a";
+                        ctx.shadowBlur = 10; // x2
+                        ctx.shadowOffsetX = 10;
+                        ctx.translate(-100, 0); // we draw the actual shape outside of the visible context
+                    }
+
+
+                    ctx.fillStyle = "#e9c46a";
+                    ctx.globalAlpha = 0.5;
+                    ctx.rect(-10, -120, 40, 80);
+
+                    //ctx.arc(0, -80, 20, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+
+                    ctx.beginPath();
+
+                    if (ctx.filter === "none") {
+                        ctx.filter = "blur(15px)";
+                    }
+                    else { // Safari still doesn't support ctx.filter...
+                        ctx.shadowColor = "#e9c46a";
+                        ctx.shadowBlur = 10; // x2
+                        ctx.shadowOffsetX = 10;
+                        ctx.translate(-100, 0); // we draw the actual shape outside of the visible context
+                    }
+
+                    ctx.fillStyle = "#e9c46a";
+                    ctx.globalAlpha = 0.5;
+                    ctx.rect(-10, -120, 40, 80);
+
+                    //ctx.arc(0, -80, 20, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+
+                    //requestAnimationFrame(draw)
+                }
+
+                // Gets the relevant location from a mouse or single touch event
+                function getEventLocation(e) {
+                    if (e.touches && e.touches.length == 1) {
+                        return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                    }
+                    else if (e.clientX && e.clientY) {
+                        return { x: e.clientX, y: e.clientY }
+                    }
+                }
+
+                function drawRect(x, y, width, height) {
+                    ctx.fillRect(x, y, width, height)
+                }
+
+                function drawText(text, x, y, size, font) {
+                    ctx.font = `${size}px ${font}`
+                    ctx.fillText(text, x, y)
+                }
+
+                let isDragging = false
+                let dragStart = { x: 0, y: 0 }
+
+                function onPointerDown(e) {
+                    isDragging = true
+                    dragStart.x = getEventLocation(e).x / cameraZoom - cameraOffset.x
+                    dragStart.y = getEventLocation(e).y / cameraZoom - cameraOffset.y
+                }
+
+                function onPointerUp(e) {
+                    isDragging = false
+                    initialPinchDistance = null
+                    lastZoom = cameraZoom
+                }
+
+                function onPointerMove(e) {
+                    if (isDragging) {
+                        cameraOffset.x = getEventLocation(e).x / cameraZoom - dragStart.x
+                        cameraOffset.y = getEventLocation(e).y / cameraZoom - dragStart.y
+                    }
+                }
+
+                function handleTouch(e, singleTouchHandler) {
+                    if (e.touches.length == 1) {
+                        singleTouchHandler(e)
+                    }
+                    else if (e.type == "touchmove" && e.touches.length == 2) {
+                        isDragging = false
+                        handlePinch(e)
+                    }
+                }
+
+                let initialPinchDistance = null
+                let lastZoom = cameraZoom
+
+                function handlePinch(e) {
+                    e.preventDefault()
+
+                    let touch1 = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                    let touch2 = { x: e.touches[1].clientX, y: e.touches[1].clientY }
+
+                    // This is distance squared, but no need for an expensive sqrt as it's only used in ratio
+                    let currentDistance = (touch1.x - touch2.x) ** 2 + (touch1.y - touch2.y) ** 2
+
+                    if (initialPinchDistance == null) {
+                        initialPinchDistance = currentDistance
+                    }
+                    else {
+                        adjustZoom(null, currentDistance / initialPinchDistance)
+                    }
+                }
+
+                function adjustZoom(zoomAmount, zoomFactor) {
+                    if (!isDragging) {
+                        if (zoomAmount) {
+                            cameraZoom += zoomAmount
+                        }
+                        else if (zoomFactor) {
+                            console.log(zoomFactor)
+                            cameraZoom = zoomFactor * lastZoom
+                        }
+
+                        cameraZoom = Math.min(cameraZoom, MAX_ZOOM)
+                        cameraZoom = Math.max(cameraZoom, MIN_ZOOM)
+
+                        console.log(zoomAmount)
+                    }
+                }
+
+                canvas.addEventListener('mousedown', onPointerDown)
+                canvas.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown))
+                canvas.addEventListener('mouseup', onPointerUp)
+                canvas.addEventListener('touchend', (e) => handleTouch(e, onPointerUp))
+                canvas.addEventListener('mousemove', onPointerMove)
+                canvas.addEventListener('touchmove', (e) => handleTouch(e, onPointerMove))
+                canvas.addEventListener('wheel', (e) => adjustZoom(e.deltaY * SCROLL_SENSITIVITY))
+
+                // Ready, set, go
+                draw()
+
+                function compress_image(imgToCompress, resizingFactor, quality) {
+                    // showing the compressed image
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+
+                    const originalWidth = imgToCompress.width;
+                    const originalHeight = imgToCompress.height;
+
+                    const canvasWidth = originalWidth * resizingFactor;
+                    const canvasHeight = originalHeight * resizingFactor;
+
+                    canvas.width = canvasWidth;
+                    canvas.height = canvasHeight;
+
+                    context.drawImage(
+                        imgToCompress,
+                        0,
+                        0,
+                        originalWidth * resizingFactor,
+                        originalHeight * resizingFactor
+                    );
+
+                    // reducing the quality of the image
+                    canvas.toBlob(
+                        (blob) => {
+                            if (blob) {
+
+                                var img = new Image();
+                                img.crossOrigin = 'Anonymous';
+
+                                img.onload = function () {
+                                    background_img = img;
+                                }
+
+                                img.src = URL.createObjectURL(blob);
+
+
+                            }
+                        },
+                        "image/jpeg",
+                        quality
+                    );
+                }
+
+            }
+        }
+
+        customElements.define("visual-controller", VisualController);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        set_decoder_id("some_id"); //Replace with decoder mac address
+        //clear_project();
+        reload_states();
+
+        window.addEventListener('load', onLoad);
+
+        function onLoad(event) {
+            initWebSocket();
+            initButtons();
+
+            var top_menu_item_els = document.getElementsByClassName('top_menu_item');
+            for (var i = 0; i < top_menu_item_els.length; ++i) {
+                top_menu_item_els[i].onclick = function (event) {
+                    event.preventDefault()
+
+                    update_top_menu();
+
+                    this.classList.add("top_menu_active");
+
+                    if (this.innerHTML == "DECODER") {
+
+                        document.querySelector('#settings_container').style.display = "none";
+                        document.querySelector('#visual-controller').style.display = "none";
+                        document.querySelector('#editor_container').style.display = "block";
+                        document.querySelector('#editor').style.display = "block";
+
+                    } else if (this.innerHTML == "CONTROLLER") {
+
+                        document.querySelector('#settings_container').style.display = "none";
+                        document.querySelector('#editor_container').style.display = "none";
+                        document.querySelector('#visual-controller').style.display = "block";
+                        document.querySelector('#editor').style.display = "none";
+
+                    } else {
+
+                        document.querySelector('#settings_container').style.display = "block";
+                        document.querySelector('#visual-controller').style.display = "none";
+                        document.querySelector('#editor_container').style.display = "none";
+                        document.querySelector('#editor').style.display = "block";
+
+                    }
+                }
+
+            }
+        }
+
+
+        function update_top_menu() {
+            var menu_items = document.querySelector('#top_menu').children;
+            for (var i = 0; i < menu_items.length; ++i) {
+                menu_items[i].classList.remove("top_menu_active");
+            }
+        }
+
+        function reload_states() {
+            let project = load_local_project();
+
+            document.querySelector('#states_list_tbody').innerHTML = '';
+
+            for (var i = 0; i < project.states.length; i++) {
+                var state = project.states[i];
+
+                //Add a cell to the DCC packets list
+                var tr_node = document.createElement('tr');
+                tr_node.classList.add("service_cell");
+                tr_node.classList.add("state_cell");
+
+                tr_node.dataset.id = state.id;
+
+                tr_node.innerHTML = `<td ><div class="state_icn"></div></td><td>${state.name}</td><td></td><td></td><td class="delete_state_btn" data-id="${state.id}" style="text-align:center;">
+                    <button class="delete_btn"><img class="delete_btn_icn" src="./delete.png"></button>
+                    </td>`;
+
+                document.querySelector('#states_list_tbody').appendChild(tr_node);
+            }
+
+            if (project.states.length > 0) {
+                document.querySelector('#no_states_hint').style.display = "none";
+            } else {
+                document.querySelector('#no_states_hint').style.display = "block";
+            }
+
+            document.querySelectorAll('.state_cell').forEach(cell => {
+                cell.addEventListener('click', function handleClick(event) {
+                    event.preventDefault();
+
+                    var selected_state = null;
+                    //Find a selected product
+                    project.states.forEach((state) => {
+                        if (state.id == this.dataset.id) {
+                            show_edit_action(reload_states, state);
+                        }
+                    });
+
+                });
+            });
+
+            document.querySelectorAll('.delete_state_btn').forEach(cell => {
+                cell.addEventListener('click', function handleClick(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    var selected_state = null;
+                    //Find a selected product
+                    let project = load_local_project();
+
+                    project.states.forEach((state, index) => {
+                        if (state.id == this.dataset.id) {
+
+                            let text = `State "${state.name}" will be deleted permanently. Are you sure?`;
+                            if (confirm(text) == true) {
+                                delete_state(this.dataset.id);
+                                reload_states();
+                            } else {
+
+                            }
+
+
+                        }
+                    });
+
+                });
+            });
+
+        }
+
+        function initButtons() {
+            document.getElementById('upload_firmware').addEventListener('click', upload_file);
+            document.getElementById('media_file_upload_btn').addEventListener('click', upload_media_file);
+        }
+
+        function connectToWiFi() {
+            let ssid = document.getElementById('ssid').value;
+            let passwd = document.getElementById('passwd').value;
+            let msg_ind = 0;
+            var wf_set = [];
+            wf_set[msg_ind++] = 2; //message type
+            wf_set[msg_ind++] = ssid.length; // ssid length
+            for (let i = 0; i < ssid.length; ++i) {
+                wf_set[msg_ind++] = ssid.charCodeAt(i);
+            }
+            wf_set[msg_ind++] = passwd.length; // passwd length
+            for (let i = 0; i < passwd.length; ++i) {
+                wf_set[msg_ind++] = passwd.charCodeAt(i);
+            }
+            let msg = new Uint8Array(wf_set);
+            console.log(msg);
+            websocket.send(msg);
+        }
+
+        document.getElementById("new_action_btn").onclick = () => {
+            show_new_action(reload_states);
+        };
+
+        document.getElementById("send_event_btn").onclick = () => {
+            show_event_modal();
+        };
+
+    </script>
+</body>
+
+</html>

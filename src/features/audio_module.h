@@ -2,7 +2,7 @@
 #define AUDIO_MODULE_H
 
 #include "test_audio.h" // The Wav file
-
+#include "./preferences_module.h"
 // Audio audio;
 
 static const i2s_port_t i2s_num = I2S_NUM_0; // i2s port number
@@ -43,13 +43,6 @@ static const i2s_config_t i2s_config = {
     .use_apll = 0,
     .tx_desc_auto_clear = true,
     .fixed_mclk = -1};
-
-static const i2s_pin_config_t pin_config = {
-    .bck_io_num = 13,                // The bit clock connectiom, goes to pin 27 of ESP32
-    .ws_io_num = 14,                 // Word select, also known as word select or left right clock
-    .data_out_num = 12,              // Data out from the ESP32, connect to DIN on 38357A
-    .data_in_num = I2S_PIN_NO_CHANGE // we are not interested in I2S data into the ESP32
-};
 
 void PrintData(const char *Data, uint8_t NumBytes)
 {
@@ -158,13 +151,12 @@ void DumpWAVHeader(WavHeader_Struct *Wav)
 
 void play_audio_from_header_file()
 {
+
     const unsigned char *WavFile = audio_data_from_h_file;
     memcpy(&WavHeader, WavFile, 44); // Copy the header part of the wav data into our structure
     DumpWAVHeader(&WavHeader);       // Dump the header data to serial, optional!
     if (ValidWavData(&WavHeader))
     {
-        i2s_driver_install(i2s_num, &i2s_config, 0, NULL);   // ESP32 will allocated resources to run I2S
-        i2s_set_pin(i2s_num, &pin_config);                   // Tell it the pins you will be using
         i2s_set_sample_rates(i2s_num, WavHeader.SampleRate); // set sample rate
         wav_data = WavFile + 44;
         wav_data_index = 0;
@@ -173,6 +165,13 @@ void play_audio_from_header_file()
 
 void setup_audio()
 {
+    i2s_pin_config_t pin_config = {
+        .bck_io_num = preferences_i2s_bck_pin(),    // The bit clock connectiom, goes to pin 27 of ESP32
+        .ws_io_num = preferences_i2s_ws_pin(),      // Word select, also known as word select or left right clock
+        .data_out_num = preferences_i2s_data_pin(), // Data out from the ESP32, connect to DIN on 38357A
+        .data_in_num = I2S_PIN_NO_CHANGE            // we are not interested in I2S data into the ESP32
+    };
+
     i2s_driver_install(i2s_num, &i2s_config, 0, NULL); // ESP32 will allocated resources to run I2S
     i2s_set_pin(i2s_num, &pin_config);                 // Tell it the pins you will be using
 }
@@ -190,8 +189,9 @@ void play_audio_from_spiffs(const char *filename, uint8_t action)
 
         if (strcmp(file.file_name, filename) == 0)
         {
-            //If we should stop sound just update the status, we shouldn't check wav 
-            if (action != 1){
+            // If we should stop sound just update the status, we shouldn't check wav
+            if (action != 1)
+            {
                 board_settings.media_files[file_ind].status = action;
             }
 

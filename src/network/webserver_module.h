@@ -4,6 +4,7 @@
 
 #include "../features/wcc_module.h"
 #include "../features/spiffs_module.h"
+#include "../features/preferences_module.h"
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -16,8 +17,7 @@ static void server_handle_upload(AsyncWebServerRequest *request, String filename
 // Initialize WiFi
 void initWiFi()
 {
-  WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);
-  WiFi.softAP(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.softAP(preferences_wifi_name(), preferences_wifi_passwd());
 
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -59,7 +59,6 @@ void send_dcc_packets(DCCPacket *cached_packets, uint8_t cached_packets_count)
     }
 
     msg_to_send[msg_index++] = cached_packet.packet_amount;
-
   }
   ws.binaryAll(msg_to_send, msg_index);
 }
@@ -271,15 +270,15 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
   if (info->final && info->index == 0 && info->len == len)
   {
-    String message = (char *)data;
-    Serial.print(message);
-    //  Check if the message is "getReadings"
-    // if (strcmp((char*)data, "getReadings") == 0) {
-    // if it is, send current sensor readings
-    // String sensorReadings = getSensorReadings();
-    // Serial.print(sensorReadings);
-    // notifyClients(sensorReadings);
-    //} width="180"
+    // String message = (char *)data;
+    // Serial.print(message);
+    //   Check if the message is "getReadings"
+    //  if (strcmp((char*)data, "getReadings") == 0) {
+    //  if it is, send current sensor readings
+    //  String sensorReadings = getSensorReadings();
+    //  Serial.print(sensorReadings);
+    //  notifyClients(sensorReadings);
+    // } width="180"
   }
 }
 
@@ -425,10 +424,6 @@ static void server_handle_OTA_update(AsyncWebServerRequest *request, String file
       logmessage = "OTA Complete: " + String(filename) + ",size: " + String(index + len);
       Serial.println(logmessage);
       request->send(200);
-      delay(500);
-      WiFi.disconnect();
-      delay(500);
-      ESP.restart();
     }
     else
     {
@@ -449,11 +444,15 @@ static void server_handle_upload(AsyncWebServerRequest *request, String filename
   }
 }
 
+String app_html = "";
+
 void setup_webserver()
 {
 
   initWiFi();
   initWebSocket();
+
+  app_html = readFile(LittleFS, "/app.html");
 
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "*");
@@ -468,7 +467,44 @@ void setup_webserver()
 
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/app.html", "text/html"); });
+            {
+              request->send("text/html", app_html.length(), [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t
+                            {
+
+      size_t from = index;
+
+      size_t to = from + maxLen;
+      if (to >= app_html.length()){
+        to = app_html.length();
+      }
+
+      String string_to_send = app_html.substring(from, to);
+
+      string_to_send.getBytes(buffer,string_to_send.length());
+      buffer[maxLen - 1] = (uint8_t)string_to_send.charAt(maxLen - 1);
+    Serial.println("==========================");
+
+    Serial.println(index);
+    Serial.println(maxLen);
+    Serial.println(string_to_send.length());
+    Serial.println("==========================");
+
+      return (size_t)string_to_send.length(); });
+            });
+
+  server.on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              request->send(200);
+
+              delay(500);
+              WiFi.disconnect();
+              delay(500);
+              ESP.restart();
+            });
+
+  // Web Server Root URL
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+  //          { request->send(LittleFS, "/app.html", "text/html"); });
 
   // run handleUpload function when any file is uploaded
   server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
@@ -482,7 +518,7 @@ void setup_webserver()
 
 void loop_webserver()
 {
-  // ws.cleanupClients();
+  ws.cleanupClients();
 }
 
 #endif

@@ -18,6 +18,24 @@ void notifyDccSpeed(uint16_t Addr, DCC_ADDR_TYPE AddrType, uint8_t Speed, DCC_DI
   Serial.print(" Dir: ");
   Serial.println((Dir == DCC_DIR_FWD) ? "Forward" : "Reverse");
 
+  if (Addr == 4){
+  if (Dir == DCC_DIR_FWD){
+
+                                ledcWrite(6, Speed*32);
+
+                        ledcWrite(7, 0);
+
+
+  }else{
+                                ledcWrite(7, Speed*32);
+
+                        ledcWrite(6, 0);
+  }
+  }
+
+
+
+
     uint8_t cur_packet_index = cached_packets_count - 1;
 
   // Set packet type
@@ -326,11 +344,20 @@ void notifyDccMsg(DCC_MSG *Msg)
 void setup_dcc_module()
 {
 
-  Dcc.pin(DCC_PIN, 0);
+  Dcc.pin(preferences_dcc_pin(), 0);
 
   Dcc.init(MAN_ID_DIY, 0, CV29_ACCESSORY_DECODER | CV29_OUTPUT_ADDRESS_MODE, 0);
   //Dcc.init(MAN_ID_DIY, 0, 0, 0);
   Serial.print("DCC reader is ready...");
+
+const int freq = 5000;
+const int resolution = 12;
+
+  /*  ledcSetup(6, freq, resolution);
+  ledcAttachPin(13, 6);
+
+          ledcSetup(7, freq, resolution);
+  ledcAttachPin(14, 7);*/
 
 }
 
