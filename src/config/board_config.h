@@ -2,6 +2,7 @@
 #define BOARD_CONFIG_H
 
 #include "../../structures.h"
+#include "../features/preferences_module.h"
 
 typedef enum
 {
@@ -17,7 +18,7 @@ typedef enum
     AUDIO
 } SIGNAL_TYPES;
 
-const uint8_t CONNECTION_NAME_LENGTH = 4;         // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
+const uint8_t CONNECTION_NAME_LENGTH = 20;        // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
 const uint8_t CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
 
 typedef struct
@@ -62,13 +63,12 @@ typedef struct
 
 } State;
 
-
-//Media files
+// Media files
 typedef struct
 {
     char *file_name;
-    uint8_t status;         // 0 - stopped, 1 - playing, 2 -paused
-    uint8_t volume; 
+    uint8_t status; // 0 - stopped, 1 - playing, 2 -paused
+    uint8_t volume;
     File file;
     uint32_t wav_data_index;
     uint32_t wav_data_size;
@@ -86,59 +86,73 @@ typedef struct
 
 } BoardSettings;
 
-
-
 /* How to add a new board
 - Update the connection_amount with amount of connections on your board
 - Fill information about connections on your board in fill_board_connections
 - If you add a new CHIP_TYPE you should add a new handler for the new chip
 - If you add a new SIGNAL_TYPES you should update the web app to show signal types correctly in the web app (the "State details" screen) and you should add a new handler for the new signal type
 */
-const uint8_t connection_amount = 28;
+const uint8_t connection_amount = 30;
 Connection board_connections[connection_amount];
 
 void fill_board_connections()
 {
 
-    const uint8_t LED_outputs_amount = 16;
-    // Fill connections to a LED driver
-    for (uint8_t i = 0; i < LED_outputs_amount; i++)
+    if (strcmp("train", preferences_board_type()) == 0)
     {
-        sprintf(board_connections[i].name, "%02d", i);
-        board_connections[i].output_num = i;
-        board_connections[i].owner_id = LED_DRIVER_PCA9955B;
-        board_connections[i].signal_types[0] = PWM;
+
+        sprintf(board_connections[0].name, "Motor, FWD");
+        board_connections[0].output_num = 13;
+        board_connections[0].owner_id = ESP32Sx;
+        board_connections[0].signal_types[0] = PWM;
+
+        sprintf(board_connections[1].name, "Motor, BWD");
+        board_connections[1].output_num = 14;
+        board_connections[1].owner_id = ESP32Sx;
+        board_connections[1].signal_types[0] = PWM;
+
     }
+    else
+    {
+        const uint8_t LED_outputs_amount = 16;
+        // Fill connections to a LED driver
+        for (uint8_t i = 0; i < LED_outputs_amount; i++)
+        {
+            sprintf(board_connections[i].name, "%02d", i);
+            board_connections[i].output_num = i;
+            board_connections[i].owner_id = LED_DRIVER_PCA9955B;
+            board_connections[i].signal_types[0] = PWM;
+        }
 
-    // Fill GPIO outputs
-    sprintf(board_connections[LED_outputs_amount].name, "io04");
-    board_connections[LED_outputs_amount].output_num = 4;
-    board_connections[LED_outputs_amount].owner_id = ESP32Sx;
-    board_connections[LED_outputs_amount].signal_types[0] = DIGITAL;
-    board_connections[LED_outputs_amount].signal_types[1] = PWM;
+        // Fill GPIO outputs
+        sprintf(board_connections[LED_outputs_amount].name, "io04");
+        board_connections[LED_outputs_amount].output_num = 4;
+        board_connections[LED_outputs_amount].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount].signal_types[1] = PWM;
 
-    sprintf(board_connections[LED_outputs_amount + 1].name, "io05");
-    board_connections[LED_outputs_amount + 1].output_num = 5;
-    board_connections[LED_outputs_amount + 1].owner_id = ESP32Sx;
-    board_connections[LED_outputs_amount + 1].signal_types[0] = DIGITAL;
-    board_connections[LED_outputs_amount + 1].signal_types[1] = PWM;
+        sprintf(board_connections[LED_outputs_amount + 1].name, "io05");
+        board_connections[LED_outputs_amount + 1].output_num = 5;
+        board_connections[LED_outputs_amount + 1].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 1].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 1].signal_types[1] = PWM;
 
-    sprintf(board_connections[LED_outputs_amount + 2].name, "io06");
-    board_connections[LED_outputs_amount + 2].output_num = 6;
-    board_connections[LED_outputs_amount + 2].owner_id = ESP32Sx;
-    board_connections[LED_outputs_amount + 2].signal_types[0] = DIGITAL;
-    board_connections[LED_outputs_amount + 2].signal_types[1] = PWM;
+        sprintf(board_connections[LED_outputs_amount + 2].name, "io06");
+        board_connections[LED_outputs_amount + 2].output_num = 6;
+        board_connections[LED_outputs_amount + 2].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 2].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 2].signal_types[1] = PWM;
 
-    sprintf(board_connections[LED_outputs_amount + 3].name, "io07");
-    board_connections[LED_outputs_amount + 3].output_num = 7;
-    board_connections[LED_outputs_amount + 3].owner_id = ESP32Sx;
-    board_connections[LED_outputs_amount + 3].signal_types[0] = DIGITAL;
-    board_connections[LED_outputs_amount + 3].signal_types[1] = PWM;
+        sprintf(board_connections[LED_outputs_amount + 3].name, "io07");
+        board_connections[LED_outputs_amount + 3].output_num = 7;
+        board_connections[LED_outputs_amount + 3].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 3].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 3].signal_types[1] = PWM;
+    }
 }
 
 BoardSettings board_settings = {
-    .states = NULL
-    };
+    .states = NULL};
 
 void load_board_settings_from_flash()
 {

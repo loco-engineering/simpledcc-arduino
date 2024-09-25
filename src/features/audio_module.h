@@ -2,7 +2,7 @@
 #define AUDIO_MODULE_H
 
 #include "test_audio.h" // The Wav file
-#include "./preferences_module.h"
+#include "../features/preferences_module.h"
 // Audio audio;
 
 static const i2s_port_t i2s_num = I2S_NUM_0; // i2s port number

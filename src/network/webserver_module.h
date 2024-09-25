@@ -74,12 +74,17 @@ void send_board_config_message()
   msg_to_send[1] = connection_amount; // amount of DCC packates in the message
 
   uint16_t msg_index = 2;
-
+  uint8_t sent_connections_amount = 0;
   // Iterate DCC packets in cached_packets and add to a websockets message
   for (uint8_t i = 0; i < connection_amount; ++i)
   {
     Connection connection = board_connections[i];
 
+    if (connection.signal_types[0] == NONE)
+    {
+      // We skip connections with Signal Type
+      continue;
+    }
     // Fill the connection name
     for (uint8_t name_ind = 0; name_ind < CONNECTION_NAME_LENGTH; ++name_ind)
     {
@@ -98,7 +103,13 @@ void send_board_config_message()
 
       msg_to_send[msg_index++] = connection.signal_types[sig_type_ind];
     }
+
+    sent_connections_amount++;
   }
+
+  // Set real amount of connections we want to send
+  msg_to_send[1] = sent_connections_amount; // amount of DCC packates in the message
+
   ws.binaryAll(msg_to_send, msg_index);
 }
 
@@ -246,6 +257,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // Move a pointer with data to the second byte
     data++;
     handle_wcc_message(data, len);
+    save_wcc_settings(LittleFS, data, len);
   }
 
   // Check the type - first byte
@@ -467,8 +479,7 @@ void setup_webserver()
 
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-              request->send("text/html", app_html.length(), [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t
+            { request->send("text/html", app_html.length(), [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t
                             {
 
       size_t from = index;
@@ -489,8 +500,7 @@ void setup_webserver()
     Serial.println(string_to_send.length());
     Serial.println("==========================");
 
-      return (size_t)string_to_send.length(); });
-            });
+      return (size_t)string_to_send.length(); }); });
 
   server.on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request)
             {
@@ -499,8 +509,7 @@ void setup_webserver()
               delay(500);
               WiFi.disconnect();
               delay(500);
-              ESP.restart();
-            });
+              ESP.restart(); });
 
   // Web Server Root URL
   // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)

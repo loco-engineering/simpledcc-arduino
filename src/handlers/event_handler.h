@@ -4,6 +4,7 @@
 #include "../../structures.h"
 #include "../config/board_config.h"
 #include "../features/GPIO_module.h"
+#include "../features/bdc_motor_module.h"
 
 void handle_turnout_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, State *state)
 {
@@ -34,6 +35,35 @@ void handle_turnout_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, St
     }
 }
 
+void handle_speed_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, State *state)
+{
+
+    if (state->values != NULL)
+    {
+        for (unsigned int value_number = 0; value_number < state->value_count; ++value_number)
+        {
+           // Value value = state->values[value_number];
+            //uint8_t value_length = value.val_length;
+            // Now we assume that val has only 1 byte
+            // ToDo: parse bytes specified in val_length not just one byte
+
+            //We skip value of a state because we take speed from a DCC packet
+            uint8_t speed =  received_packet->user_data[0];
+            uint8_t dir = received_packet->user_data[1];
+            uint8_t speed_steps = received_packet->user_data[2];
+
+            uint8_t duty_cycle = speed *100 / speed_steps;
+            
+            if (dir == DCC_DIR_REV){
+                bdc_reverse(duty_cycle);
+            }else{
+                bdc_forward(duty_cycle);
+            }
+        }
+    }
+
+}
+
 void handle_dcc_packet(DCCPacket *received_packet)
 {
     if (board_settings.states != NULL)
@@ -58,6 +88,7 @@ void handle_dcc_packet(DCCPacket *received_packet)
                         switch (received_packet->packet_type)
                         {
                         case 1:
+                            handle_speed_packet(received_packet, &dcc_packet, &state);
                             break;
                         case 2:
                             break;
@@ -74,9 +105,13 @@ void handle_dcc_packet(DCCPacket *received_packet)
     }
 }
 
-
 bool process_dcc_raw(DCCPacket *received_packet)
 {
+}
+
+void process_dcc_speed(DCCPacket *received_packet)
+{
+    handle_dcc_packet(received_packet);
 }
 
 void process_dcc_turnout(DCCPacket *received_packet)

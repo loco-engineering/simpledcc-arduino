@@ -108,6 +108,24 @@ class ActionModal extends HTMLElement {
             const dcc_packet_type = event.target.value;
             var advanced_ddc_packet_settings = "";
 
+            if (dcc_packet_type == 1) {
+                advanced_ddc_packet_settings =
+                    `
+                <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Direction</div></div>
+                <div class="pure-u-1-2 ">
+                <div class="output_cell">
+                <select class="type_output" id="dcc_speed_packet_dir">
+                <option value="0">Forward</option>
+                <option value="1">Backward</option>
+                </select>
+
+                </div>
+                </div>
+            
+                `;
+
+            }
+
             if (dcc_packet_type == 3) {
                 advanced_ddc_packet_settings =
                     `
@@ -167,6 +185,8 @@ class ActionModal extends HTMLElement {
                     case 0:
                         break;
                     case 1:
+                        current_state.dcc_packet.user_data_length = 1;
+                        current_state.dcc_packet.user_data[0] = document.querySelector("#dcc_speed_packet_dir").value;
                         break;
                     case 2:
                         break;
@@ -218,7 +238,7 @@ export function reload_action_outputs() {
 
         var value = current_state.values[value_index];
         var output_select = `<select class="state_output" id="state_output_${value_index}">`;
-        output_select += `<option value="0">Not selected</option>`;
+        output_select += `<option>Not selected</option>`;
 
         for (let index = 0; index < available_outputs.length; ++index) {
             const output = available_outputs[index];
@@ -227,10 +247,10 @@ export function reload_action_outputs() {
         output_select += `</select>`;
 
         var type_select = `<select class="type_output" id="type_output_${value_index}">`;
-        type_select += `<option value="0">Not selected</option>`;
+        type_select += `<option>Not selected</option>`;
 
         for (let index = 0; index < 1; ++index) {
-            type_select += `<option value="gpio">GPIO</option>`;
+            type_select += `<option value="pwm">PWM</option>`;
         }
         type_select += `</select>`;
 
@@ -293,6 +313,7 @@ export function reload_action_outputs() {
 
 
         if (current_state.values[value_index].connection_name != undefined) {
+            console.log("+++++");
             document.getElementById(`state_output_${value_index}`).value = current_state.values[value_index].connection_id;
             document.getElementById(`state_value_${value_index}`).value = current_state.values[value_index].value;
 
@@ -320,7 +341,7 @@ export function reload_action_outputs() {
 
         save_outputs();
 
-        current_state.values.push({start_delay:0, on_duration:0, off_duration:0, replays:1});
+        current_state.values.push({ start_delay: 0, on_duration: 0, off_duration: 0, replays: 1 });
         reload_action_outputs();
     };
 
@@ -334,25 +355,27 @@ export function save_outputs() {
 
     var state_output_els = document.getElementsByClassName('state_output');
     for (var i = 0; i < state_output_els.length; ++i) {
-        const state_connection_id = parseInt(document.getElementById(`state_output_${i}`).value);
-        const state_connection_name = available_outputs[state_connection_id];
-        const state_value_val = document.getElementById(`state_value_${i}`).value;
-
-        const start_delay = parseInt(document.getElementById(`state_value_start_delay_${i}`).value);
-        const on_duration = parseInt(document.getElementById(`state_value_on_duration_${i}`).value);
-        const off_duration = parseInt(document.getElementById(`state_value_off_duration_${i}`).value);
-        const replays = parseInt(document.getElementById(`state_value_replays_${i}`).value);
-
-        current_state.values.push({ 
-            connection_name: state_connection_name, 
-            connection_id: state_connection_id, 
-            signal_type: 0, 
-            value: parseInt(state_value_val),
-            start_delay: start_delay,
-            on_duration: on_duration,
-            off_duration: off_duration,
-            replays: replays
-        });
+        if (document.getElementById(`state_output_${i}`).value != undefined){
+            const state_connection_id = parseInt(document.getElementById(`state_output_${i}`).value);
+            const state_connection_name = available_outputs[state_connection_id].name;
+            const state_value_val = document.getElementById(`state_value_${i}`).value;
+    
+            const start_delay = parseInt(document.getElementById(`state_value_start_delay_${i}`).value);
+            const on_duration = parseInt(document.getElementById(`state_value_on_duration_${i}`).value);
+            const off_duration = parseInt(document.getElementById(`state_value_off_duration_${i}`).value);
+            const replays = parseInt(document.getElementById(`state_value_replays_${i}`).value);
+    
+            current_state.values.push({
+                connection_name: state_connection_name,
+                connection_id: state_connection_id,
+                signal_type: 0,
+                value: parseInt(state_value_val),
+                start_delay: start_delay,
+                on_duration: on_duration,
+                off_duration: off_duration,
+                replays: replays
+            });
+        }
 
     }
 }
@@ -360,7 +383,7 @@ export function save_outputs() {
 export function show_new_action(reload_states) {
 
     current_state = {};
-    current_state.values = [{start_delay:0, on_duration:0, off_duration:0, replays:1}];
+    current_state.values = [{ start_delay: 0, on_duration: 0, off_duration: 0, replays: 1 }];
 
     reload_action_outputs();
     document.getElementById("action-modal-container").style.display = "block";

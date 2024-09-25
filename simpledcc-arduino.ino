@@ -21,13 +21,14 @@
 
 #include "src/dcc_reader/dcc_module.h"
 #include "src/features/led_module.h"
+#include "src/features/wcc_module.h"
 //#include "src/features/nfc_module.h"
-#include "src/features/audio_module.h"
 #include "src/features/spiffs_module.h"
 #include "src/features/status_led_module.h"
-#include "src/features/wcc_module.h"
 #include "src/features/preferences_module.h"
+#include "src/features/bdc_motor_module.h"
 #include "src/network/webserver_module.h"
+#include "src/features/audio_module.h"
 
 void initLittleFS(){
   if(!LittleFS.begin()){
@@ -46,6 +47,7 @@ void initLittleFS(){
 
 void setup()
 {
+
   Serial.begin(115200);
   Serial.print("Initializing SimpleDCC/WCC decoder ... Full documentation is available at https://loco.engineering/docs");
   
@@ -66,11 +68,13 @@ void setup()
   //setup_nfc();
   setup_status_led();
   setup_audio();
+  setup_bdc_module();
+
   on_status_led(0x00ff00);
 
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
   //add_led_connection(0, 1, 0.5, 1000, 1000, 0);
-  //add_led_connection(1,34, 0.5, 1000, 1000, 1000);
+  //add_led_connection(1,7, 0.5, 1000, 1000, 1000);
 
   // Test LittleFS
   //deleteFile(LittleFS, "/level_crossing_1.wav");
@@ -97,12 +101,14 @@ void setup()
 
 void loop()
 {
+
   loop_dcc_module();
   loop_webserver();
   loop_led();
   //loop_nfc();
   loop_audio();
   loop_gpio_module();
+  loop_bdc_module();
   //Uncomment if you want to check memory leaks and usage
   //Data can be visualized in Serial Plotter"
   //Serial.printf("\nStack:%d,Heap:%lu\n", uxTaskGetStackHighWaterMark(NULL), (unsigned long)ESP.getFreeHeap());

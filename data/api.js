@@ -8,8 +8,6 @@ export var media_files = [];
 
 export async function upload_file() {
 
-    document.querySelector('.file_loader').style.display = "block";
-
     var input = document.querySelector('#firmware_file_input');
 
     /*for (var ind = 0; ind < input.files.length; ind += 1) {
@@ -34,6 +32,8 @@ export async function upload_file() {
 
 
     for (var ind = 0; ind < input.files.length; ind += 1) {
+
+        document.querySelector('.file_loader').style.display = "block";
 
         var file = input.files[ind]; //this is an array
 
@@ -573,7 +573,7 @@ async function onMessage(event) {
 
         available_outputs = [];
 
-        const CONNECTION_NAME_LENGTH = 4; // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
+        const CONNECTION_NAME_LENGTH = 20; // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
         const CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
         const connection_types = ["Digital", "PWM"];
 
