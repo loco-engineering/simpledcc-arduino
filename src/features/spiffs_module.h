@@ -179,4 +179,62 @@ uint8_t *read_wcc_settings(fs::FS &fs, size_t *wcc_data_len)
   return data;
 }
 
+const char *wcc_project_file = "/wcc_project.txt";
+
+void save_wcc_project_file(fs::FS &fs, uint8_t *data, size_t len, bool is_append = false)
+{
+  Serial.printf("Save WCC project file\n");
+
+  File file;
+  if (is_append == false)
+  {
+    deleteFile(fs, wcc_project_file);
+
+    file = fs.open(wcc_project_file, FILE_WRITE);
+  }
+  else
+  {
+    file = fs.open(wcc_project_file, FILE_APPEND);
+  }
+
+  if (!file)
+  {
+    Serial.println("- failed to open file for writing");
+    return;
+  }
+
+  if (file.write(data, len))
+  {
+    Serial.println("- file written");
+  }
+  else
+  {
+    Serial.println("- write failed");
+  }
+
+  file.close();
+}
+
+uint8_t *read_generate_wcc_project_file(fs::FS &fs, size_t *wcc_data_len)
+{
+
+  Serial.printf("Load WCC project file\n");
+
+  File file = fs.open(wcc_project_file);
+
+  if (!file)
+  {
+    Serial.println("- failed to open file for reading");
+    return NULL;
+  }
+
+  size_t avail_len = file.available();
+  uint8_t *data = (uint8_t *)ps_calloc(avail_len + 1, sizeof(uint8_t));
+  data[0] = 7; // set the message type we plan to send, 7 - wcc project file
+  *wcc_data_len = (file.readBytes((char *)(data + 1), avail_len) + 1); // we add 1 to the length because the first byte is a msg type
+
+  file.close();
+  return data;
+}
+
 #endif

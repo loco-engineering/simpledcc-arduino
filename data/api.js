@@ -1,3 +1,5 @@
+import {set_local_project} from "./storage.js"
+
 //var gateway = `ws://${window.location.hostname}/ws`;
 const base_ip = `192.168.4.1`;
 const gateway = `ws://${base_ip}/ws`;
@@ -384,8 +386,24 @@ export function generate_wcc_media_file_msg(filename, action_type) {
     for (var id_ind = 0; id_ind < filename.length; id_ind += 1) {
         wcc_msg[wcc_msg_ind++] = filename.charCodeAt(id_ind);
     }
-    //Set if the state should be activated or not
+
     wcc_msg[wcc_msg_ind++] = '\0';
+
+    return wcc_msg;
+
+}
+
+export function generate_project_file_msg(project_file) {
+
+    var project_file_str = JSON.stringify(project_file);
+    var wcc_msg = [];
+    let wcc_msg_ind = 0;
+    wcc_msg[wcc_msg_ind++] = 7; //message type, 7 - send a WCC project file
+
+    //Fille file name
+    for (var id_ind = 0; id_ind < project_file_str.length; id_ind += 1) {
+        wcc_msg[wcc_msg_ind++] = project_file_str.charCodeAt(id_ind);
+    }
 
     return wcc_msg;
 
@@ -424,6 +442,11 @@ export function send_wcc_event(wcc_event) {
 
 export function send_wcc_manage_media_file(filename, action_type) {
     var message_to_send = generate_wcc_media_file_msg(filename, action_type);
+    send_websocket_message(message_to_send);
+}
+
+export function send_wcc_project_file(project_file) {
+    var message_to_send = generate_project_file_msg(project_file);
     send_websocket_message(message_to_send);
 }
 
@@ -690,6 +713,21 @@ async function onMessage(event) {
 
         console.log(media_files);
 
+    }
+
+
+    if (msg_type == 7) {
+
+        var wcc_project_file_str = "";
+
+        for (var i = msg_index; i < buffer.length; i++) {
+            wcc_project_file_str += String.fromCharCode(buffer[msg_index++]);
+        }
+        console.log("Received WCC project file data");
+        console.log(wcc_project_file_str);
+        console.log("===============================");
+
+        set_local_project(wcc_project_file_str);
     }
 
     //Autoscoll

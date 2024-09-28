@@ -58,9 +58,6 @@ void setup()
 
   //Set board config
   fill_board_connections(); //after we call this function we can get connections by using var board_connections
-  for (int i = 0; i < 16; i++) {
-      Serial.println( board_connections[i].name);
-  }
 
   setup_dcc_module();
   setup_webserver();

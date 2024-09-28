@@ -83,7 +83,7 @@ void setup_bdc_module()
   }
 
   mcpwm_config_t pwm_config = {};
-  pwm_config.frequency = 1000;
+  pwm_config.frequency = 16000;
   pwm_config.cmpr_a = 0;
   pwm_config.cmpr_b = 0;
   pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -91,7 +91,7 @@ void setup_bdc_module()
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
 
   // Frequency doesn't update till this is called.
-  mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 1);
+  mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 16000);
 
 }
 

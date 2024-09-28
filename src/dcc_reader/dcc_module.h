@@ -1,3 +1,6 @@
+#ifndef DCC_MODULE_H
+#define DCC_MODULE_H
+
 #include "NmraDcc.h"
 #include "../network/webserver_module.h"
 #include "../handlers/event_handler.h"
@@ -58,8 +61,6 @@ void notifyDccSpeed(uint16_t Addr, DCC_ADDR_TYPE AddrType, uint8_t Speed, DCC_DI
 
 void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint8_t FuncState)
 {
-
-  return;
   
   serial_print("notifyDccFunc: Addr: ");
   serial_print_format(Addr, DEC);
@@ -79,6 +80,8 @@ void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint
   cached_packets[cur_packet_index].user_data[1] = FuncState;
   cached_packets[cur_packet_index].user_data_length = 2;
   cached_packets[cur_packet_index].packet_amount = 1;
+
+  process_dcc_multi_function(&cached_packets[cur_packet_index]);
 
 //Check if the previous packet the same
   if (cached_packets_count > 1){
@@ -362,3 +365,5 @@ void loop_dcc_module()
     }
 
 }
+
+#endif

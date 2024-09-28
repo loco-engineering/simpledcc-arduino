@@ -406,4 +406,10 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
     ESP_LOGI(TAG, "============================");
 }
 
+//We don't parse WCC project file and use a decoder as a place where we save it and restore
+void handle_wcc_project_file(uint8_t *output_buffer, size_t buffer_size){
+
+}
+
+
 #endif

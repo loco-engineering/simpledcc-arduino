@@ -111,6 +111,49 @@ void fill_board_connections()
         board_connections[1].owner_id = ESP32Sx;
         board_connections[1].signal_types[0] = PWM;
 
+        sprintf(board_connections[2].name, "Front Light");
+        board_connections[2].output_num = 33;
+        board_connections[2].owner_id = ESP32Sx;
+        board_connections[2].signal_types[0] = PWM;
+
+        sprintf(board_connections[3].name, "Rear Light");
+        board_connections[3].output_num = 34;
+        board_connections[3].owner_id = ESP32Sx;
+        board_connections[3].signal_types[0] = PWM;
+
+        sprintf(board_connections[4].name, "Function 1");
+        board_connections[4].output_num = 17;
+        board_connections[4].owner_id = ESP32Sx;
+        board_connections[4].signal_types[0] = PWM;
+
+        sprintf(board_connections[5].name, "Function 2");
+        board_connections[5].output_num = 18;
+        board_connections[5].owner_id = ESP32Sx;
+        board_connections[5].signal_types[0] = PWM;
+
+        sprintf(board_connections[6].name, "IO6");
+        board_connections[6].output_num = 6;
+        board_connections[6].owner_id = ESP32Sx;
+        board_connections[6].signal_types[0] = PWM;
+        board_connections[6].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[7].name, "IO8");
+        board_connections[7].output_num = 8;
+        board_connections[7].owner_id = ESP32Sx;
+        board_connections[7].signal_types[0] = PWM;
+        board_connections[7].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[8].name, "IO10");
+        board_connections[8].output_num = 10;
+        board_connections[8].owner_id = ESP32Sx;
+        board_connections[8].signal_types[0] = PWM;
+        board_connections[8].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[9].name, "IO11");
+        board_connections[9].output_num = 11;
+        board_connections[9].owner_id = ESP32Sx;
+        board_connections[9].signal_types[0] = PWM;
+        board_connections[9].signal_types[1] = DIGITAL;
     }
     else
     {
@@ -125,25 +168,25 @@ void fill_board_connections()
         }
 
         // Fill GPIO outputs
-        sprintf(board_connections[LED_outputs_amount].name, "io04");
+        sprintf(board_connections[LED_outputs_amount].name, "IO04");
         board_connections[LED_outputs_amount].output_num = 4;
         board_connections[LED_outputs_amount].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount].signal_types[1] = PWM;
 
-        sprintf(board_connections[LED_outputs_amount + 1].name, "io05");
+        sprintf(board_connections[LED_outputs_amount + 1].name, "IO05");
         board_connections[LED_outputs_amount + 1].output_num = 5;
         board_connections[LED_outputs_amount + 1].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 1].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 1].signal_types[1] = PWM;
 
-        sprintf(board_connections[LED_outputs_amount + 2].name, "io06");
+        sprintf(board_connections[LED_outputs_amount + 2].name, "IO06");
         board_connections[LED_outputs_amount + 2].output_num = 6;
         board_connections[LED_outputs_amount + 2].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 2].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 2].signal_types[1] = PWM;
 
-        sprintf(board_connections[LED_outputs_amount + 3].name, "io07");
+        sprintf(board_connections[LED_outputs_amount + 3].name, "IO07");
         board_connections[LED_outputs_amount + 3].output_num = 7;
         board_connections[LED_outputs_amount + 3].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 3].signal_types[0] = DIGITAL;

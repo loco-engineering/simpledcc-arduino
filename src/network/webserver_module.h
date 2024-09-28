@@ -235,6 +235,22 @@ void reload_and_send_media_files_list()
   free(msg);
 }
 
+void send_wcc_project_file_message()
+{
+
+  size_t wcc_data_len = 0;
+  uint8_t *wcc_project_file_data = read_generate_wcc_project_file(LittleFS, &wcc_data_len);
+  if (wcc_project_file_data != NULL)
+  {
+    ws.binaryAll(wcc_project_file_data, wcc_data_len);
+
+    free(wcc_project_file_data);
+  }
+
+}
+
+uint8_t msg_type_cont = 0;
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
@@ -243,6 +259,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   Serial.println("New message over WebSocket received");
   Serial.println("Size");
   Serial.println(info->len);
+    Serial.println("Num");
+  Serial.println(info->num);
+      Serial.println("Final");
+  Serial.println(info->final);
+        Serial.println("Index");
+  Serial.println(info->index);
   Serial.println("Content");
   for (int i = 0; i < len; i++)
   {
@@ -256,8 +278,8 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // This message is WCC board settings
     // Move a pointer with data to the second byte
     data++;
-    handle_wcc_message(data, len);
-    save_wcc_settings(LittleFS, data, len);
+    handle_wcc_message(data, len - 1);
+    save_wcc_settings(LittleFS, data, len - 1);
   }
 
   // Check the type - first byte
@@ -266,7 +288,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // This message is WCC event
     // Move a pointer with data to the second byte
     data++;
-    handle_wcc_event(data, len);
+    handle_wcc_event(data, len - 1);
   }
 
   // Check the type - first byte
@@ -275,8 +297,37 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     // This message is WCC message to manage media files
     // Move a pointer with data to the second byte
     data++;
-    handle_wcc_media_file_message(data, len);
+    handle_wcc_media_file_message(data, len - 1);
   }
+
+  // Check the type - first byte
+  // 7 - web app project file
+  if (data[0] == 7 && info->index == 0)
+  {
+    Serial.println("WCC project file data is received");
+    // This message is a message with a WCC project file
+    // WCC project file is used to show decoder's settings/states in the web app
+    data++;
+    save_wcc_project_file(LittleFS, data, len - 1);
+
+    if ((info->index + len) != info->len){
+      msg_type_cont = 7;
+    }
+  }
+
+    if (msg_type_cont == 7)
+  {
+    Serial.println("WCC project file data is received");
+    // This message is a message with a WCC project file
+    // WCC project file is used to show decoder's settings/states in the web app
+    save_wcc_project_file(LittleFS, data, len, true);
+
+  }
+
+  //Reset msg type
+  if ((info->index + len) == info->len){
+      msg_type_cont = 0;
+    }
 
   Serial.println("=======================");
 
@@ -309,6 +360,9 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
     // Send a list with media files
     reload_and_send_media_files_list();
+
+    // Send WCC project file data to the web app
+    send_wcc_project_file_message();
 
     break;
   case WS_EVT_DISCONNECT:

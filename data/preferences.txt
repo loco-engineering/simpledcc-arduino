@@ -2,4 +2,4 @@ serial=ac_111111;
 wifi_ssid=loco-ac_111111;
 wifi_passwd=loco.eng;
 hw=1.0;
-board_type=train;
+board_type=accessory;

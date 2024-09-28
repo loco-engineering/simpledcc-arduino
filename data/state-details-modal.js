@@ -55,7 +55,6 @@ class ActionModal extends HTMLElement {
     </div>
 
 
-
     
     </div>
     </div>
@@ -126,6 +125,19 @@ class ActionModal extends HTMLElement {
 
             }
 
+            if (dcc_packet_type == 2) {
+                advanced_ddc_packet_settings =
+                    `
+                <div class="pure-u-1-2 "><div class="state_input_text_label state_settings_adv_params">Function number</div></div>
+                <div class="pure-u-1-2 ">
+                <div class="output_cell"><input type="text" placeholder="1-28" id="state_dcc_packet_function_number">
+                </div>
+                </div>
+            
+                `;
+
+            }
+
             if (dcc_packet_type == 3) {
                 advanced_ddc_packet_settings =
                     `
@@ -189,6 +201,8 @@ class ActionModal extends HTMLElement {
                         current_state.dcc_packet.user_data[0] = document.querySelector("#dcc_speed_packet_dir").value;
                         break;
                     case 2:
+                        current_state.dcc_packet.user_data_length = 1;
+                        current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_function_number").value;
                         break;
                     case 3:
                         current_state.dcc_packet.user_data_length = 1;
@@ -355,16 +369,16 @@ export function save_outputs() {
 
     var state_output_els = document.getElementsByClassName('state_output');
     for (var i = 0; i < state_output_els.length; ++i) {
-        if (document.getElementById(`state_output_${i}`).value != undefined){
+        if (document.getElementById(`state_output_${i}`).value != undefined) {
             const state_connection_id = parseInt(document.getElementById(`state_output_${i}`).value);
             const state_connection_name = available_outputs[state_connection_id].name;
             const state_value_val = document.getElementById(`state_value_${i}`).value;
-    
+
             const start_delay = parseInt(document.getElementById(`state_value_start_delay_${i}`).value);
             const on_duration = parseInt(document.getElementById(`state_value_on_duration_${i}`).value);
             const off_duration = parseInt(document.getElementById(`state_value_off_duration_${i}`).value);
             const replays = parseInt(document.getElementById(`state_value_replays_${i}`).value);
-    
+
             current_state.values.push({
                 connection_name: state_connection_name,
                 connection_id: state_connection_id,
