@@ -1,4 +1,4 @@
-import {get_project_settings} from "./storage.js"
+import { get_project_settings, delete_state } from "./storage.js";
 import {show_edit_action } from "./state-details-modal.js";
 
 export function reload_states() {

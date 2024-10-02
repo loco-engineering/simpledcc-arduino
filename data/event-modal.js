@@ -21,13 +21,13 @@ class EventModal extends HTMLElement {
     </div>
         `;
 
-        document.getElementById("close_event_modal").onclick = function () {
+        /*document.getElementById("close_event_modal").onclick = function () {
             document.getElementById("event-modal-container").style.display = "none";
         }
 
         document.getElementById("send_event").onclick = () => {
 
-        };
+        };*/
     }
 }
 

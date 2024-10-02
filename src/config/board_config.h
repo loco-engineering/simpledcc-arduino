@@ -7,7 +7,8 @@
 typedef enum
 {
     ESP32Sx,
-    LED_DRIVER_PCA9955B
+    LED_DRIVER_PCA9955B,
+    MAX98357
 } CHIP_TYPE;
 typedef enum
 {
@@ -92,7 +93,7 @@ typedef struct
 - If you add a new CHIP_TYPE you should add a new handler for the new chip
 - If you add a new SIGNAL_TYPES you should update the web app to show signal types correctly in the web app (the "State details" screen) and you should add a new handler for the new signal type
 */
-const uint8_t connection_amount = 30;
+const uint8_t connection_amount = 35;
 Connection board_connections[connection_amount];
 
 void fill_board_connections()
@@ -154,6 +155,11 @@ void fill_board_connections()
         board_connections[9].owner_id = ESP32Sx;
         board_connections[9].signal_types[0] = PWM;
         board_connections[9].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[10].name, "SOUND");
+        board_connections[10].output_num = 0;
+        board_connections[10].owner_id = MAX98357;
+        board_connections[10].signal_types[0] = AUDIO;
     }
     else
     {
@@ -191,6 +197,53 @@ void fill_board_connections()
         board_connections[LED_outputs_amount + 3].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 3].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 3].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 4].name, "IO08");
+        board_connections[LED_outputs_amount + 4].output_num = 8;
+        board_connections[LED_outputs_amount + 4].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 4].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 4].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 5].name, "IO09");
+        board_connections[LED_outputs_amount + 5].output_num = 9;
+        board_connections[LED_outputs_amount + 5].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 5].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 5].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 6].name, "IO10");
+        board_connections[LED_outputs_amount + 6].output_num = 10;
+        board_connections[LED_outputs_amount + 6].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 6].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 6].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 7].name, "IO11");
+        board_connections[LED_outputs_amount + 7].output_num = 11;
+        board_connections[LED_outputs_amount + 7].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 7].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 7].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 8].name, "IO18");
+        board_connections[LED_outputs_amount + 8].output_num = 18;
+        board_connections[LED_outputs_amount + 8].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 8].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 8].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 9].name, "IO21");
+        board_connections[LED_outputs_amount + 9].output_num = 21;
+        board_connections[LED_outputs_amount + 9].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 9].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 9].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 10].name, "IO47");
+        board_connections[LED_outputs_amount + 10].output_num = 47;
+        board_connections[LED_outputs_amount + 10].owner_id = ESP32Sx;
+        board_connections[LED_outputs_amount + 10].signal_types[0] = DIGITAL;
+        board_connections[LED_outputs_amount + 10].signal_types[1] = PWM;
+
+        sprintf(board_connections[LED_outputs_amount + 11].name, "SOUND");
+        board_connections[LED_outputs_amount + 11].output_num = 0;
+        board_connections[LED_outputs_amount + 11].owner_id = MAX98357;
+        board_connections[LED_outputs_amount + 11].signal_types[0] = AUDIO;
     }
 }
 

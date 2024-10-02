@@ -221,7 +221,7 @@ void play_audio_from_spiffs(const char *filename, uint8_t action)
 void loop_audio()
 {
 
-    // Iterate over madia files with status 1 and play them
+    // Iterate over media files with status 1 and play them
 
     const uint8_t bytes_to_read = 4; // bytes to read in mono
 

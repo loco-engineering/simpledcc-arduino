@@ -28,7 +28,7 @@
                 </h3>
 
                 <p class="section_hint">What the decoder should do when a DCC packet or WCC event message is
-                    received. For example, turn on top red light on a signal or play sound on a level crossing, etc.</p>
+                    received. For example, move a train forward, turn on top red light on a signal or play sound on a level crossing, etc.</p>
                 <div class="tableFixHead">
 
                     <table id="states_list" class="common_table">
@@ -36,8 +36,8 @@
                             <tr>
                                 <th width="60">ICON</th>
                                 <th>NAME</th>
-                                <th width="100">TYPE</th>
-                                <th width="40">ACTIVE</th>
+                                <th width="100">DCC</th>
+                                <th width="100">WCC</th>
                                 <th width="40"></th>
                             </tr>
                         </thead>
@@ -164,17 +164,20 @@
                 <h3 class="section_header">Settings</h3>
                 <h5 class="section_subheader">Firmware Update</h5>
                 <p class="section_hint"></p>
-<ul class="section_hint">
-<li> Download the latest firmware from <a href="https://loco.engineering/firmware" target="__blank">loco.engineering/firmware</a>. <b>Note:</b> If you are currently connected to the decoder's WiFi, disconnect and connect to your router/modem or Internet to download the firmware. Don't forget to connect to the decoder's WiFi again before uploading files.
-</li>
-   <li> Unzip the downloaded file to access the firmware files.</li>
+                <ul class="section_hint">
+                    <li> Download the latest firmware from <a href="https://loco.engineering/firmware"
+                            target="__blank">loco.engineering/firmware</a>. <b>Note:</b> If you are currently connected
+                        to the decoder's WiFi, disconnect and connect to your router/modem or Internet to download the
+                        firmware. Don't forget to connect to the decoder's WiFi again before uploading files.
+                    </li>
+                    <li> Unzip the downloaded file to access the firmware files.</li>
 
-    <li> Click on "Choose Files" below, and select all files from the unzipped folder.</li>
+                    <li> Click on "Choose Files" below, and select all files from the unzipped folder.</li>
 
-        <li> Click on "Upload" to update the firmware. The upload process may take up to a minute.</li>
+                    <li> Click on "Upload" to update the firmware. The upload process may take up to a minute.</li>
 
-            <li>Once the upload is complete, the decoder will automatically reboot.</li>
-</ul>
+                    <li>Once the upload is complete, the decoder will automatically reboot.</li>
+                </ul>
                 </p>
                 <div class="pure-g">
 
@@ -294,6 +297,7 @@
         };
 
     </script>
+
 </body>
 
 </html>

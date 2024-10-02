@@ -92,7 +92,9 @@ void setup()
 
   //Uncomment and change WiFI Tx Power if you want to increase the range or reduce the board heating
   //Possible values can be found at https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/src/WiFiGeneric.h, struct wifi_power_t
-  //WiFi.setTxPower(WIFI_POWER_5dBm);
+  WiFi.setTxPower(WIFI_POWER_5dBm);
+
+  bdc_forward(80);
 
 }
 

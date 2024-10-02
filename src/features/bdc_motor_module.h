@@ -6,6 +6,13 @@
 uint8_t bemf_pin = 0;
 uint8_t isense_pin = 0;
 
+uint8_t cur_direction = 0; // 1 - forward, 2 - reverse, 0 - stop
+uint8_t cur_duty = 0;
+double next_time_to_start_mpwm = 0;
+double next_time_to_pause_mpwm = 0;
+bool is_mpwm_is_paused = false;
+bool if_bdc_module_disabled = false;
+
 void IRAM_ATTR bemf_isense_isr()
 {
 
@@ -47,6 +54,14 @@ void IRAM_ATTR bemf_isense_isr()
 void setup_bdc_module()
 {
 
+    uint8_t motor_1_A_pin = preferences_motor_1_A_pin();
+  uint8_t motor_1_B_pin = preferences_motor_1_B_pin();
+
+  if (motor_1_A_pin == 0 && motor_1_B_pin == 0){
+    if_bdc_module_disabled = true;
+    return;
+  }
+
   // Setup BackEMF reading
   bemf_pin = preferences_bemf_pin();
   if (bemf_pin != 0)
@@ -60,9 +75,6 @@ void setup_bdc_module()
   {
     analogSetPinAttenuation(isense_pin, ADC_11db);
   }
-
-  uint8_t motor_1_A_pin = preferences_motor_1_A_pin();
-  uint8_t motor_1_B_pin = preferences_motor_1_B_pin();
 
   if (motor_1_A_pin != 0)
   {
@@ -83,7 +95,7 @@ void setup_bdc_module()
   }
 
   mcpwm_config_t pwm_config = {};
-  pwm_config.frequency = 16000;
+  pwm_config.frequency = 12000;
   pwm_config.cmpr_a = 0;
   pwm_config.cmpr_b = 0;
   pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -91,30 +103,83 @@ void setup_bdc_module()
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
 
   // Frequency doesn't update till this is called.
-  mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 16000);
+  mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 12000);
 
+  next_time_to_pause_mpwm = millis() + 10;
 }
 
 void bdc_forward(uint8_t duty)
 {
 
+  cur_direction = 1;
+  cur_duty = duty;
   mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
 
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
   mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MCPWM_DUTY_MODE_0); // call this each time, if operator was previously in low/high state
+
+  // mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 12000 - duty*50);
 }
 
 void bdc_reverse(uint8_t duty)
 {
 
+  cur_direction = 2;
+  cur_duty = duty;
+
   mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A);
 
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
   mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, MCPWM_DUTY_MODE_0); // call this each time, if operator was previously in low/high state
+
+  // mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 12000 - duty*50);
 }
 
 void loop_bdc_module()
 {
+
+  if (if_bdc_module_disabled == true){
+    return;
+  }
+
+  if (millis() > next_time_to_pause_mpwm && is_mpwm_is_paused == false)
+  {
+    if (is_mpwm_is_paused == false)
+    {
+      next_time_to_start_mpwm = millis();
+      is_mpwm_is_paused = true;
+      if (cur_duty > 5)
+      {
+        mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
+        mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A);
+      }
+    }
+  }
+  else
+  {
+    if (millis() > next_time_to_start_mpwm)
+    {
+      // Restart PWM
+      if (is_mpwm_is_paused == true)
+      {
+        is_mpwm_is_paused = false;
+        next_time_to_pause_mpwm = millis() + 5;
+      }
+      if (cur_direction == 1)
+      {
+        bdc_forward(cur_duty);
+      }
+      else if (cur_direction == 2)
+      {
+        bdc_reverse(cur_duty);
+      }
+      else
+      {
+        mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
+        mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A);
+      }
+    }
+  }
 }
 
 #endif

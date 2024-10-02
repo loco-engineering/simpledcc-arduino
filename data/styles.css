@@ -135,6 +135,24 @@ select {
     cursor: pointer;
 }
 
+.circle_btn {
+    width: 25px;
+    border-radius: 17px;
+    height: 25px;
+    line-height: 25px;
+    color: black;
+    border-style: none;
+    background-color: #e9c46a;
+    font-weight: 800;
+    margin-left: 0px;
+    font-size: 15px;
+
+}
+
+.circle_btn:hover {
+    cursor: pointer;
+}
+
 .new_action_btn {
     margin-left: 5px;
 }
