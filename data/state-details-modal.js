@@ -117,76 +117,83 @@ class ActionModal extends HTMLElement {
 
         document.getElementById("save_action_settings").onclick = () => {
 
-            save_outputs();
-
-            current_state.name = document.getElementById("state_name").value;
-            //current_state.is_active = document.getElementById("state_is_active").value;
-
-            var wcc_event_ids_str = document.getElementById("state_wcc_event").value;
-            if (wcc_event_ids_str != undefined && wcc_event_ids_str != "") {
-                current_state.wcc_event_ids = wcc_event_ids_str.split(",");
-            }
-
-            var dcc_packet_addr = document.getElementById("state_dcc_packet_address").value;
-            if (dcc_packet_addr != undefined) {
-                current_state.dcc_packet = {};
-                current_state.dcc_packet.address = dcc_packet_addr;
-
-                //Get the packet type
-                current_state.dcc_packet.type = document.querySelector("#dcc_packet_type").value;
-
-                //Get packet data depending on the packet
-                current_state.dcc_packet.user_data = [];
-                current_state.dcc_packet.user_data_length = 0;
-
-                switch (parseInt(current_state.dcc_packet.type)) {
-                    case 0:
-                        break;
-                    case 1:
-                        current_state.dcc_packet.user_data_length = 1;
-                        current_state.dcc_packet.user_data[0] = document.querySelector("#dcc_speed_packet_dir").value;
-                        break;
-                    case 2:
-                        current_state.dcc_packet.user_data_length = 1;
-                        current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_function_number").value;
-                        break;
-                    case 3:
-                        current_state.dcc_packet.user_data_length = 1;
-                        current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_aspect_number").value;
-                        break;
-                    case 4:
-                        current_state.dcc_packet.user_data_length = 1;
-                        current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_turnout_direction").value;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (current_state.name == '') {
-                if (current_state.values.length > 0) {
-                    var name = '';
-                    current_state.values.forEach(value => {
-                        if (value.output != undefined) {
-                            name += `${value.output} `;
-                        }
-                    });
-                    current_state.name = name;
-                } else {
-                    current_state.name = `-`;
-                }
-            }
-            if (current_state.id != undefined) {
-                update_state(current_state);
-            } else {
-                add_state(current_state);
-            }
-
-            close_callback();
-
-            document.getElementById("action-modal-container").style.display = "none";
+            save_state(true);
 
         };
+    }
+}
+
+export         function save_state(send_to_decoder){
+    save_outputs(true);
+
+    current_state.name = document.getElementById("state_name").value;
+    //current_state.is_active = document.getElementById("state_is_active").value;
+
+    var wcc_event_ids_str = document.getElementById("state_wcc_event").value;
+    if (wcc_event_ids_str != undefined && wcc_event_ids_str != "") {
+        current_state.wcc_event_ids = wcc_event_ids_str.split(",");
+    }
+
+    var dcc_packet_addr = document.getElementById("state_dcc_packet_address").value;
+    if (dcc_packet_addr != undefined) {
+        current_state.dcc_packet = {};
+        current_state.dcc_packet.address = dcc_packet_addr;
+
+        //Get the packet type
+        current_state.dcc_packet.type = document.querySelector("#dcc_packet_type").value;
+
+        //Get packet data depending on the packet
+        current_state.dcc_packet.user_data = [];
+        current_state.dcc_packet.user_data_length = 0;
+
+        switch (parseInt(current_state.dcc_packet.type)) {
+            case 0:
+                break;
+            case 1:
+                current_state.dcc_packet.user_data_length = 1;
+                current_state.dcc_packet.user_data[0] = document.querySelector("#dcc_speed_packet_dir").value;
+                break;
+            case 2:
+                current_state.dcc_packet.user_data_length = 1;
+                current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_function_number").value;
+                break;
+            case 3:
+                current_state.dcc_packet.user_data_length = 1;
+                current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_aspect_number").value;
+                break;
+            case 4:
+                current_state.dcc_packet.user_data_length = 1;
+                current_state.dcc_packet.user_data[0] = document.querySelector("#state_dcc_packet_turnout_direction").value;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (send_to_decoder == true){
+        if (current_state.name == '') {
+            if (current_state.values.length > 0) {
+                var name = '';
+                current_state.values.forEach(value => {
+                    if (value.output != undefined) {
+                        name += `${value.output} `;
+                    }
+                });
+                current_state.name = name;
+            } else {
+                current_state.name = `-`;
+            }
+        }
+
+        if (current_state.id != undefined) {
+            update_state(current_state);
+        } else {
+            add_state(current_state);
+        }
+
+        close_callback();
+
+        document.getElementById("action-modal-container").style.display = "none";
     }
 }
 
@@ -433,7 +440,7 @@ export function reload_action_outputs() {
 
     document.getElementById("new_output_value_btn").onclick = () => {
 
-        save_outputs();
+        save_state(false);
 
         current_state.values.push({ start_delay: 0, on_duration: 0, off_duration: 0, replays: 1 });
         reload_action_outputs();

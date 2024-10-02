@@ -93,9 +93,10 @@ void remove_gpio(uint8_t GPIO_NUM)
             // Remove connection and
             for (uint8_t rem_ind = i; rem_ind < gpio_connections_count - 1; rem_ind++)
             {
-                gpio_connections[i] = gpio_connections[i + 1];
+                gpio_connections[rem_ind] = gpio_connections[rem_ind + 1];
             }
             gpio_connections_count--;
+            return;
         }
     }
 }

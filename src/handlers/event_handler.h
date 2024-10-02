@@ -49,6 +49,41 @@ void handle_turnout_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, St
     }
 }
 
+void handle_aspect_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, State *state)
+{
+    // Check if it's the same direction
+    bool is_on = false;
+    if (dcc_packet->user_data[0] == received_packet->user_data[0])
+    {
+        is_on = true;
+    }
+
+    if (state->values != NULL)
+    {
+        for (unsigned int value_number = 0; value_number < state->value_count; ++value_number)
+        {
+            Value value = state->values[value_number];
+            uint8_t value_length = value.val_length;
+            // Now we assume that val has only 1 byte
+            // ToDo: parse bytes specified in val_length not just one byte
+
+            uint8_t connection_value = value.val[0];
+            uint8_t connection_id = value.connection_id;
+
+            Connection connection = board_connections[connection_id];
+
+            if (is_on == true)
+            {
+                add_led_connection(0, connection.output_num, (float)connection_value / 255.0, 0, 0, 0);
+            }
+            else
+            {
+                remove_led_connection(0, connection.output_num);
+            }
+        }
+    }
+}
+
 void handle_speed_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, State *state)
 {
 
@@ -292,9 +327,10 @@ void handle_dcc_packet(DCCPacket *received_packet)
                             handle_multi_function_packet(received_packet, &dcc_packet, &state);
                             break;
                         case 3:
-                            handle_turnout_packet(received_packet, &dcc_packet, &state);
+                            handle_aspect_packet(received_packet, &dcc_packet, &state);
                             break;
                         case 4:
+                            handle_turnout_packet(received_packet, &dcc_packet, &state);
                             break;
                         }
                     }

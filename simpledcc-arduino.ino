@@ -94,8 +94,6 @@ void setup()
   //Possible values can be found at https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/src/WiFiGeneric.h, struct wifi_power_t
   WiFi.setTxPower(WIFI_POWER_5dBm);
 
-  bdc_forward(80);
-
 }
 
 void loop()

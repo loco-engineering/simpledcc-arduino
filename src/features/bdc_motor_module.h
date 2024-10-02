@@ -54,7 +54,7 @@ void IRAM_ATTR bemf_isense_isr()
 void setup_bdc_module()
 {
 
-    uint8_t motor_1_A_pin = preferences_motor_1_A_pin();
+  uint8_t motor_1_A_pin = preferences_motor_1_A_pin();
   uint8_t motor_1_B_pin = preferences_motor_1_B_pin();
 
   if (motor_1_A_pin == 0 && motor_1_B_pin == 0){

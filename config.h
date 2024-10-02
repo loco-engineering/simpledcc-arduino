@@ -10,7 +10,7 @@
 #define MAX_GPIO_CONNECTIONS 30
 
 //Logs
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG==1
 #define serial_print(x); Serial.print(x);
