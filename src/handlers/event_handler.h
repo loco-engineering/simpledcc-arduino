@@ -76,6 +76,7 @@ void handle_aspect_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, Sta
             id[0] = dcc_packet->address[0];
             id[1] = dcc_packet->address[1];
             id[2] = dcc_packet->user_data[0];
+            id[3] = value_number;
 
             if (is_on == true)
             {
