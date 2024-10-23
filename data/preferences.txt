@@ -1,5 +1,5 @@
-serial=tr_11111;
-wifi_ssid=loco-tr_11111;
+serial=ac_ukj1zc;
+wifi_ssid=loco-ac_ukj1zc;
 wifi_passwd=loco.eng;
 hw=1.0;
 board_type=accessory;

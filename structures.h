@@ -27,6 +27,7 @@ struct gpio_connection{
    unsigned long off_duration;
    double next_on;
    double next_off;
+   uint8_t id[10];
 };
 
 #endif

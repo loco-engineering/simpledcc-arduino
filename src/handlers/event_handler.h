@@ -72,13 +72,18 @@ void handle_aspect_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, Sta
 
             Connection connection = board_connections[connection_id];
 
+            uint8_t id[10] = {0};
+            id[0] = dcc_packet->address[0];
+            id[1] = dcc_packet->address[1];
+            id[2] = dcc_packet->user_data[0];
+
             if (is_on == true)
             {
-                add_led_connection(0, connection.output_num, (float)connection_value / 255.0, 0, 0, 0);
+                add_led_connection(0, connection.output_num, (float)connection_value / 255.0, value.on_duration, value.off_duration, 0, id);
             }
             else
             {
-                remove_led_connection(0, connection.output_num);
+                remove_led_connection(0, id);
             }
         }
     }

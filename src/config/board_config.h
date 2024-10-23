@@ -16,6 +16,7 @@ typedef enum
     DIGITAL,
     PWM,
     ANGLE,
+    STEPPER,
     AUDIO
 } SIGNAL_TYPES;
 
@@ -179,71 +180,83 @@ void fill_board_connections()
         board_connections[LED_outputs_amount].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 1].name, "IO05");
         board_connections[LED_outputs_amount + 1].output_num = 5;
         board_connections[LED_outputs_amount + 1].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 1].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 1].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 1].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 2].name, "IO06");
         board_connections[LED_outputs_amount + 2].output_num = 6;
         board_connections[LED_outputs_amount + 2].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 2].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 2].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 2].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 3].name, "IO07");
         board_connections[LED_outputs_amount + 3].output_num = 7;
         board_connections[LED_outputs_amount + 3].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 3].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 3].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 3].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 4].name, "IO08");
         board_connections[LED_outputs_amount + 4].output_num = 8;
         board_connections[LED_outputs_amount + 4].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 4].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 4].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 4].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 5].name, "IO09");
         board_connections[LED_outputs_amount + 5].output_num = 9;
         board_connections[LED_outputs_amount + 5].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 5].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 5].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 5].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 6].name, "IO10");
         board_connections[LED_outputs_amount + 6].output_num = 10;
         board_connections[LED_outputs_amount + 6].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 6].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 6].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 6].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 7].name, "IO11");
         board_connections[LED_outputs_amount + 7].output_num = 11;
         board_connections[LED_outputs_amount + 7].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 7].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 7].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 7].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 8].name, "IO18");
         board_connections[LED_outputs_amount + 8].output_num = 18;
         board_connections[LED_outputs_amount + 8].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 8].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 8].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 8].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 9].name, "IO21");
         board_connections[LED_outputs_amount + 9].output_num = 21;
         board_connections[LED_outputs_amount + 9].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 9].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 9].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 9].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 10].name, "IO47");
         board_connections[LED_outputs_amount + 10].output_num = 47;
         board_connections[LED_outputs_amount + 10].owner_id = ESP32Sx;
         board_connections[LED_outputs_amount + 10].signal_types[0] = DIGITAL;
         board_connections[LED_outputs_amount + 10].signal_types[1] = PWM;
+        board_connections[LED_outputs_amount + 10].signal_types[2] = STEPPER;
 
         sprintf(board_connections[LED_outputs_amount + 11].name, "SOUND");
         board_connections[LED_outputs_amount + 11].output_num = 0;
         board_connections[LED_outputs_amount + 11].owner_id = MAX98357;
         board_connections[LED_outputs_amount + 11].signal_types[0] = AUDIO;
+
     }
 }
 

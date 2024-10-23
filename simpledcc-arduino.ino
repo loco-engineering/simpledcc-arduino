@@ -70,8 +70,19 @@ void setup()
   on_status_led(0x00ff00);
 
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
-  //add_led_connection(0, 1, 0.5, 1000, 1000, 0);
-  //add_led_connection(1,7, 0.5, 1000, 1000, 1000);
+
+  //LED tests, LED driver
+  /*
+  add_led_connection(0, 0, 0.06, 2000, 9000, 0); //white
+  add_led_connection(0, 11, 0.09, 2000, 9000, 2000); //green
+  add_led_connection(0, 10, 0.5, 2000, 9000, 4000); //yellow bottom
+  add_led_connection(0, 8, 0.7, 2000, 9000, 4000); //yellow top
+  add_led_connection(0, 9, 0.08, 2000, 9000, 6000); //red
+  */
+  //LED tests, GPIO outputs
+  //add_led_connection(1,33, 0.5, 1000, 1000, 1000);
+  //add_led_connection(1,34, 0.5, 1000, 1000, 1000);
+
 
   // Test LittleFS
   //deleteFile(LittleFS, "/level_crossing_1.wav");
@@ -88,7 +99,6 @@ void setup()
 
   //Pullup on GPIO 00 is required for Loco.Engineering flashing tools
   pinMode(0, INPUT_PULLUP);
-  // analogWrite(GPIO_NUM, pwm);
 
   //Uncomment and change WiFI Tx Power if you want to increase the range or reduce the board heating
   //Possible values can be found at https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/src/WiFiGeneric.h, struct wifi_power_t
@@ -99,6 +109,7 @@ void setup()
 void loop()
 {
 
+  
   loop_dcc_module();
   loop_webserver();
   loop_led();
