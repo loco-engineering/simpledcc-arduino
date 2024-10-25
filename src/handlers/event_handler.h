@@ -117,11 +117,13 @@ void handle_speed_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, Stat
 
             if (dir == DCC_DIR_REV)
             {
-                bdc_reverse(duty_cycle);
+                 set_motor_duty_target(duty_cycle, 1);
+                //bdc_reverse(duty_cycle);
             }
             else
             {
-                bdc_forward(duty_cycle);
+                set_motor_duty_target(duty_cycle, 2);
+                //bdc_forward(duty_cycle);
             }
         }
     }

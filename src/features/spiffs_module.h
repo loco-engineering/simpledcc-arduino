@@ -232,6 +232,9 @@ uint8_t *read_generate_wcc_project_file(fs::FS &fs, size_t *wcc_data_len)
   uint8_t *data = (uint8_t *)ps_calloc(avail_len + 1, sizeof(uint8_t));
   data[0] = 7; // set the message type we plan to send, 7 - wcc project file
   *wcc_data_len = (file.readBytes((char *)(data + 1), avail_len) + 1); // we add 1 to the length because the first byte is a msg type
+      Serial.println("!!!!!!!!!!!LOADED");
+            Serial.println(avail_len);
+
 
   file.close();
   return data;

@@ -73,6 +73,7 @@ void setup()
 
   //LED tests, LED driver
   /*
+  //Don't forget to add to add_led_connection some random ID as the last parameter
   add_led_connection(0, 0, 0.06, 2000, 9000, 0); //white
   add_led_connection(0, 11, 0.09, 2000, 9000, 2000); //green
   add_led_connection(0, 10, 0.5, 2000, 9000, 4000); //yellow bottom
@@ -82,7 +83,6 @@ void setup()
   //LED tests, GPIO outputs
   //add_led_connection(1,33, 0.5, 1000, 1000, 1000);
   //add_led_connection(1,34, 0.5, 1000, 1000, 1000);
-
 
   // Test LittleFS
   //deleteFile(LittleFS, "/level_crossing_1.wav");

@@ -246,7 +246,6 @@ void send_wcc_project_file_message()
 
     free(wcc_project_file_data);
   }
-
 }
 
 uint8_t msg_type_cont = 0;
@@ -259,11 +258,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   Serial.println("New message over WebSocket received");
   Serial.println("Size");
   Serial.println(info->len);
-    Serial.println("Num");
+  Serial.println("Num");
   Serial.println(info->num);
-      Serial.println("Final");
+  Serial.println("Final");
   Serial.println(info->final);
-        Serial.println("Index");
+  Serial.println("Index");
   Serial.println(info->index);
   Serial.println("Content");
   for (int i = 0; i < len; i++)
@@ -310,24 +309,27 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     data++;
     save_wcc_project_file(LittleFS, data, len - 1);
 
-    if ((info->index + len) != info->len){
+    if (len != info->len)
+    {
       msg_type_cont = 7;
     }
   }
-
-    if (msg_type_cont == 7)
+  else
   {
-    Serial.println("WCC project file data is received");
-    // This message is a message with a WCC project file
-    // WCC project file is used to show decoder's settings/states in the web app
-    save_wcc_project_file(LittleFS, data, len, true);
-
+    if (msg_type_cont == 7)
+    {
+      Serial.println("WCC project file data is received");
+      // This message is a message with a WCC project file
+      // WCC project file is used to show decoder's settings/states in the web app
+      save_wcc_project_file(LittleFS, data, len, true);
+    }
   }
 
-  //Reset msg type
-  if ((info->index + len) == info->len){
-      msg_type_cont = 0;
-    }
+  // Reset msg type
+  if ((info->index + len) == info->len)
+  {
+    msg_type_cont = 0;
+  }
 
   Serial.println("=======================");
 
