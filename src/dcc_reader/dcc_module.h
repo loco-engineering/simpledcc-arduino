@@ -331,8 +331,16 @@ void notifyDccMsg(DCC_MSG *Msg)
   ++cached_packets_count;
 }
 
+double time_from_last_sent_dcc_packet = 0;
+bool is_dcc_enabled = true;
+
 void setup_dcc_module()
 {
+
+  if (preferences_dcc_pin() == 0){
+    is_dcc_enabled = false;
+    return;
+  }
 
   Dcc.pin(preferences_dcc_pin(), 0);
 
@@ -342,10 +350,12 @@ void setup_dcc_module()
 
 }
 
-double time_from_last_sent_dcc_packet = 0;
-
 void loop_dcc_module()
 {
+  if (is_dcc_enabled == false){
+    return;
+  }
+
   Dcc.process();
 
   // Send cached packets to the web app when

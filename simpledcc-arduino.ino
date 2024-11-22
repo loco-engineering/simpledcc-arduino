@@ -14,15 +14,15 @@
 
 #include "driver/i2s.h"
 
-//#include <SPI.h>
-//#include <MFRC522.h>
+#include <SPI.h>
+#include <MFRC522.h>
 
 #include <LiteLED.h>
 
 #include "src/dcc_reader/dcc_module.h"
 #include "src/features/led_module.h"
 #include "src/features/wcc_module.h"
-//#include "src/features/nfc_module.h"
+#include "src/features/nfc_module.h"
 #include "src/features/spiffs_module.h"
 #include "src/features/status_led_module.h"
 #include "src/features/preferences_module.h"
@@ -62,7 +62,7 @@ void setup()
   setup_dcc_module();
   setup_webserver();
   setup_led();
-  //setup_nfc();
+  setup_nfc();
   setup_status_led();
   setup_audio();
   setup_bdc_module();
@@ -109,11 +109,10 @@ void setup()
 void loop()
 {
 
-  
   loop_dcc_module();
   loop_webserver();
   loop_led();
-  //loop_nfc();
+  loop_nfc();
   loop_audio();
   loop_gpio_module();
   loop_bdc_module();

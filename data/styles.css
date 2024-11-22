@@ -490,6 +490,9 @@ select {
   /*Visual controller*/
   #visual-controller{
     display: none;
+    width: 100vw;
+    height: calc(100vh - 65px);
+    
   }
 
   .canvas_controller{

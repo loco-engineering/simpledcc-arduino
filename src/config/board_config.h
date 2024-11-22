@@ -162,7 +162,68 @@ void fill_board_connections()
         board_connections[10].owner_id = MAX98357;
         board_connections[10].signal_types[0] = AUDIO;
     }
-    else
+    else if (strcmp("car", preferences_board_type()) == 0)
+    {
+
+        sprintf(board_connections[0].name, "Motor, FWD");
+        board_connections[0].output_num = 13;
+        board_connections[0].owner_id = ESP32Sx;
+        board_connections[0].signal_types[0] = PWM;
+
+        sprintf(board_connections[1].name, "Motor, BWD");
+        board_connections[1].output_num = 14;
+        board_connections[1].owner_id = ESP32Sx;
+        board_connections[1].signal_types[0] = PWM;
+
+        sprintf(board_connections[2].name, "Front Light");
+        board_connections[2].output_num = 33;
+        board_connections[2].owner_id = ESP32Sx;
+        board_connections[2].signal_types[0] = PWM;
+
+        sprintf(board_connections[3].name, "Rear Light");
+        board_connections[3].output_num = 34;
+        board_connections[3].owner_id = ESP32Sx;
+        board_connections[3].signal_types[0] = PWM;
+
+        sprintf(board_connections[4].name, "Function 1");
+        board_connections[4].output_num = 17;
+        board_connections[4].owner_id = ESP32Sx;
+        board_connections[4].signal_types[0] = PWM;
+
+        sprintf(board_connections[5].name, "Function 2");
+        board_connections[5].output_num = 18;
+        board_connections[5].owner_id = ESP32Sx;
+        board_connections[5].signal_types[0] = PWM;
+
+        sprintf(board_connections[6].name, "IO6");
+        board_connections[6].output_num = 6;
+        board_connections[6].owner_id = ESP32Sx;
+        board_connections[6].signal_types[0] = PWM;
+        board_connections[6].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[7].name, "IO8");
+        board_connections[7].output_num = 8;
+        board_connections[7].owner_id = ESP32Sx;
+        board_connections[7].signal_types[0] = PWM;
+        board_connections[7].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[8].name, "IO10");
+        board_connections[8].output_num = 10;
+        board_connections[8].owner_id = ESP32Sx;
+        board_connections[8].signal_types[0] = PWM;
+        board_connections[8].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[9].name, "IO11");
+        board_connections[9].output_num = 11;
+        board_connections[9].owner_id = ESP32Sx;
+        board_connections[9].signal_types[0] = PWM;
+        board_connections[9].signal_types[1] = DIGITAL;
+
+        sprintf(board_connections[10].name, "SOUND");
+        board_connections[10].output_num = 0;
+        board_connections[10].owner_id = MAX98357;
+        board_connections[10].signal_types[0] = AUDIO;
+    } else
     {
         const uint8_t LED_outputs_amount = 16;
         // Fill connections to a LED driver

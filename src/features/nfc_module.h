@@ -25,7 +25,8 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
  */
 void setup_nfc() {
 
-	SPI.begin(6, 4, 5, 1);			// Init SPI bus
+	SPI.begin(6, 4, 5, 1);			// Init SPI bus -SCK, MISO, MOSI, CS
+
   delay(10);	
 
   for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {

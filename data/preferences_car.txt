@@ -1,0 +1,8 @@
+dcc_pin=0;
+i2s_bck_pin=36;
+i2s_ws_pin=37;
+i2s_data_pin=35;
+motor_1_A=2;
+motor_1_B=4;
+bemf_pin=5;
+isense_pin=12;

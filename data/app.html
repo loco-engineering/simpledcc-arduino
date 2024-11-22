@@ -7,6 +7,7 @@
     <title>Loco.Engineering Decoder Settings</title>
 
     <link rel="stylesheet" href="./styles.css">
+    <script src="https://pixijs.download/release/pixi.min.js"></script>
 
 </head>
 
@@ -15,7 +16,7 @@
 
         <div class="top_menu" id="top_menu">
             <a class="top_menu_item top_menu_active">DECODER</a> |
-            <!-- <a class="top_menu_item">CONTROLLER</a> |-->
+            <a class="top_menu_item">CONTROLLER</a> |
             <a class="top_menu_item">SETTINGS</a>
         </div>
 
@@ -203,7 +204,8 @@
     <visual-controller id="visual-controller"></visual-controller>
 
     <script type="module">
-        //import "./visual-controller.js";
+        import "./visual-controller.js";
+        import { start_controller } from "./visual-controller.js";
         import { show_new_action, show_edit_action } from "./state-details-modal.js";
         import { show_event_modal } from "./event-modal.js";
         import { set_decoder_id, get_project_settings, add_state, clear_project, delete_state } from "./storage.js";
@@ -242,6 +244,8 @@
                         document.querySelector('#editor_container').style.display = "none";
                         document.querySelector('#visual-controller').style.display = "block";
                         document.querySelector('#editor').style.display = "none";
+
+                        start_controller();
 
                     } else {
 

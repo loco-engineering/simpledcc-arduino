@@ -3,269 +3,111 @@ import { available_outputs } from "./api.js"
 
 class VisualController extends HTMLElement {
 
-    //Example of canvas zooming from https://codepen.io/chengarda/pen/wRxoyB
     constructor() {
+
         super();
 
-        this.innerHTML = /*html*/`
-        <input id="background_image" type="file" accept="image/*">
-
-        <canvas id="canvas_ctrl" class="canvas_controller">
-
-
-        </canvas>
-        
+        this.innerHTML = /*html*/`        
         `;
 
-        var canvas_el = document.getElementById("canvas_ctrl");
-        const ctx = canvas_el.getContext('2d');
-
-        let navbar_height = document.querySelector('#navbar').offsetHeight;
-
-        canvas_el.width = document.documentElement.clientWidth;
-        canvas_el.height = document.documentElement.clientHeight - navbar_height;
-
-        var background_img = null;
-
-        document.getElementById("background_image").addEventListener("change", function (e) {
-
-            const fileName = e.target.files[0].name;
-            const reader = new FileReader();
-            reader.readAsDataURL(e.target.files[0]);
-            reader.onload = event => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    compress_image(img, 0.5, 0.7);
-                }
-            }
-
-
-        });
-
-        let canvas = canvas_el;
-
-        var cameraOffset = { x: canvas.width / 2, y: canvas.height / 2 }
-        let cameraZoom = 1
-        let MAX_ZOOM = 5
-        let MIN_ZOOM = 0.1
-        let SCROLL_SENSITIVITY = 0.0005
-
-        async function draw() {
-
-            canvas.width = document.documentElement.clientWidth;
-            canvas.height = document.documentElement.clientHeight - navbar_height;
-
-            // Translate to the canvas centre before zooming - so you'll always zoom on what you're looking directly at
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.scale(cameraZoom, cameraZoom);
-            ctx.translate(-canvas.width / 2 + cameraOffset.x, -canvas.height / 2 + cameraOffset.y);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (background_img != null) {
-                var scale = Math.min(canvas_el.width / background_img.width, canvas_el.height / background_img.height);
-
-                var w = background_img.width * scale;
-                var h = background_img.height * scale;
-
-                var left = - w / 2;
-                var top = - h / 2;
-
-                ctx.drawImage(background_img, left, top, w, h);
-            }
-
-
-            //Draw test objects
-
-            // Create gradient
-            ctx.beginPath();
-
-            if (ctx.filter === "none") {
-                ctx.filter = "blur(15px)";
-            }
-            else { // Safari still doesn't support ctx.filter...
-                ctx.shadowColor = "#e9c46a";
-                ctx.shadowBlur = 10; // x2
-                ctx.shadowOffsetX = 10;
-                ctx.translate(-100, 0); // we draw the actual shape outside of the visible context
-            }
-
-
-            ctx.fillStyle = "#e9c46a";
-            ctx.globalAlpha = 0.5;
-            ctx.rect(-10, -120, 40, 80);
-
-            //ctx.arc(0, -80, 20, 0, Math.PI*2);
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-
-            ctx.beginPath();
-
-            if (ctx.filter === "none") {
-                ctx.filter = "blur(15px)";
-            }
-            else { // Safari still doesn't support ctx.filter...
-                ctx.shadowColor = "#e9c46a";
-                ctx.shadowBlur = 10; // x2
-                ctx.shadowOffsetX = 10;
-                ctx.translate(-100, 0); // we draw the actual shape outside of the visible context
-            }
-
-            ctx.fillStyle = "#e9c46a";
-            ctx.globalAlpha = 0.5;
-            ctx.rect(-10, -120, 40, 80);
-
-            //ctx.arc(0, -80, 20, 0, Math.PI*2);
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-
-            //requestAnimationFrame(draw)
-        }
-
-        // Gets the relevant location from a mouse or single touch event
-        function getEventLocation(e) {
-            if (e.touches && e.touches.length == 1) {
-                return { x: e.touches[0].clientX, y: e.touches[0].clientY }
-            }
-            else if (e.clientX && e.clientY) {
-                return { x: e.clientX, y: e.clientY }
-            }
-        }
-
-        function drawRect(x, y, width, height) {
-            ctx.fillRect(x, y, width, height)
-        }
-
-        function drawText(text, x, y, size, font) {
-            ctx.font = `${size}px ${font}`
-            ctx.fillText(text, x, y)
-        }
-
-        let isDragging = false
-        let dragStart = { x: 0, y: 0 }
-
-        function onPointerDown(e) {
-            isDragging = true
-            dragStart.x = getEventLocation(e).x / cameraZoom - cameraOffset.x
-            dragStart.y = getEventLocation(e).y / cameraZoom - cameraOffset.y
-        }
-
-        function onPointerUp(e) {
-            isDragging = false
-            initialPinchDistance = null
-            lastZoom = cameraZoom
-        }
-
-        function onPointerMove(e) {
-            if (isDragging) {
-                cameraOffset.x = getEventLocation(e).x / cameraZoom - dragStart.x
-                cameraOffset.y = getEventLocation(e).y / cameraZoom - dragStart.y
-            }
-        }
-
-        function handleTouch(e, singleTouchHandler) {
-            if (e.touches.length == 1) {
-                singleTouchHandler(e)
-            }
-            else if (e.type == "touchmove" && e.touches.length == 2) {
-                isDragging = false
-                handlePinch(e)
-            }
-        }
-
-        let initialPinchDistance = null
-        let lastZoom = cameraZoom
-
-        function handlePinch(e) {
-            e.preventDefault()
-
-            let touch1 = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-            let touch2 = { x: e.touches[1].clientX, y: e.touches[1].clientY }
-
-            // This is distance squared, but no need for an expensive sqrt as it's only used in ratio
-            let currentDistance = (touch1.x - touch2.x) ** 2 + (touch1.y - touch2.y) ** 2
-
-            if (initialPinchDistance == null) {
-                initialPinchDistance = currentDistance
-            }
-            else {
-                adjustZoom(null, currentDistance / initialPinchDistance)
-            }
-        }
-
-        function adjustZoom(zoomAmount, zoomFactor) {
-            if (!isDragging) {
-                if (zoomAmount) {
-                    cameraZoom += zoomAmount
-                }
-                else if (zoomFactor) {
-                    console.log(zoomFactor)
-                    cameraZoom = zoomFactor * lastZoom
-                }
-
-                cameraZoom = Math.min(cameraZoom, MAX_ZOOM)
-                cameraZoom = Math.max(cameraZoom, MIN_ZOOM)
-
-                console.log(zoomAmount)
-            }
-        }
-
-        canvas.addEventListener('mousedown', onPointerDown)
-        canvas.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown))
-        canvas.addEventListener('mouseup', onPointerUp)
-        canvas.addEventListener('touchend', (e) => handleTouch(e, onPointerUp))
-        canvas.addEventListener('mousemove', onPointerMove)
-        canvas.addEventListener('touchmove', (e) => handleTouch(e, onPointerMove))
-        canvas.addEventListener('wheel', (e) => adjustZoom(e.deltaY * SCROLL_SENSITIVITY))
-
-        // Ready, set, go
-        draw()
-
-        function compress_image(imgToCompress, resizingFactor, quality) {
-            // showing the compressed image
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-
-            const originalWidth = imgToCompress.width;
-            const originalHeight = imgToCompress.height;
-
-            const canvasWidth = originalWidth * resizingFactor;
-            const canvasHeight = originalHeight * resizingFactor;
-
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-
-            context.drawImage(
-                imgToCompress,
-                0,
-                0,
-                originalWidth * resizingFactor,
-                originalHeight * resizingFactor
-            );
-
-            // reducing the quality of the image
-            canvas.toBlob(
-                (blob) => {
-                    if (blob) {
-
-                        var img = new Image();
-                        img.crossOrigin = 'Anonymous';
-
-                        img.onload = function () {
-                            background_img = img;
-                        }
-
-                        img.src = URL.createObjectURL(blob);
-
-
-                    }
-                },
-                "image/jpeg",
-                quality
-            );
-        }
-
     }
+
 }
+
+var app = null;
+
+export async function start_controller() {
+
+    if (app != null) {
+        app.destroy({ removeView: true });
+    }
+
+    app = new PIXI.Application();
+
+    console.log(document.querySelector('#visual-controller').style.width);
+
+    var pixi_background_color = '#ECECEC';
+
+    if (window.innerWidth < 500){
+        pixi_background_color = '#ffffff';
+    }
+    await app.init({ width: document.querySelector('#visual-controller').style.width, height: document.querySelector('#visual-controller').style.height, background: pixi_background_color, resizeTo: document.querySelector('#visual-controller') })
+    document.querySelector('#visual-controller').appendChild(app.canvas);
+
+    // Create background
+    const controller_width = 350;
+    const controller_height = 700;
+
+    const container = new PIXI.Container({
+        x: app.screen.width / 2 - controller_width / 2,
+        y: app.screen.height / 2 - controller_height / 2
+    });
+
+    app.stage.addChild(container);
+
+
+    const controller_background = new PIXI.Graphics();
+    controller_background.roundRect(0, 0, controller_width, controller_height, 40);
+    controller_background.fill(0xffffff);
+    container.addChild(controller_background);
+
+    //Create picture circle
+    const circle_photo_radius = 60
+    const circle_photo_y = 100 + circle_photo_radius / 2
+    const circle_photo_x = controller_width / 2
+
+    const circle_photo = new PIXI.Graphics();
+    circle_photo.circle(circle_photo_x, circle_photo_y, circle_photo_radius);
+    circle_photo.fill(0xECECEC);
+    // Opt-in to interactivity
+    circle_photo.eventMode = 'static';
+
+    // Shows hand cursor
+    circle_photo.cursor = 'pointer'
+    circle_photo.on('pointerdown', pictureClicked);
+
+    function pictureClicked() {
+        console.log("clicked");
+    }
+
+    container.addChild(circle_photo);
+
+
+    //Create backward direction triangle
+    const triangle_width = 25;
+    const triangle_circle_offset = 60;
+    const left_triangle_x = circle_photo_x - triangle_circle_offset - circle_photo_radius/2 - triangle_width;
+
+    const left_triangle = new PIXI.Graphics();
+    left_triangle.moveTo(left_triangle_x, circle_photo_y);
+    left_triangle.lineTo(left_triangle_x + triangle_width, circle_photo_y - triangle_width);
+    left_triangle.lineTo(left_triangle_x + triangle_width, circle_photo_y + triangle_width);
+    left_triangle.lineTo(left_triangle_x, circle_photo_y);
+    left_triangle.fill(0xECECEC);
+    container.addChild(left_triangle);
+
+    const right_triangle_x = circle_photo_x + circle_photo_radius/2 + triangle_circle_offset + triangle_width;
+    const right_triangle = new PIXI.Graphics();
+    right_triangle.moveTo(right_triangle_x, circle_photo_y);
+    right_triangle.lineTo(right_triangle_x - triangle_width, circle_photo_y - triangle_width);
+    right_triangle.lineTo(right_triangle_x - triangle_width, circle_photo_y + triangle_width);
+    right_triangle.lineTo(right_triangle_x, circle_photo_y);
+    right_triangle.fill(0x3D405B);
+    container.addChild(right_triangle);
+
+    // Add a ticker callback to move the sprite back and forth
+    let elapsed = 0.0;
+    app.ticker.add((ticker) => {
+        elapsed += ticker.deltaTime;
+        //sprite.x = 100.0 + Math.cos(elapsed/50.0) * 100.0;
+    });
+
+}
+
+window.addEventListener('resize', resize);
+function resize() {
+    start_controller();
+}
+
 
 customElements.define("visual-controller", VisualController);
