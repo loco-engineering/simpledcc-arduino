@@ -62,7 +62,7 @@ void setup()
   setup_dcc_module();
   setup_webserver();
   setup_led();
-  setup_nfc();
+  //setup_nfc();
   setup_status_led();
   setup_audio();
   setup_bdc_module();
@@ -74,12 +74,16 @@ void setup()
   //LED tests, LED driver
   /*
   //Don't forget to add to add_led_connection some random ID as the last parameter
-  add_led_connection(0, 0, 0.06, 2000, 9000, 0); //white
-  add_led_connection(0, 11, 0.09, 2000, 9000, 2000); //green
+  uint8_t id_1[10] = {1,1,1,1,1,1,1,1,1,1};
+  uint8_t id_2[10] = {1,1,1,1,1,1,1,1,2,1};
+
+  add_led_connection(0, 0, 0.09, 2000, 6000, 0, id_1); //blue
+  add_led_connection(0, 4, 0.09, 2000, 6000, 3000, id_2); //white
   add_led_connection(0, 10, 0.5, 2000, 9000, 4000); //yellow bottom
   add_led_connection(0, 8, 0.7, 2000, 9000, 4000); //yellow top
   add_led_connection(0, 9, 0.08, 2000, 9000, 6000); //red
   */
+
   //LED tests, GPIO outputs
   //add_led_connection(1,33, 0.5, 1000, 1000, 1000);
   //add_led_connection(1,34, 0.5, 1000, 1000, 1000);
@@ -112,7 +116,7 @@ void loop()
   loop_dcc_module();
   loop_webserver();
   loop_led();
-  loop_nfc();
+  //loop_nfc();
   loop_audio();
   loop_gpio_module();
   loop_bdc_module();
