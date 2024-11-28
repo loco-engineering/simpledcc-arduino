@@ -2,4 +2,4 @@ serial=tr_lpri80;
 wifi_ssid=loco-tr_lpri80;
 wifi_passwd=loco.eng;
 hw=1.2;
-board_type=accessory;
+board_type=train;

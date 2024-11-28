@@ -598,8 +598,8 @@ async function onMessage(event) {
 
         const CONNECTION_NAME_LENGTH = 20; // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
         const CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
-        const connection_types = ["Digital", "PWM"];
-
+        const connection_types = ["Digital", "PWM", "ANGLE", "AUDIO", "DC MOTOR"];
+ 
         for (var i = 0; i < connections_amount; i++) {
 
             var connection = {};

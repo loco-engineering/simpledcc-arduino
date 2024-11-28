@@ -17,7 +17,8 @@ typedef enum
     PWM,
     ANGLE,
     STEPPER,
-    AUDIO
+    AUDIO,
+    DC_MOTOR
 } SIGNAL_TYPES;
 
 const uint8_t CONNECTION_NAME_LENGTH = 20;        // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
@@ -104,14 +105,14 @@ void fill_board_connections()
     {
 
         sprintf(board_connections[0].name, "Motor, FWD");
-        board_connections[0].output_num = 13;
+        board_connections[0].output_num = preferences_motor_1_A_pin();
         board_connections[0].owner_id = ESP32Sx;
-        board_connections[0].signal_types[0] = PWM;
+        board_connections[0].signal_types[0] = DC_MOTOR;
 
         sprintf(board_connections[1].name, "Motor, BWD");
-        board_connections[1].output_num = 14;
+        board_connections[1].output_num = preferences_motor_1_B_pin();
         board_connections[1].owner_id = ESP32Sx;
-        board_connections[1].signal_types[0] = PWM;
+        board_connections[1].signal_types[0] = DC_MOTOR;
 
         sprintf(board_connections[2].name, "Front Light");
         board_connections[2].output_num = 33;
@@ -166,14 +167,14 @@ void fill_board_connections()
     {
 
         sprintf(board_connections[0].name, "Motor, FWD");
-        board_connections[0].output_num = 13;
+        board_connections[0].output_num = preferences_motor_1_A_pin();
         board_connections[0].owner_id = ESP32Sx;
-        board_connections[0].signal_types[0] = PWM;
+        board_connections[0].signal_types[0] = DC_MOTOR;
 
         sprintf(board_connections[1].name, "Motor, BWD");
-        board_connections[1].output_num = 14;
+        board_connections[1].output_num = preferences_motor_1_B_pin();
         board_connections[1].owner_id = ESP32Sx;
-        board_connections[1].signal_types[0] = PWM;
+        board_connections[1].signal_types[0] = DC_MOTOR;
 
         sprintf(board_connections[2].name, "Front Light");
         board_connections[2].output_num = 33;

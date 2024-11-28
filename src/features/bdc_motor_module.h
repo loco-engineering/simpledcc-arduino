@@ -266,7 +266,7 @@ void loop_bdc_module()
         mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A);
       }
 
-      serial_print("BEMF: ");
+      /*serial_print("BEMF: ");
       serial_print(average_BEMF);
       serial_println("");
 
@@ -274,7 +274,7 @@ void loop_bdc_module()
       serial_print(pwm_rate);
       serial_print(measured_rpm);
 
-      serial_println("");
+      serial_println("");*/
     }
   }
 }
