@@ -1,4 +1,4 @@
-import {set_local_project} from "./storage.js"
+import { set_local_project } from "./storage.js"
 
 //var gateway = `ws://${window.location.hostname}/ws`;
 const base_ip = `192.168.4.1`;
@@ -51,7 +51,7 @@ export async function upload_file() {
                 });
                 document.querySelector('.file_loader').style.display = "none";
 
-                if (ind == input.files.length - 1){
+                if (ind == input.files.length - 1) {
                     await fetch(`http://${base_ip}/reboot`, {
                         method: 'GET'
                     });
@@ -87,7 +87,7 @@ export async function upload_file() {
 
                 document.querySelector('.file_loader').style.display = "none";
 
-                if (ind == input.files.length - 1){
+                if (ind == input.files.length - 1) {
                     await fetch(`http://${base_ip}/reboot`, {
                         method: 'GET'
                     });
@@ -371,6 +371,24 @@ export function generate_wcc_event_msg(wcc_event) {
     //Set if the state should be activated or not
     wcc_msg[wcc_msg_ind++] = wcc_event.is_state_active;
 
+
+    //Set value amount
+    wcc_msg[wcc_msg_ind++] = wcc_event.values.length;
+
+    wcc_event.values.forEach(value => {
+
+        //Set state's connection_id, 1 byte
+        wcc_msg[wcc_msg_ind++] = value.connection_id;
+
+        //Set state's value length in bytes, 2 bytes
+        const value_length = bytesArray(1, 2);
+        wcc_msg[wcc_msg_ind++] = value_length[0];
+        wcc_msg[wcc_msg_ind++] = value_length[1];
+
+        //Set state's value
+        wcc_msg[wcc_msg_ind++] = value.value;
+    })
+
     return wcc_msg;
 
 }
@@ -466,13 +484,20 @@ export function initWebSocket() {
     websocket.onmessage = onMessage;
 }
 function onOpen(event) {
+
     console.log('Connection opened');
+
     var wcc_test_event = {};
     //wcc_test_event.id = 'eq125k';
-    wcc_test_event.id = 'eq125a';
-
+    wcc_test_event.id = 'forward';
     wcc_test_event.is_state_active = 1;
+    wcc_test_event.values = [];
+    var value = {};
+    value.value = 124;
+    value.connection_id = 0;
+    wcc_test_event.values.push(value);
     send_wcc_event(wcc_test_event);
+
 }
 
 function onClose(event) {
@@ -599,7 +624,7 @@ async function onMessage(event) {
         const CONNECTION_NAME_LENGTH = 20; // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
         const CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
         const connection_types = ["Digital", "PWM", "ANGLE", "AUDIO", "DC MOTOR"];
- 
+
         for (var i = 0; i < connections_amount; i++) {
 
             var connection = {};

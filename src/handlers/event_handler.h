@@ -378,14 +378,20 @@ void process_wcc_event(WCC_event msg)
     if (board_settings.states != NULL)
     {
 
+        serial_print((String)"process_wcc_event ");
+
         // Iterate and clean states
         for (unsigned int state_number = 0; state_number < board_settings.state_count; ++state_number)
         {
 
             State state = board_settings.states[state_number];
 
+        serial_print((String)"iterate state " + state_number);
+
             if (state.wcc_msg_count > 0)
             {
+
+        serial_print((String)"state.wcc_msg_count " + state.wcc_msg_count);
 
                 WCC_event cur_wcc_ev = state.wcc_msg[0];
 
@@ -399,13 +405,16 @@ void process_wcc_event(WCC_event msg)
                     }
                 }
 
+                            serial_print((String)"is_event_same " + is_event_same);
+
                 if (is_event_same == true)
                 {
+
                     if (msg.is_state_active == true)
                     {
-                        for (unsigned int value_number = 0; value_number < state.value_count; ++value_number)
+                        for (unsigned int value_number = 0; value_number < msg.value_count; ++value_number)
                         {
-                            Value value = state.values[value_number];
+                            Value value = msg.values[value_number];
                             uint8_t value_length = value.val_length;
                             // Now we assume that val has only 1 byte
                             // ToDo: parse bytes specified in val_length not just one byte

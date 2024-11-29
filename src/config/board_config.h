@@ -32,13 +32,6 @@ typedef struct
     SIGNAL_TYPES signal_types[CONNECTION_SIGNAL_TYPES_AMOUNT] = {NONE}; // one connection can have up to 5 SIGNAL_TYPES
 } Connection;
 
-const uint8_t WCC_EVENT_ID_LENGTH = 6;
-typedef struct
-{
-    uint8_t id[WCC_EVENT_ID_LENGTH];
-    uint8_t is_state_active;
-} WCC_event;
-
 typedef struct
 {
     uint8_t *val;
@@ -51,6 +44,15 @@ typedef struct
     uint8_t replays;
 
 } Value;
+
+const uint8_t WCC_EVENT_ID_LENGTH = 6;
+typedef struct
+{
+    uint8_t id[WCC_EVENT_ID_LENGTH];
+    uint8_t value_count;
+    Value *values;
+    uint8_t is_state_active;
+} WCC_event;
 
 typedef struct
 {
@@ -224,7 +226,8 @@ void fill_board_connections()
         board_connections[10].output_num = 0;
         board_connections[10].owner_id = MAX98357;
         board_connections[10].signal_types[0] = AUDIO;
-    } else
+    }
+    else
     {
         const uint8_t LED_outputs_amount = 16;
         // Fill connections to a LED driver
@@ -318,7 +321,6 @@ void fill_board_connections()
         board_connections[LED_outputs_amount + 11].output_num = 0;
         board_connections[LED_outputs_amount + 11].owner_id = MAX98357;
         board_connections[LED_outputs_amount + 11].signal_types[0] = AUDIO;
-
     }
 }
 

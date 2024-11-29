@@ -49,12 +49,17 @@ export async function start_controller() {
     train_picture_btn.classList.add('train_picture_btn');
     train_picture_btn.style.width = train_picture_btn_width + 'px';
     train_picture_btn.style.height = train_picture_btn_width + 'px';
+    train_picture_btn.style.lineHeight = train_picture_btn_width + 'px';
     train_picture_btn.style.borderRadius = train_picture_btn_width / 2 + 'px';
 
     train_picture_btn.style.left = train_controller_width / 2 - train_picture_btn_width / 2 + 'px';
     train_picture_btn.style.top = train_picture_top + 'px';
     train_controller_container.appendChild(train_picture_btn);
 
+    let train_picture_img = document.createElement('img');
+    train_picture_img.classList.add('train_picture_img');
+    train_picture_img.src = '/train.png';
+    train_picture_btn.appendChild(train_picture_img);
 
     let traingle_offset = 40;
 
@@ -68,12 +73,23 @@ export async function start_controller() {
     train_reverse_btn.style.top = train_picture_top + train_picture_btn_width / 2 - triangle_btn_width + 'px';
     train_controller_container.appendChild(train_reverse_btn);
 
+    train_reverse_btn.addEventListener('click', function handleClick(event) {
+        train_forward_btn.classList.remove('triangle_right_active');
+        train_reverse_btn.classList.add('triangle_left_active');
+    });
+
     //Add forward btn
     const train_forward_btn = document.createElement("div");
     train_forward_btn.classList.add('triangle_right');
+    train_forward_btn.classList.add('triangle_right_active');
     train_forward_btn.style.left = train_controller_width / 2 + train_picture_btn_width / 2 + traingle_offset + 'px';
     train_forward_btn.style.top = train_picture_top + train_picture_btn_width / 2 - triangle_btn_width + 'px';
     train_controller_container.appendChild(train_forward_btn);
+
+    train_forward_btn.addEventListener('click', function handleClick(event) {
+        train_reverse_btn.classList.remove('triangle_left_active');
+        train_forward_btn.classList.add('triangle_right_active');
+    });
 
     //Create speed slider
     let speed_slider = document.createElement('input');
@@ -142,9 +158,22 @@ export async function start_controller() {
             const func_btn = document.createElement("div");
             func_btn.innerText = `F${func_number}`;
             func_btn.classList.add('train_function_btn');
+
+            func_btn.addEventListener('click', function handleClick(event) {
+                //event.preventDefault();
+    
+                if (this.classList.contains('active_function_btn') == true){
+                    func_btn.classList.remove('active_function_btn');
+                }else{
+                    func_btn.classList.add('active_function_btn');
+                }
+
+    
+            });
+
             func_btn.style.height = function_btn_height + 'px';
             func_btn.style.width = function_btn_width + 'px';
-            func_btn.style.left = function_btns_left + cell_width/2 - function_btn_width/2 + col * cell_width + 'px';
+            func_btn.style.left = function_btns_left + cell_width / 2 - function_btn_width / 2 + col * cell_width + 'px';
             func_btn.style.top = function_btns_top + row * 60 + 'px';
             train_controller_container.appendChild(func_btn);
 

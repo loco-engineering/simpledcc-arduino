@@ -325,6 +325,14 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
 void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
 {
 
+    // WCC event includes
+    //  - id, that id is specified in state.wcc_ids, 6 bytes
+    //  - amount of values, that we should update in a state, 1 byte
+    //  - array with values
+    //       - output id where we should send the value, 1 byte
+    //       - value length - 2 bytes
+    //       - value, max 256 bytes
+
     Serial.println("New WCC event is received");
 
     ESP_LOG_BUFFER_HEX(TAG, output_buffer, buffer_size);
@@ -344,7 +352,52 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
     }
 
     msg.is_state_active = output_buffer[element_data_start_ind++];
-    ESP_LOGI(TAG, "is state active: %d", msg.is_state_active);
+    // ESP_LOGI(TAG, "is state active: %d", msg.is_state_active);
+
+    msg.value_count = output_buffer[element_data_start_ind++];
+    ESP_LOGI(TAG, "WCC Event: Amount of values to update: %d", msg.value_count);
+
+    msg.values = (Value *)malloc(msg.value_count * sizeof(Value));
+
+    for (unsigned int value_number = 0; value_number < msg.value_count; ++value_number)
+    {
+
+        ESP_LOGI(TAG, "WCC Event: Loading Value number : %d", value_number);
+
+        // Allocate memory for Value
+        Value value;
+
+        // Get connection id
+        value.connection_id = output_buffer[element_data_start_ind];
+        ESP_LOGI(TAG, "WCC Event: Connection id: %d", value.connection_id);
+
+        ++element_data_start_ind;
+
+        // Get value length
+        value.val_length = bytes_to_short(output_buffer[element_data_start_ind + 1], output_buffer[element_data_start_ind]);
+        ESP_LOGI(TAG, "WCC Event: Value length: %d", value.val_length);
+        element_data_start_ind += 2;
+
+        // Load value
+        value.val = (uint8_t *)malloc(value.val_length);
+
+        for (unsigned int val_index = 0; val_index < value.val_length; ++val_index)
+        {
+            value.val[val_index] = output_buffer[element_data_start_ind];
+            ++element_data_start_ind;
+        }
+
+        ESP_LOGI(TAG, "WCC Event: Value:");
+        for (int i = 0; i < value.val_length; i++)
+        {
+            ESP_LOGI(TAG, "%d: %d", i, value.val[i]);
+        }
+        ESP_LOGI(TAG, "=======================");
+
+        // add_led_connection(0, value.connection_id, (float)(value.val[0]) / 255.0);
+
+        msg.values[value_number] = value;
+    }
 
     process_wcc_event(msg);
     ESP_LOGI(TAG, "============================");
@@ -379,8 +432,8 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
     }
     else if (action_type == 3)
     {
-        
-        ESP_LOGI(TAG, "Removing file %s",file_name);
+
+        ESP_LOGI(TAG, "Removing file %s", file_name);
 
         // Close a file
         for (uint8_t file_ind = 0; file_ind < board_settings.media_files_amount; ++file_ind)
@@ -406,10 +459,9 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
     ESP_LOGI(TAG, "============================");
 }
 
-//We don't parse WCC project file and use a decoder as a place where we save it and restore
-void handle_wcc_project_file(uint8_t *output_buffer, size_t buffer_size){
-
+// We don't parse WCC project file and use a decoder as a place where we save it and restore
+void handle_wcc_project_file(uint8_t *output_buffer, size_t buffer_size)
+{
 }
-
 
 #endif

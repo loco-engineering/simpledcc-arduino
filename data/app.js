@@ -8,7 +8,7 @@ export function reload_states() {
 
     for (var i = 0; i < project.states.length; i++) {
         var state = project.states[i];
-
+        console.log(project.states);
         //Add a cell to the DCC packets list
         var tr_node = document.createElement('tr');
         tr_node.classList.add("service_cell");

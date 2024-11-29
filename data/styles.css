@@ -4,7 +4,10 @@ html {
 }
 
 body {
-    margin: 0
+    margin: 0;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 
 main {
@@ -2214,6 +2217,16 @@ select {
     opacity: 0.8;
 }
 
+.train_picture_img {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    max-height: 60%;
+}
+
 .triangle_left {
     width: 0;
     height: 0;
@@ -2228,6 +2241,15 @@ select {
     opacity: 0.8;
 }
 
+.triangle_left:active {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.triangle_left_active {
+    border-right: 25px solid #3d405b;
+}
+
 .triangle_right {
     width: 0;
     height: 0;
@@ -2237,7 +2259,16 @@ select {
     position: absolute;
 }
 
+.triangle_right_active {
+    border-left: 25px solid #3d405b;
+}
+
 .triangle_right:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.triangle_right:active {
     cursor: pointer;
     opacity: 0.8;
 }
@@ -2256,6 +2287,16 @@ select {
 .train_function_btn:hover {
     cursor: pointer;
     opacity: 0.8;
+}
+
+.train_function_btn:active {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.active_function_btn{
+    background-color: #3d405b;
+    color: #ffffff;
 }
 
 .speed_slider {
