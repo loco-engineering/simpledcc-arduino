@@ -133,7 +133,7 @@ void setup_bdc_module()
   }
 
   mcpwm_config_t pwm_config = {};
-  pwm_config.frequency = 12000;
+  pwm_config.frequency = 15000;
   pwm_config.cmpr_a = 0;
   pwm_config.cmpr_b = 0;
   pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -141,14 +141,14 @@ void setup_bdc_module()
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
 
   // Frequency doesn't update till this is called.
-  mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 12000);
+  mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 15000);
 
   next_time_to_pause_mpwm = micros() + 10;
   next_time_to_start_mpwm = micros() + 2;
 
   // turn the PID on
   myPID.SetSampleTime(sampleTime);
-  myPID.SetOutputLimits(0, 50);
+  myPID.SetOutputLimits(0, 80);
   myPID.SetMode(AUTOMATIC);
 }
 

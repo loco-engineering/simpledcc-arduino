@@ -487,17 +487,6 @@ function onOpen(event) {
 
     console.log('Connection opened');
 
-    var wcc_test_event = {};
-    //wcc_test_event.id = 'eq125k';
-    wcc_test_event.id = 'forward';
-    wcc_test_event.is_state_active = 1;
-    wcc_test_event.values = [];
-    var value = {};
-    value.value = 124;
-    value.connection_id = 0;
-    wcc_test_event.values.push(value);
-    send_wcc_event(wcc_test_event);
-
 }
 
 function onClose(event) {

@@ -1,5 +1,5 @@
 import { add_state, update_state } from "./storage.js";
-import { available_outputs } from "./api.js"
+import { available_outputs, send_wcc_event } from "./api.js"
 
 class VisualController extends HTMLElement {
 
@@ -16,6 +16,7 @@ class VisualController extends HTMLElement {
 }
 
 var app = null;
+var controller_timeer = null;
 
 export async function start_controller() {
 
@@ -97,13 +98,17 @@ export async function start_controller() {
     speed_slider.id = "train_speed";
     speed_slider.type = 'range';
     speed_slider.min = 0;
-    speed_slider.max = 1;
+    speed_slider.max = 255;
     speed_slider.value = 0.0;
-    speed_slider.step = 0.01;
+    speed_slider.step = 1;
     speed_slider.style.width = train_controller_width - 2 * reverse_btn_left + 'px';
     speed_slider.style.left = reverse_btn_left + 'px';
     speed_slider.style.top = train_picture_top + train_picture_btn_width + 20 + 'px';
     train_controller_container.appendChild(speed_slider);
+
+    speed_slider.oninput = function() {
+        console.log("New speed: " + this.value);
+    }
 
     let function_btn_width = 60;
     let function_btn_height = 40;
@@ -180,6 +185,21 @@ export async function start_controller() {
             func_number += 1;
         }
     }
+
+    setInterval(function () {
+        
+        var wcc_test_event = {};
+        wcc_test_event.id = 'forward';
+        wcc_test_event.is_state_active = 1;
+        wcc_test_event.values = [];
+        var value = {};
+        value.value = speed_slider.value;
+        value.connection_id = 0;
+        wcc_test_event.values.push(value);
+        send_wcc_event(wcc_test_event);
+
+    }, 1000);
+
 
 }
 

@@ -429,10 +429,11 @@ void process_wcc_event(WCC_event msg)
                                     //Check the type
                                     if (local_connection.signal_types[0] == DC_MOTOR){
                                         serial_print((String)"Get WCC event for DC motor, output " + connection.output_num + " value: " + connection_value);
+                                        uint8_t duty_cycle = connection_value * 100 / 255;
+                                        set_motor_duty_target(duty_cycle, 1);
                                     }else{
                                         serial_print((String)"Get WCC event for PWM, output " + connection.output_num + " value: " + connection_value);
                                         add_led_connection(0, connection.output_num, (float)(connection_value) / 255.0, value.on_duration, value.off_duration, value.start_delay);
-
                                     }
                                 }
                             }
