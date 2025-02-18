@@ -42,7 +42,40 @@ void handle_turnout_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, St
             {
                 for (unsigned int value_number = 0; value_number < state->value_count; ++value_number)
                 {
-                    handle_gpio_pwm(state, value_number);
+                    Value value = state->values[value_number];
+                    uint8_t connection_id = value.connection_id;
+                    Connection connection = board_connections[connection_id];
+
+                    //For LED control (light signals for example, we assume that
+                    //a state is "on" if direction == 1 and the state is "off" if direction == 1
+                    if (connection.owner_id == LED_DRIVER_PCA9955B)
+                    {
+                        uint8_t value_length = value.val_length;
+                        // Now we assume that val has only 1 byte
+                        // ToDo: parse bytes specified in val_length not just one byte
+
+                        uint8_t connection_value = value.val[0];
+
+                        uint8_t id[10] = {0};
+                        id[0] = dcc_packet->address[0];
+                        id[1] = dcc_packet->address[1];
+                        id[2] = 1; 
+                        id[3] = value_number;
+                        if (dcc_packet->user_data[0] == 1)
+                        {
+                            //play_audio_from_spiffs("level_crossing.wav", 1);
+                            add_led_connection(0, connection.output_num, (float)connection_value / 255.0, value.on_duration, value.off_duration, value.start_delay, id);
+                        }
+                        else
+                        {
+                            //                            play_audio_from_spiffs("level_crossing.wav", 0);
+                            remove_led_connection(0, id);
+                        }
+                    }
+                    else
+                    {
+                        handle_gpio_pwm(state, value_number);
+                    }
                 }
             }
         }
@@ -80,7 +113,7 @@ void handle_aspect_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, Sta
 
             if (is_on == true)
             {
-                add_led_connection(0, connection.output_num, (float)connection_value / 255.0, value.on_duration, value.off_duration, 0, id);
+                add_led_connection(0, connection.output_num, (float)connection_value / 255.0, value.on_duration, value.off_duration, value.start_delay, id);
             }
             else
             {
@@ -92,7 +125,7 @@ void handle_aspect_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, Sta
 
 void handle_speed_packet(DCCPacket *received_packet, DCCPacket *dcc_packet, State *state)
 {
-
+Serial.println("new speed packet");
     if (state->values != NULL)
     {
         for (unsigned int value_number = 0; value_number < state->value_count; ++value_number)
@@ -307,6 +340,7 @@ void handle_multi_function_packet(DCCPacket *received_packet, DCCPacket *dcc_pac
 
 void handle_dcc_packet(DCCPacket *received_packet)
 {
+
     if (board_settings.states != NULL)
     {
 
@@ -378,7 +412,7 @@ void process_wcc_event(WCC_event msg)
     if (board_settings.states != NULL)
     {
 
-        serial_print((String)"process_wcc_event ");
+        serial_print((String) "process_wcc_event ");
 
         // Iterate and clean states
         for (unsigned int state_number = 0; state_number < board_settings.state_count; ++state_number)
@@ -386,12 +420,12 @@ void process_wcc_event(WCC_event msg)
 
             State state = board_settings.states[state_number];
 
-        serial_print((String)"iterate state " + state_number);
+            serial_print((String) "iterate state " + state_number);
 
             if (state.wcc_msg_count > 0)
             {
 
-        serial_print((String)"state.wcc_msg_count " + state.wcc_msg_count);
+                serial_print((String) "state.wcc_msg_count " + state.wcc_msg_count);
 
                 WCC_event cur_wcc_ev = state.wcc_msg[0];
 
@@ -405,7 +439,7 @@ void process_wcc_event(WCC_event msg)
                     }
                 }
 
-                            serial_print((String)"is_event_same " + is_event_same);
+                serial_print((String) "is_event_same " + is_event_same);
 
                 if (is_event_same == true)
                 {
@@ -425,14 +459,23 @@ void process_wcc_event(WCC_event msg)
                             for (uint8_t i = 0; i < connection_amount; ++i)
                             {
                                 Connection local_connection = board_connections[i];
-                                if (local_connection.output_num == connection.output_num){
-                                    //Check the type
-                                    if (local_connection.signal_types[0] == DC_MOTOR){
-                                        serial_print((String)"Get WCC event for DC motor, output " + connection.output_num + " value: " + connection_value);
+                                if (local_connection.output_num == connection.output_num)
+                                {
+                                    // Check the type
+                                    if (local_connection.signal_types[0] == DC_MOTOR)
+                                    {
+                                        uint8_t direction = 1;
+                                        if (connection.output_num == preferences_motor_1_B_pin())
+                                        {
+                                            direction = 2;
+                                        }
+                                        Serial.println((String) "Get WCC event for DC motor, output " + connection.output_num + " value: " + connection_value);
                                         uint8_t duty_cycle = connection_value * 100 / 255;
-                                        set_motor_duty_target(duty_cycle, 1);
-                                    }else{
-                                        serial_print((String)"Get WCC event for PWM, output " + connection.output_num + " value: " + connection_value);
+                                        set_motor_duty_target(duty_cycle, direction);
+                                    }
+                                    else
+                                    {
+                                        serial_print((String) "Get WCC event for PWM, output " + connection.output_num + " value: " + connection_value);
                                         add_led_connection(0, connection.output_num, (float)(connection_value) / 255.0, value.on_duration, value.off_duration, value.start_delay);
                                     }
                                 }

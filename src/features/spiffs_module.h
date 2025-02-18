@@ -159,7 +159,7 @@ void save_wcc_settings(fs::FS &fs, uint8_t *data, size_t len)
   file.close();
 }
 
-uint8_t *read_wcc_settings(fs::FS &fs, size_t *wcc_data_len)
+uint8_t *read_wcc_settings(fs::FS &fs, uint8_t *data, size_t *wcc_data_len)
 {
 
   File file = fs.open("/wcc_settings.bin");
@@ -171,7 +171,7 @@ uint8_t *read_wcc_settings(fs::FS &fs, size_t *wcc_data_len)
   }
 
   size_t avail_len = file.available();
-  uint8_t *data = (uint8_t *)ps_calloc(avail_len, sizeof(uint8_t));
+  //ps_calloc, check that static memory will be enough
 
   *wcc_data_len = file.readBytes((char *)data, avail_len); // read all to buffer to buffer
 
@@ -215,7 +215,7 @@ void save_wcc_project_file(fs::FS &fs, uint8_t *data, size_t len, bool is_append
   file.close();
 }
 
-uint8_t *read_generate_wcc_project_file(fs::FS &fs, size_t *wcc_data_len)
+void read_generate_wcc_project_file(fs::FS &fs, size_t *wcc_data_len, uint8_t *data)
 {
 
   Serial.printf("Load WCC project file\n");
@@ -225,11 +225,10 @@ uint8_t *read_generate_wcc_project_file(fs::FS &fs, size_t *wcc_data_len)
   if (!file)
   {
     Serial.println("- failed to open file for reading");
-    return NULL;
+    return;
   }
 
   size_t avail_len = file.available();
-  uint8_t *data = (uint8_t *)ps_calloc(avail_len + 1, sizeof(uint8_t));
   data[0] = 7; // set the message type we plan to send, 7 - wcc project file
   *wcc_data_len = (file.readBytes((char *)(data + 1), avail_len) + 1); // we add 1 to the length because the first byte is a msg type
       Serial.println("!!!!!!!!!!!LOADED");
@@ -237,7 +236,6 @@ uint8_t *read_generate_wcc_project_file(fs::FS &fs, size_t *wcc_data_len)
 
 
   file.close();
-  return data;
 }
 
 #endif

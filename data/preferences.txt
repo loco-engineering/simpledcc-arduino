@@ -1,5 +1,5 @@
-serial=tr_lpri80;
-wifi_ssid=loco-tr_lpri80;
+serial=ac_aa3jlc;
+wifi_ssid=loco-ac_aa3jlc;
 wifi_passwd=loco.eng;
 hw=1.2;
 board_type=train;

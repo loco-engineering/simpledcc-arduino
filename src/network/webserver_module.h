@@ -17,7 +17,10 @@ static void server_handle_upload(AsyncWebServerRequest *request, String filename
 // Initialize WiFi
 void initWiFi()
 {
-  WiFi.softAP(preferences_wifi_name(), preferences_wifi_passwd());
+  char wifi_name[MAX_PREF_VALUE_LENGTH];
+  char wifi_passwd[MAX_PREF_VALUE_LENGTH];
+
+  WiFi.softAP(preferences_wifi_name(wifi_name), preferences_wifi_passwd(wifi_passwd));
 
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -120,7 +123,7 @@ void reload_and_send_media_files_list()
   uint8_t levels = 0;
 
   // Fill a message
-  uint8_t *msg;
+  uint8_t msg[500];
 
   size_t msg_index = 0;
 
@@ -129,7 +132,7 @@ void reload_and_send_media_files_list()
   uint16_t allocated_bytes = 100;
   uint8_t files_amount = 0;
 
-  msg = (uint8_t *)ps_calloc(allocated_bytes, sizeof(uint8_t));
+  // msg = (uint8_t *)ps_calloc(allocated_bytes, sizeof(uint8_t));
 
   // Set message type
   msg[0] = 6; // 6 - a message with media files
@@ -190,7 +193,7 @@ void reload_and_send_media_files_list()
         Serial.print("  FILE: ");
         Serial.print(file.name());
 
-        board_settings.media_files[files_amount].file_name = (char *)ps_malloc(strlen(file.name()) * sizeof(char));
+        // board_settings.media_files[files_amount].file_name = (char *)ps_malloc(strlen(file.name()) * sizeof(char));
 
         strcpy(board_settings.media_files[files_amount].file_name, file.name());
         board_settings.media_files[files_amount].status = 0;
@@ -205,12 +208,12 @@ void reload_and_send_media_files_list()
         for (uint8_t c = *file_name; c != '\0'; c = *++file_name)
         {
           msg[msg_index++] = c;
-          if (msg_index == allocated_bytes)
+          /*if (msg_index == allocated_bytes)
           {
             allocated_bytes += 100;
             // Reallocate memory
             msg = (uint8_t *)ps_realloc(msg, allocated_bytes);
-          }
+          }*/
         }
         msg[msg_index++] = '\0';
         ++files_amount;
@@ -232,19 +235,21 @@ void reload_and_send_media_files_list()
 
   ws.binaryAll(msg, msg_index);
 
-  free(msg);
+  // free(msg);
 }
 
 void send_wcc_project_file_message()
 {
 
   size_t wcc_data_len = 0;
-  uint8_t *wcc_project_file_data = read_generate_wcc_project_file(LittleFS, &wcc_data_len);
-  if (wcc_project_file_data != NULL)
-  {
-    ws.binaryAll(wcc_project_file_data, wcc_data_len);
+  uint8_t data[10000]; // = (uint8_t *)ps_calloc(avail_len + 1, sizeof(uint8_t));
 
-    free(wcc_project_file_data);
+  read_generate_wcc_project_file(LittleFS, &wcc_data_len, data);
+  if (wcc_data_len != 0)
+  {
+    ws.binaryAll(data, wcc_data_len);
+
+    // free(wcc_project_file_data);
   }
 }
 
@@ -254,7 +259,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
 
-  Serial.println("=======================");
+  /*Serial.println("=======================");
   Serial.println("New message over WebSocket received");
   Serial.println("Size");
   Serial.println(info->len);
@@ -264,7 +269,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   Serial.println(info->final);
   Serial.println("Index");
   Serial.println(info->index);
-  Serial.println("Content");
+  Serial.println("Content");*/
   for (int i = 0; i < len; i++)
   {
     Serial.print(data[i]);
@@ -303,9 +308,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   // 7 - web app project file
   if (data[0] == 7 && info->index == 0)
   {
-    Serial.println("WCC project file data is received");
-    // This message is a message with a WCC project file
-    // WCC project file is used to show decoder's settings/states in the web app
+    // Serial.println("WCC project file data is received");
+    //  This message is a message with a WCC project file
+    //  WCC project file is used to show decoder's settings/states in the web app
     data++;
     save_wcc_project_file(LittleFS, data, len - 1);
 
@@ -318,9 +323,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   {
     if (msg_type_cont == 7)
     {
-      Serial.println("WCC project file data is received");
-      // This message is a message with a WCC project file
-      // WCC project file is used to show decoder's settings/states in the web app
+      // Serial.println("WCC project file data is received");
+      //  This message is a message with a WCC project file
+      //  WCC project file is used to show decoder's settings/states in the web app
       save_wcc_project_file(LittleFS, data, len, true);
     }
   }
@@ -331,7 +336,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     msg_type_cont = 0;
   }
 
-  Serial.println("=======================");
+  // Serial.println("=======================");
 
   if (info->final && info->index == 0 && info->len == len)
   {
@@ -583,7 +588,7 @@ void setup_webserver()
 
 void loop_webserver()
 {
-  ws.cleanupClients();
+  //ws.cleanupClients();
 }
 
 #endif

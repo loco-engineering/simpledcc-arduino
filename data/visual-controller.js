@@ -17,6 +17,7 @@ class VisualController extends HTMLElement {
 
 var app = null;
 var controller_timeer = null;
+var direction = 1; //1 - forward, 2 - reverse
 
 export async function start_controller() {
 
@@ -77,6 +78,7 @@ export async function start_controller() {
     train_reverse_btn.addEventListener('click', function handleClick(event) {
         train_forward_btn.classList.remove('triangle_right_active');
         train_reverse_btn.classList.add('triangle_left_active');
+        direction = 2;
     });
 
     //Add forward btn
@@ -90,6 +92,8 @@ export async function start_controller() {
     train_forward_btn.addEventListener('click', function handleClick(event) {
         train_reverse_btn.classList.remove('triangle_left_active');
         train_forward_btn.classList.add('triangle_right_active');
+        direction = 1;
+
     });
 
     //Create speed slider
@@ -126,6 +130,10 @@ export async function start_controller() {
     speed_minus_btn.style.top = speed_btns_top + 'px';
     train_controller_container.appendChild(speed_minus_btn);
 
+    speed_minus_btn.addEventListener('click', function handleClick(event) {
+        speed_slider.value = parseInt(speed_slider.value) - 10;
+    });
+
     //Create plus button
     const speed_plus_btn = document.createElement("div");
     speed_plus_btn.innerText = "+";
@@ -135,6 +143,10 @@ export async function start_controller() {
     speed_plus_btn.style.right = reverse_btn_left + 'px';
     speed_plus_btn.style.top = speed_btns_top + 'px';
     train_controller_container.appendChild(speed_plus_btn);
+
+    speed_plus_btn.addEventListener('click', function handleClick(event) {
+        speed_slider.value = parseInt(speed_slider.value) + 10;
+    });
 
     //Create stop button
     let stop_btn_width = function_btn_width * 2 - 20;
@@ -149,6 +161,9 @@ export async function start_controller() {
     speed_stop_btn.style.top = speed_btns_top + 'px';
     train_controller_container.appendChild(speed_stop_btn);
 
+    speed_stop_btn.addEventListener('click', function handleClick(event) {
+        speed_slider.value = 0;
+    });
 
     //Generate function buttons
     let function_btns_top = speed_btns_top + 40 + function_btn_height;
@@ -189,16 +204,24 @@ export async function start_controller() {
     setInterval(function () {
         
         var wcc_test_event = {};
-        wcc_test_event.id = 'forward';
-        wcc_test_event.is_state_active = 1;
-        wcc_test_event.values = [];
         var value = {};
         value.value = speed_slider.value;
-        value.connection_id = 0;
+
+        if (direction == 1){
+            wcc_test_event.id = 'forward';
+            value.connection_id = 0;
+        }else{
+            wcc_test_event.id = 'reverse';
+            value.connection_id = 1;
+        }
+        wcc_test_event.is_state_active = 1;
+
+        wcc_test_event.values = [];
         wcc_test_event.values.push(value);
+
         send_wcc_event(wcc_test_event);
 
-    }, 1000);
+    }, 500);
 
 
 }

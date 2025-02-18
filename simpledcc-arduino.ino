@@ -74,13 +74,53 @@ void setup()
   // LED connection examples for a level crossing with 2 LEDs blinking alternately
 
   //LED tests, LED driver
-  /*
+  
   //Don't forget to add to add_led_connection some random ID as the last parameter
-  uint8_t id_1[10] = {1,1,1,1,1,1,1,1,1,1};
+  /*uint8_t id_1[10] = {1,1,1,1,1,1,1,1,1,1};
   uint8_t id_2[10] = {1,1,1,1,1,1,1,1,2,1};
+  uint8_t id_3[10] = {1,1,1,2,1,1,1,1,2,1};
+  uint8_t id_4[10] = {1,1,1,1,4,2,1,2,2,1};
+  uint8_t id_5[10] = {1,1,1,1,4,3,1,2,2,1};
+  uint8_t id_6[10] = {1,1,1,1,4,5,1,2,2,1};
+  uint8_t id_7[10] = {1,1,1,1,4,6,1,2,2,1};
+  uint8_t id_8[10] = {1,1,1,1,4,7,1,2,2,1};
+  uint8_t id_9[10] = {1,1,1,1,5,7,1,2,2,1};
+  uint8_t id_10[10] = {1,1,1,1,5,8,1,2,2,1};
 
-  add_led_connection(0, 0, 0.09, 2000, 6000, 0, id_1); //blue
-  add_led_connection(0, 4, 0.09, 2000, 6000, 3000, id_2); //white
+  add_led_connection(0, 15, 1.0, 10000, 2000, 0, id_1); // 0
+  add_led_connection(0, 14, 1.0, 9000, 3000, 1000, id_2); //1
+    add_led_connection(0, 13, 1.0, 8000, 4000, 2000, id_3); //1
+
+    add_led_connection(0, 9, 1.0, 7000, 5000, 3000, id_4); //2
+    add_led_connection(0, 10, 1.0, 6000, 6000, 4000, id_5); //2
+    add_led_connection(0, 11, 1.0, 4000, 7000, 6000, id_6); //white*/
+
+  //add_led_connection(0, 4, 0.2, 2000, 10000, 4000, id_2); // green
+  //add_led_connection(0, 0, 0.4, 2000, 10000, 6000, id_3); //top yellow
+  //add_led_connection(0, 15, 0.3, 2000, 10000, 6000, id_4); //bottom yellow
+
+  //add_led_connection(0, 5, 0.3, 2000, 10000, 6300, id_5); //red
+  //add_led_connection(0, 11, 0.1, 2000, 10000, 6300, id_6); //whit
+
+ /* add_led_connection(0, 4, 0.3, 3000, 1500, 1500, id_5); //ped red
+
+  add_led_connection(0, 11, 0.3, 3000, 1500, 1500, id_6); //ped red
+  add_led_connection(0, 12, 0.5, 1500, 3000, 1500, id_7); //car yellow
+  add_led_connection(0, 13, 0.3, 1500, 3000, 0, id_8); //car red
+  add_led_connection(0, 14, 0.3, 1500, 3000, 3000, id_9); //car green
+  add_led_connection(0, 15, 0.3, 1500, 3000, 0, id_10); //ped green
+
+  add_led_connection(0, 4, 0.1, 1500, 3000, 3000, id_2); //red
+
+  add_led_connection(0, 15, 0.6, 1500, 3000, 1500, id_3); //yellow
+    add_led_connection(0, 5, 1.0, 0, 0, 0, id_4); //white
+
+  add_led_connection(0, 11, 1.0, 0, 0, 0, id_5); //blue
+    add_led_connection(0, 10, 1.0, 0, 0, 0, id_6); //blue
+
+  add_led_connection(0, 14, 1.0, 0, 0, 0, id_7); //white
+    add_led_connection(0, 15, 1.0, 0, 0, 0, id_8); //white
+  
   add_led_connection(0, 10, 0.5, 2000, 9000, 4000); //yellow bottom
   add_led_connection(0, 8, 0.7, 2000, 9000, 4000); //yellow top
   add_led_connection(0, 9, 0.08, 2000, 9000, 6000); //red
@@ -100,7 +140,7 @@ void setup()
   //play_audio_from_header_file();
 
   reload_and_send_media_files_list();
-  //play_audio_from_spiffs("train_mon_16bit_32khz.wav", 0);
+  //play_audio_from_spiffs("train_mon_16bit_32khz.wav", 1);
   //play_audio_from_spiffs("lev_cros1_mon_16bit_32k.wav", 0);
 
   //Pullup on GPIO 00 is required for Loco.Engineering flashing tools
@@ -108,7 +148,7 @@ void setup()
 
   //Uncomment and change WiFI Tx Power if you want to increase the range or reduce the board heating
   //Possible values can be found at https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/src/WiFiGeneric.h, struct wifi_power_t
-  WiFi.setTxPower(WIFI_POWER_5dBm);
+  WiFi.setTxPower(WIFI_POWER_2dBm);
 
   initTempSensor();
 
@@ -130,8 +170,8 @@ void loop()
     next_time_to_check_temp = millis() + 1000;
       float result = 0;
     temp_sensor_read_celsius(&result);
-    Serial.print(result);
-    Serial.println(" °C");
+    /*Serial.println(result);
+    Serial.println(" °C");*/
   }
 
   loop_dcc_module();

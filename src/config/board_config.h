@@ -23,6 +23,11 @@ typedef enum
 
 const uint8_t CONNECTION_NAME_LENGTH = 20;        // If you change this value you should update it in the web app - search for CONNECTION_NAME_LENGTH in js files
 const uint8_t CONNECTION_SIGNAL_TYPES_AMOUNT = 5; // If you change this value you should update it in the web app - search for CONNECTION_SIGNAL_TYPES_AMOUNT in js files
+const uint8_t VALUE_MAX_LENGTH = 20; 
+const uint8_t MAX_VALUES_AMOUNT_IN_EVENT = 10; 
+const uint8_t MAX_DCC_PACKETS_AMOUNT_IN_STATE = 4; 
+const uint8_t MAX_WCC_MESSAGE_IDS_IN_STATE = 10; 
+const uint8_t MAX_STATES_AMOUNT = 25; 
 
 typedef struct
 {
@@ -34,7 +39,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t *val;
+    uint8_t val[VALUE_MAX_LENGTH];
     unsigned short val_length;
     uint8_t connection_id;
 
@@ -50,20 +55,20 @@ typedef struct
 {
     uint8_t id[WCC_EVENT_ID_LENGTH];
     uint8_t value_count;
-    Value *values;
+    Value values[MAX_VALUES_AMOUNT_IN_EVENT];
     uint8_t is_state_active;
 } WCC_event;
 
 typedef struct
 {
     uint8_t id[6];
-    Value *values;
+    Value values[MAX_VALUES_AMOUNT_IN_EVENT];
     uint8_t value_count;
     bool is_active;
-    WCC_event *wcc_msg;
+    WCC_event wcc_msg[MAX_WCC_MESSAGE_IDS_IN_STATE];
     uint8_t wcc_msg_count;
 
-    DCCPacket *dcc_packets;
+    DCCPacket dcc_packets[MAX_DCC_PACKETS_AMOUNT_IN_STATE];
     uint8_t dcc_packet_count;
 
 } State;
@@ -71,7 +76,7 @@ typedef struct
 // Media files
 typedef struct
 {
-    char *file_name;
+    char file_name[30];
     uint8_t status; // 0 - stopped, 1 - playing, 2 -paused
     uint8_t volume;
     File file;
@@ -82,7 +87,7 @@ typedef struct
 
 typedef struct
 {
-    State *states;
+    State states[MAX_STATES_AMOUNT];
     uint8_t module_mac_address[6];
     uint16_t state_count;
 
@@ -103,7 +108,9 @@ Connection board_connections[connection_amount];
 void fill_board_connections()
 {
 
-    if (strcmp("train", preferences_board_type()) == 0)
+    char board_type[MAX_PREF_VALUE_LENGTH];
+
+    if (strcmp("train", preferences_board_type(board_type)) == 0)
     {
 
         sprintf(board_connections[0].name, "Motor, FWD");
@@ -111,7 +118,7 @@ void fill_board_connections()
         board_connections[0].owner_id = ESP32Sx;
         board_connections[0].signal_types[0] = DC_MOTOR;
 
-        sprintf(board_connections[1].name, "Motor, BWD");
+        sprintf(board_connections[1].name, "Motor, REV");
         board_connections[1].output_num = preferences_motor_1_B_pin();
         board_connections[1].owner_id = ESP32Sx;
         board_connections[1].signal_types[0] = DC_MOTOR;
@@ -165,7 +172,7 @@ void fill_board_connections()
         board_connections[10].owner_id = MAX98357;
         board_connections[10].signal_types[0] = AUDIO;
     }
-    else if (strcmp("car", preferences_board_type()) == 0)
+    else if (strcmp("car", preferences_board_type(board_type)) == 0)
     {
 
         sprintf(board_connections[0].name, "Motor, FWD");
@@ -324,8 +331,7 @@ void fill_board_connections()
     }
 }
 
-BoardSettings board_settings = {
-    .states = NULL};
+BoardSettings board_settings = {};
 
 void load_board_settings_from_flash()
 {

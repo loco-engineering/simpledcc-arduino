@@ -2,12 +2,14 @@
 #define BDC_MOTOR_MODULE_H
 
 #include "driver/mcpwm.h"
+#include "esp32-hal-log.h"
+
+static const char *BDC_TAG = "BDC_MODULE";
 
 uint8_t bemf_pin = 0;
 uint8_t isense_pin = 0;
 
 uint8_t cur_direction = 0; // 1 - forward, 2 - reverse, 0 - stop
-uint8_t cur_duty = 0;
 double next_time_to_start_mpwm = 0;
 double next_time_to_pause_mpwm = 0;
 bool is_mpwm_is_paused = false;
@@ -27,20 +29,19 @@ int average_BEMF = 0;
 // double Kp=0.05, Ki=1.35, Kd=0.38;
 
 // Very good results with those:
-double Kp = 0.40, Ki = 1.45, Kd = 0;
+double Kp = 2, Ki = 1.45, Kd = 1;
 
 // We need a fast running loop, because the trains are
 // very lightweight, so their speed changes very fast when
 // any perturbation occurs.
-int sampleTime = 200; // Lower than 80 is shorter than the loop, so the PID calculations
-                      // will be wrong, don't go lower than this.
-
-// Default controller serial update rate
-int updateRate = 300;
+int sampleTime = 80; // Lower than 80 is shorter than the loop, so the PID calculations
+                     // will be wrong, don't go lower than this.
 
 double pwm_rate = 0;
-double target_rpm = 10;
+double target_rpm = 0;
 double measured_rpm = 0;
+double d_pwm = 0;
+double requested_duty = 0;
 
 /**
  *   Input : The variable we're trying to control -> Measured speed of the train
@@ -148,39 +149,51 @@ void setup_bdc_module()
 
   // turn the PID on
   myPID.SetSampleTime(sampleTime);
-  myPID.SetOutputLimits(0, 80);
+  myPID.SetOutputLimits(0, 0);
   myPID.SetMode(AUTOMATIC);
+
+
+  //Put a driver into a sleep mode
+  mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
+  mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
+
 }
 
 void set_motor_duty_target(uint8_t duty, uint8_t direction)
 {
-  target_rpm = duty;
+  if (duty > target_rpm)
+  {
+    d_pwm = 1;
+  }
+  else
+  {
+    d_pwm = -1;
+  }
+  requested_duty = duty;
+
   cur_direction = direction;
+
+  //ESP_LOGI(BDC_TAG, "New Motor PWM Target: %d, direction: %d", duty, direction);
 }
 
 void bdc_forward(uint8_t duty)
 {
 
-  mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
-  mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, MCPWM_DUTY_MODE_0); // call this each time, if operator was previously in low/high state
-
+  mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty);
-  mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MCPWM_DUTY_MODE_0); // call this each time, if operator was previously in low/high state
 
-  // mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 12000 - duty*50);
 }
 
 void bdc_reverse(uint8_t duty)
 {
 
-  mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A);
-  mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MCPWM_DUTY_MODE_0); // call this each time, if operator was previously in low/high state
-
+  mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, duty);
-  mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, MCPWM_DUTY_MODE_0); // call this each time, if operator was previously in low/high state
 
-  // mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_0, 12000 - duty*50);
 }
+
+double next_time_to_update_target_rpm = 0;
+bool is_bemf_enabled = false;
 
 void loop_bdc_module()
 {
@@ -190,10 +203,38 @@ void loop_bdc_module()
     return;
   }
 
-  if (micros() > next_time_to_pause_mpwm && is_mpwm_is_paused == false)
+  if (is_bemf_enabled == false){
+    if (cur_direction == 1)
+        {
+          bdc_forward(requested_duty);
+        }
+        else if (cur_direction == 2)
+        {
+          bdc_reverse(requested_duty);
+        }
+        else
+        {
+          mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
+          mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
+        }
+        return;
+  }
+
+  if (millis() > next_time_to_update_target_rpm)
+  {
+    next_time_to_update_target_rpm = millis() + 10;
+    if (target_rpm != requested_duty)
+    {
+      target_rpm += d_pwm;
+    }
+
+    myPID.SetOutputLimits(0, target_rpm);
+  }
+
+  /*if (micros() > next_time_to_pause_mpwm && is_mpwm_is_paused == false)
   {
 
-    next_time_to_start_mpwm = micros() + 100;
+    next_time_to_start_mpwm = micros();
     is_mpwm_is_paused = true;
 
     mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
@@ -216,7 +257,7 @@ void loop_bdc_module()
   else
   {
     if (is_mpwm_is_paused == true && micros() > next_time_to_start_mpwm)
-    {
+    {*/
 
       if (bemf_pin != 0)
       {
@@ -236,23 +277,33 @@ void loop_bdc_module()
       }
       measured_rpm = average_BEMF * 100.0 / 3400.0;
 
-      myPID.Compute(); // Most important part!
+      //Arduino PID doesn't work with target == 0 that's why we set all values to 0 manually
+      if (target_rpm == 0)
+      {
+        target_rpm = 0;
+        pwm_rate = 0;
+        measured_rpm = 0;
+      }
+      else
+      {
+        //myPID.Compute(); // Most important part!
+      }
 
       // Restart PWM
       if (is_mpwm_is_paused == true)
       {
         is_mpwm_is_paused = false;
-        next_time_to_pause_mpwm = micros() + 50 * 1000;
+        next_time_to_pause_mpwm = micros() + 1000 * 1000;
       }
-      if (pwm_rate > 5)
+      if (target_rpm > 2)
       {
         if (cur_direction == 1)
         {
-          bdc_forward(pwm_rate);
+          bdc_forward(target_rpm);
         }
         else if (cur_direction == 2)
         {
-          bdc_reverse(pwm_rate);
+          bdc_reverse(target_rpm);
         }
         else
         {
@@ -266,17 +317,9 @@ void loop_bdc_module()
         mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A);
       }
 
-      /*serial_print("BEMF: ");
-      serial_print(average_BEMF);
-      serial_println("");
-
-      serial_print("NEW PWM: ");
-      serial_print(pwm_rate);
-      serial_print(measured_rpm);
-
-      serial_println("");*/
+       //ESP_LOGI(BDC_TAG, "PWM target: %f, calculated: %f, avg rpm: %f", target_rpm, pwm_rate, measured_rpm);
     }
-  }
-}
+//  }
+//}
 
 #endif

@@ -104,7 +104,7 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
         // If we should forward settings to another decoder inside the newtrok we should skip parsing them
 
         // Clean old board settings
-        if (board_settings.states != NULL)
+        /*if (board_settings.states != NULL)
         {
             // Iterate and clean states
             for (unsigned int state_number = 0; state_number < board_settings.state_count; ++state_number)
@@ -115,24 +115,20 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                     for (unsigned int value_number = 0; value_number < state.value_count; ++value_number)
                     {
                         Value value = state.values[value_number];
-                        free(value.val);
-                        value.val = NULL;
+                        value.val = {0};
                     }
 
-                    free(state.values);
                     state.values = NULL;
                 }
 
                 if (state.wcc_msg != NULL)
                 {
-                    free(state.wcc_msg);
                     state.wcc_msg = NULL;
                 }
             }
 
-            free(board_settings.states);
             board_settings.states = NULL;
-        }
+        }*/
 
         // Parse States
         // Get State Count, 2 bytes
@@ -140,8 +136,7 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
         ESP_LOGI(TAG, "States count: %d", board_settings.state_count);
         element_data_start_ind += 2;
 
-        // Allocate memory for States for the current element
-        board_settings.states = (State *)malloc(board_settings.state_count * sizeof(State));
+        board_settings.state_count = min(board_settings.state_count, (uint16_t)MAX_STATES_AMOUNT);
 
         // Iterate over states
         for (unsigned int state_number = 0; state_number < board_settings.state_count; ++state_number)
@@ -159,11 +154,9 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
             state.id[4] = (uint8_t)output_buffer[element_data_start_ind++];
             state.id[5] = (uint8_t)output_buffer[element_data_start_ind++];
 
-            state.value_count = output_buffer[element_data_start_ind];
+            state.value_count = min(output_buffer[element_data_start_ind], MAX_VALUES_AMOUNT_IN_EVENT);
             ESP_LOGI(TAG, "Connections to update inside this state: %d", state.value_count);
             ++element_data_start_ind;
-
-            state.values = (Value *)malloc(state.value_count * sizeof(Value));
 
             for (unsigned int value_number = 0; value_number < state.value_count; ++value_number)
             {
@@ -181,8 +174,8 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
                 ESP_LOGI(TAG, "Value length: %d", value.val_length);
                 element_data_start_ind += 2;
 
+                value.val_length = min(value.val_length, (uint16_t)VALUE_MAX_LENGTH);
                 // Load value
-                value.val = (uint8_t *)malloc(value.val_length);
 
                 for (unsigned int val_index = 0; val_index < value.val_length; ++val_index)
                 {
@@ -226,9 +219,7 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
             state.wcc_msg_count = output_buffer[element_data_start_ind++];
             ESP_LOGI(TAG, "WCC events for this state: %d", state.wcc_msg_count);
 
-            state.wcc_msg = (WCC_event *)malloc(state.wcc_msg_count * sizeof(WCC_event));
-
-            for (uint8_t msg_number = 0; msg_number < state.wcc_msg_count; ++msg_number)
+            for (uint8_t msg_number = 0; msg_number < state.wcc_msg_count && msg_number < MAX_WCC_MESSAGE_IDS_IN_STATE; ++msg_number)
             {
                 // Allocate memory for WCC event
                 WCC_event msg;
@@ -258,9 +249,8 @@ void handle_wcc_message(uint8_t *output_buffer, size_t buffer_size)
 
             if (state.dcc_packet_count != 0)
             {
-                state.dcc_packets = (DCCPacket *)malloc(state.dcc_packet_count * sizeof(DCCPacket));
 
-                for (uint8_t packet_number = 0; packet_number < state.dcc_packet_count; ++packet_number)
+                for (uint8_t packet_number = 0; packet_number < state.dcc_packet_count && packet_number < MAX_VALUES_AMOUNT_IN_EVENT; ++packet_number)
                 {
                     // Allocate memory for DCC packet
                     DCCPacket dcc_packet;
@@ -333,9 +323,9 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
     //       - value length - 2 bytes
     //       - value, max 256 bytes
 
-    Serial.println("New WCC event is received");
+    //ESP_LOGI(TAG,"New WCC event is received");
 
-    ESP_LOG_BUFFER_HEX(TAG, output_buffer, buffer_size);
+    //ESP_LOG_BUFFER_HEX(TAG, output_buffer, buffer_size);
 
     WCC_event msg;
     unsigned int element_data_start_ind = 0;
@@ -345,7 +335,7 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
         msg.id[id_index] = output_buffer[element_data_start_ind++];
     }
 
-    ESP_LOGI(TAG, "WCC msg ID:");
+    //ESP_LOGI(TAG, "WCC msg ID:");
     for (int i = 0; i < WCC_EVENT_ID_LENGTH; i++)
     {
         ESP_LOGI(TAG, "%d: %d", i, msg.id[i]);
@@ -355,44 +345,41 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
     // ESP_LOGI(TAG, "is state active: %d", msg.is_state_active);
 
     msg.value_count = output_buffer[element_data_start_ind++];
-    ESP_LOGI(TAG, "WCC Event: Amount of values to update: %d", msg.value_count);
+    //ESP_LOGI(TAG, "WCC Event: Amount of values to update: %d", msg.value_count);
 
-    msg.values = (Value *)malloc(msg.value_count * sizeof(Value));
-
-    for (unsigned int value_number = 0; value_number < msg.value_count; ++value_number)
+    for (unsigned int value_number = 0; value_number < msg.value_count && value_number < MAX_VALUES_AMOUNT_IN_EVENT; ++value_number)
     {
 
-        ESP_LOGI(TAG, "WCC Event: Loading Value number : %d", value_number);
+        //ESP_LOGI(TAG, "WCC Event: Loading Value number : %d", value_number);
 
         // Allocate memory for Value
         Value value;
 
         // Get connection id
         value.connection_id = output_buffer[element_data_start_ind];
-        ESP_LOGI(TAG, "WCC Event: Connection id: %d", value.connection_id);
+        //ESP_LOGI(TAG, "WCC Event: Connection id: %d", value.connection_id);
 
         ++element_data_start_ind;
 
         // Get value length
         value.val_length = bytes_to_short(output_buffer[element_data_start_ind + 1], output_buffer[element_data_start_ind]);
-        ESP_LOGI(TAG, "WCC Event: Value length: %d", value.val_length);
+        //ESP_LOGI(TAG, "WCC Event: Value length: %d", value.val_length);
         element_data_start_ind += 2;
 
         // Load value
-        value.val = (uint8_t *)malloc(value.val_length);
 
-        for (unsigned int val_index = 0; val_index < value.val_length; ++val_index)
+        for (unsigned int val_index = 0; val_index < value.val_length && val_index < VALUE_MAX_LENGTH; ++val_index)
         {
             value.val[val_index] = output_buffer[element_data_start_ind];
             ++element_data_start_ind;
         }
 
-        ESP_LOGI(TAG, "WCC Event: Value:");
+        //ESP_LOGI(TAG, "WCC Event: Value:");
         for (int i = 0; i < value.val_length; i++)
         {
             ESP_LOGI(TAG, "%d: %d", i, value.val[i]);
         }
-        ESP_LOGI(TAG, "=======================");
+        //ESP_LOGI(TAG, "=======================");
 
         // add_led_connection(0, value.connection_id, (float)(value.val[0]) / 255.0);
 
@@ -400,7 +387,7 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
     }
 
     process_wcc_event(msg);
-    ESP_LOGI(TAG, "============================");
+    //ESP_LOGI(TAG, "============================");
 }
 
 /*Message format:
@@ -409,11 +396,9 @@ void handle_wcc_event(uint8_t *output_buffer, size_t buffer_size)
 void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
 {
 
-    Serial.println("New WCC media file message is received");
-
     // Check what should we do with a media file
     uint8_t action_type = output_buffer[0]; // 0 - stop, 1 - start, 2 - pause, 3 - delete
-    char *file_name = (char *)ps_calloc(buffer_size, sizeof(char));
+    char file_name[30];// = (char *)ps_calloc(buffer_size, sizeof(char));
 
     // Load a file name
     uint8_t filename_ind = 1;
@@ -424,7 +409,11 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
     }
 
     file_name[filename_ind] = '\0';
-    Serial.print(file_name);
+
+    Serial.println("Play audio file");
+    Serial.println(file_name);
+    Serial.println("Action type");
+    Serial.println(action_type);
 
     if (action_type >= 0 && action_type <= 2)
     {
@@ -454,7 +443,7 @@ void handle_wcc_media_file_message(uint8_t *output_buffer, size_t buffer_size)
         reload_and_send_media_files_list();
     }
 
-    free(file_name);
+    //free(file_name);
 
     ESP_LOGI(TAG, "============================");
 }

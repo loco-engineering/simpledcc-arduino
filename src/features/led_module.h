@@ -140,7 +140,7 @@ double time_from_last_check = 0;
 
 void loop_led()
 {
-    if (millis() - time_from_last_check < 200)
+    if (millis() - time_from_last_check < 50)
     {
         return;
     }
@@ -184,7 +184,6 @@ void loop_led()
                     }
                     else
                     {
-                        Serial.println("off");
 
                         led_connections[i].is_on = false;
                         led_connections[i].next_on = millis() + led_connections[i].off_duration;
@@ -205,7 +204,6 @@ void loop_led()
                     }
                     else
                     {
-                        Serial.println("on");
                         led_connections[i].is_on = true;
                         led_connections[i].next_off = millis() + led_connections[i].on_duration;
                     }

@@ -263,7 +263,7 @@ void loop_audio()
             for (uint8_t ind = 0; ind < 2 * bytes_to_read; ind += 2)
             {
                 *((int16_t *)(pcm_data + ind)) += *((int16_t *)(cur_pcm_data + ind));
-                *((int16_t *)(pcm_data + ind)) /= 2;
+                //*((int16_t *)(pcm_data + ind)) /= 2;
             }
 
             if (board_settings.media_files[file_ind].wav_data_index >= file.wav_data_size) // If we gone past end of data reset back to beginning
