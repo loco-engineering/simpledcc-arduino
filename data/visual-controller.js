@@ -178,17 +178,28 @@ export async function start_controller() {
             const func_btn = document.createElement("div");
             func_btn.innerText = `F${func_number}`;
             func_btn.classList.add('train_function_btn');
-
+            func_btn.dataset.funcId = func_number;
             func_btn.addEventListener('click', function handleClick(event) {
                 //event.preventDefault();
     
+                let state = 0;
                 if (this.classList.contains('active_function_btn') == true){
                     func_btn.classList.remove('active_function_btn');
                 }else{
                     func_btn.classList.add('active_function_btn');
+                    state = 1;
                 }
 
-    
+                console.log("clicked on " + func_btn.dataset.funcId + " state " + state)
+
+                let wcc_test_event = {};
+                let value = {};
+                wcc_test_event.id = `func_${func_btn.dataset.funcId}`;
+                wcc_test_event.is_state_active = state;
+                wcc_test_event.values = [];
+                wcc_test_event.values.push(value);
+                send_wcc_event(wcc_test_event);
+                
             });
 
             func_btn.style.height = function_btn_height + 'px';
