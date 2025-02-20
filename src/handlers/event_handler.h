@@ -500,7 +500,7 @@ void process_wcc_event(WCC_event msg)
                                         }
 
                                         serial_print((String) "Get WCC event for PWM, output " + connection.output_num + " value: " + connection_value);
-                                        add_led_connection(0, connection.output_num, (float)(connection_value) / 255.0, value_to_set.on_duration, value_to_set.off_duration, value_to_set.start_delay, id);
+                                        add_led_connection(1, connection.output_num, (float)(connection_value) / 255.0, value_to_set.on_duration, value_to_set.off_duration, value_to_set.start_delay, id);
                                     }
                                 }
                             }
@@ -537,7 +537,7 @@ void process_wcc_event(WCC_event msg)
                                         }
 
                                         serial_print((String) "Get WCC event for PWM, output " + connection.output_num + " value: " + connection_value);
-                                        remove_led_connection(0, id);
+                                        remove_led_connection(1, id);
                                     }
                                 }
                             }

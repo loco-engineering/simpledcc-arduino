@@ -199,7 +199,7 @@ export async function start_controller() {
                 wcc_test_event.values = [];
                 wcc_test_event.values.push(value);
                 send_wcc_event(wcc_test_event);
-                
+
             });
 
             func_btn.style.height = function_btn_height + 'px';
