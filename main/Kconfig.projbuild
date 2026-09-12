@@ -1,0 +1,21 @@
+menu "Simple DCC Configuration"
+
+    config DCC_DEFAULT_PIN1
+        int "Default DCC Pin 1 (IN1/DIR)"
+        default 12
+        help
+            Default GPIO pin for DCC IN1 or DIR.
+
+    config DCC_DEFAULT_PIN2
+        int "Default DCC Pin 2 (IN2/EN)"
+        default 13
+        help
+            Default GPIO pin for DCC IN2 or EN.
+
+    config DCC_SLEEP_PIN
+        int "Motor Driver Sleep/Fault Pin (Optional)"
+        default 11
+        help
+            GPIO pin to enable the motor driver out of sleep mode. Set to -1 to disable.
+
+endmenu
